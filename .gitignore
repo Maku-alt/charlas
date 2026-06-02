@@ -1,10 +1,10 @@
 # Root repo hygiene
 outputs/
-ideas-pendientes.md
-STYLE-CHARLAS.md
 
-# Keep only the top-level repo README
+# Keep only the top-level repo guidance docs
 !README.md
+!AGENTS.md
+!STYLE-CHARLAS.md
 
 # Ignore everything inside talk folders by default
 Harness Engineer/**

@@ -2,6 +2,12 @@
 
 Este repositorio agrupa materiales para distintas charlas relacionadas con Data Science, analitica aplicada y el uso practico de datos.
 
+## Documentos raiz
+
+- `README.md`: explicacion humana del repositorio
+- `AGENTS.md`: instrucciones persistentes para el agente al trabajar en estas charlas
+- `STYLE-CHARLAS.md`: sistema visual y narrativo compartido entre presentaciones
+
 ## Proposito
 
 Las charlas de este repo estan pensadas para data scientists y equipos tecnicos que trabajan con datos, modelos, experimentacion, automatizacion y mejores practicas de trabajo.
@@ -50,6 +56,11 @@ Estas charlas deben priorizar:
 - ejemplos aplicables a trabajo real de Data Science
 - comparaciones claras entre enfoques clasicos y nuevos
 
-## Idea de linea tematica
+## Linea editorial
 
-Una linea natural para futuras charlas en este repo es revisar como evolucionan las librerias clasicas del stack de Data Science y que cambios valen la pena adoptar en flujos reales de trabajo.
+Las charlas de este repo suelen combinar:
+
+- una tesis tecnica clara
+- comparaciones o tradeoffs concretos
+- una recomendacion ejecutiva
+- una slide final con mensaje de cierre e imagen editorial alineada con la tesis
