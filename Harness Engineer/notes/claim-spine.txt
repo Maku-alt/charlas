@@ -1,0 +1,28 @@
+thesis:
+The real advantage of coding agents for data science does not come only from the model. It comes from the harness that turns context, tools, memory, and verification into a reproducible operating system.
+
+audience:
+Technical data scientists and analysts working in repository-based SQL/Python workflows.
+
+one-line arc:
+Stop treating the agent like a chatbot; start treating context like an operational asset.
+
+slide list:
+1. Cover
+   claim: Harness engineering is the shift from chatting with AI to operating a reliable system around it.
+2. Myth
+   claim: Better outcomes do not come mainly from better models; they come from better execution environments.
+3. What is a harness
+   claim: Context, tools, memory, verification, and orchestration make the model useful and replaceable.
+4. Context lifecycle
+   claim: If context is the new code, it also needs generation, testing, distribution, observation, and adaptation.
+5. Simplicity paradox
+   claim: More tools often create more degradation; minimal operational surface improves reliability.
+6. Context bottleneck
+   claim: Long context alone does not scale; memory externalization and scoped subagents do.
+7. Repo pattern
+   claim: A repository can function as the operating system of the agent through protocol, tasks, memory, and review.
+8. Metrics and controls
+   claim: Context must be measured and protected like any probabilistic production system.
+9. Closing quote
+   claim: Context is the fuel; coding agents are the engine.

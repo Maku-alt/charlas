@@ -1,0 +1,22 @@
+task mode: create
+primary deck-profile: engineering-platform
+secondary profile gates: none
+required proof objects:
+- architecture/workflow map of a harnessed analytics repo
+- concrete multi-agent workflow tied to SQL/Python tasks
+- guardrails/risk-control framing
+- adoption roadmap for a data science team
+source/asset requirements:
+- use only verified textual sources
+- no fabricated company logos or pseudo-product marks
+- rely on typography, layout, and abstract geometry
+brand authenticity constraints:
+- no official brand marks from external sources unless verified and necessary
+- avoid decorative identity assets
+profile-specific QA gates:
+- preserve technical precision while simplifying visually
+- claims must point to repo structures, roles, or controls
+- workflow slide must show technically meaningful roles
+known missing inputs:
+- exact audience confirmation from user
+- reliable transcript access for both YouTube videos in current environment

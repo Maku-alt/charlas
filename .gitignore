@@ -1,0 +1,40 @@
+# Root repo hygiene
+outputs/
+ideas-pendientes.md
+STYLE-CHARLAS.md
+
+# Keep only the top-level repo README
+!README.md
+
+# Ignore everything inside talk folders by default
+Harness Engineer/**
+Evolucion Stack Clasico DS/**
+El Eterno Retorno/**
+
+# Re-include only the publishable structure per talk
+!Harness Engineer/
+!Harness Engineer/README.md
+!Harness Engineer/*.pptx
+!Harness Engineer/notes/
+!Harness Engineer/notes/**
+
+!Evolucion Stack Clasico DS/
+!Evolucion Stack Clasico DS/README.md
+!Evolucion Stack Clasico DS/*.pptx
+!Evolucion Stack Clasico DS/notes/
+!Evolucion Stack Clasico DS/notes/**
+
+!El Eterno Retorno/
+!El Eterno Retorno/README.md
+!El Eterno Retorno/*.pptx
+!El Eterno Retorno/notes/
+!El Eterno Retorno/notes/**
+
+# Explicit technical artifacts to keep out even if structure changes
+**/slides/
+**/slides/**
+**/assets/
+**/assets/**
+**/validation/
+**/validation/**
+**/artifact-build-manifest.json

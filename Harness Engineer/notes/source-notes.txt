@@ -1,0 +1,17 @@
+Primary sources
+- User context from thread: current workflow with Codex/Cursor in repo, heavy SQL usage, Python for modeling, and emerging use of specialized agents for query/review/comment tasks.
+- betta-tech/ejemplo-harness-subagentes README and linked repo files:
+  https://github.com/betta-tech/ejemplo-harness-subagentes
+  Key points used: repo-as-system, AGENTS.md map, feature_list.json scope control, progress/ disk state, leader/implementer/reviewer split, init.sh executable verification.
+- OpenAI article:
+  https://openai.com/ms-BN/index/harness-engineering/
+  Key points used: repository knowledge as system of record, agent legibility, enforcing invariants instead of micromanaging implementations.
+
+Secondary / contextual sources
+- YouTube video q9Vaoz0hd0U: transcript extracted on 2026-05-05 through the configured yt-dlp MCP package path. Key claims used: harness = context + tools + memory + validation; simpler tools can outperform hyper-specialized wrappers; context degrades before it fills; verification-first.
+- YouTube video bSG9wUYaHWU: transcript extracted on 2026-05-05 through the configured yt-dlp MCP package path. Key claims used: "context is the new code"; Context Development Lifecycle = generate, test, distribute, observe, adapt; evals as probabilistic tests; observability and feedback loops.
+
+Usage policy for deck
+- Attribute exact repo mechanics only to the GitHub repo.
+- Attribute context lifecycle and testing framing to the verified transcripts and OpenAI article where appropriate.
+- Claims taken from the videos should be presented as statements from the speakers unless separately verified in a primary written source.
