@@ -1,5 +1,16 @@
 # Root repo hygiene
 outputs/
+.venv/
+venv/
+env/
+**/node_modules/
+**/node_modules/**
+**/preview/
+**/preview/**
+**/layout/
+**/layout/**
+**/qa/
+**/qa/**
 
 # Keep only the top-level repo guidance docs
 !README.md
@@ -31,6 +42,7 @@ El Eterno Retorno/**
 !El Eterno Retorno/notes/**
 
 # Explicit technical artifacts to keep out even if structure changes
+researcher.md
 **/slides/
 **/slides/**
 **/assets/

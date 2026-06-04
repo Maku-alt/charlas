@@ -20,6 +20,36 @@ Cuando el usuario llegue con una idea de charla, el agente debe:
 5. dejar notas de soporte, baseline tecnico y material validado cuando corresponda
 6. construir un `pptx` editable y visualmente fuerte
 
+Convencion minima recomendada dentro de cada carpeta de charla:
+
+- `notes/`: narrativa, fuentes, claims, material validado y bibliografia
+- `slides/` o `deck/`: fuente editable y exportables de la presentacion
+- `assets/`: imagenes, prompts visuales y recursos de soporte cuando existan
+- `review/`: observaciones, ajustes y chequeos finales cuando existan
+
+Cuando convenga, separar explicitamente el flujo en agentes especializados:
+
+- `orchestrator-charlas`: coordinar el flujo, dependencias y bifurcaciones entre agentes
+- `researcher-charlas`: explorar el tema, investigar, proponer tesis y converger narrativa
+- `deck-builder-charlas`: tomar una direccion ya discutida y convertirla en deck editable
+- `image-closer-charlas`: resolver la metafora visual y la imagen editorial final del cierre
+- `review-charlas`: revisar deck, cierre e imagen final contra los lineamientos del repo
+
+No asumir que todo hallazgo del research entra automaticamente a la presentacion.
+
+Si el framing principal ya esta claro y existen subpreguntas independientes, el research puede paralelizarse antes de converger de nuevo en una sola narrativa.
+
+Orden recomendado:
+
+1. `orchestrator-charlas`
+2. `researcher-charlas`
+3. research en paralelo si aplica
+4. `deck-builder-charlas`
+5. `image-closer-charlas`
+6. `review-charlas`
+
+`deck-builder-charlas` e `image-closer-charlas` pueden bifurcarse en paralelo cuando la tesis, el mensaje final, la cita y el tono ya estan suficientemente claros.
+
 ## Patron narrativo preferido
 
 Por defecto, las charlas deben incluir:
