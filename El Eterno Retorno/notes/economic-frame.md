@@ -1,14 +1,14 @@
-# Marco economico para madurar la hipotesis
+# Marco económico para madurar la hipótesis
 
 Fecha de referencia: 2026-06-02
 
-## 1. Lo primero: corregir la conversacion de modelos
+## 1. Lo primero: corregir la conversación de modelos
 
 Para que la charla sea precisa, conviene hablar de modelos reales y precios reales del momento.
 
 ### OpenAI API pricing oficial
 
-Segun la pagina oficial de precios de OpenAI al 2026-06-02:
+Según la página oficial de precios de OpenAI al 2026-06-02:
 
 - `GPT-5.5`: `input $5 / 1M tokens`, `output $30 / 1M tokens`
 - `GPT-5.4`: `input $2.5 / 1M tokens`, `output $15 / 1M tokens`
@@ -16,7 +16,7 @@ Segun la pagina oficial de precios de OpenAI al 2026-06-02:
 
 ### Anthropic API pricing oficial
 
-Segun la documentacion oficial de Anthropic al 2026-06-02:
+Según la documentación oficial de Anthropic al 2026-06-02:
 
 - `Claude Opus 4.8`: `input $5 / 1M tokens`, `output $25 / 1M tokens`
 - `Claude Sonnet 4.6`: `input $3 / 1M tokens`, `output $15 / 1M tokens`
@@ -24,29 +24,29 @@ Segun la documentacion oficial de Anthropic al 2026-06-02:
 
 Esto importa porque la charla debe evitar hablar de versiones imprecisas o desactualizadas.
 
-## 2. Senales de tension de costos
+## 2. Señales de tensión de costos
 
-### Casos de mercado utiles para la narrativa
+### Casos de mercado útiles para la narrativa
 
-- Axios publico el `2026-05-28` que empresas estan empezando a cuestionar si el gasto creciente en IA entrega retornos claros.
-- El mismo articulo dice que un cliente de un consultor gasto `500 millones de dolares en un solo mes` al no poner limites de uso sobre Claude.
-- Fortune publico el `2026-05-26` que Uber habia consumido su presupuesto anual de IA en cuatro meses y que su COO dijo que el gasto se estaba volviendo mas dificil de justificar.
-- La documentacion de Claude Code dice que en despliegues enterprise el costo promedio puede estar alrededor de `150 a 250 dolares por desarrollador por mes`, con alta varianza segun uso y automatizacion.
+- Axios publicó el `2026-05-28` que empresas están empezando a cuestionar si el gasto creciente en IA entrega retornos claros.
+- El mismo artículo dice que un cliente de un consultor gastó `500 millones de dólares en un solo mes` al no poner límites de uso sobre Claude.
+- Fortune publicó el `2026-05-26` que Uber había consumido su presupuesto anual de IA en cuatro meses y que su COO dijo que el gasto se estaba volviendo más difícil de justificar.
+- La documentación de Claude Code dice que en despliegues enterprise el costo promedio puede estar alrededor de `150 a 250 dólares por desarrollador por mes`, con alta varianza según uso y automatización.
 
-### Casos adicionales que si se pueden citar
+### Casos adicionales que sí se pueden citar
 
-- Axios reporto el `2026-05-28` que Microsoft habia cancelado la mayoria de sus licencias internas de Claude Code, en parte por costos, citando a The Verge.
-- The Information reporto el `2026-04-08` que Meta habia desmontado un leaderboard interno de tokens llamado `Claudeonomics`.
-- Fortune reporto el `2026-05-12` que Amazon habia tenido un patron similar de `tokenmaxxing`, con uso incentivado por rankings internos.
+- Axios reportó el `2026-05-28` que Microsoft había cancelado la mayoría de sus licencias internas de Claude Code, en parte por costos, citando a The Verge.
+- The Information reportó el `2026-04-08` que Meta había desmontado un leaderboard interno de tokens llamado `Claudeonomics`.
+- Fortune reportó el `2026-05-12` que Amazon había tenido un patrón similar de `tokenmaxxing`, con uso incentivado por rankings internos.
 
-### Casos que no conviene afirmar todavia
+### Casos que no conviene afirmar todavía
 
-No encontre evidencia suficientemente solida y verificable para usar en la charla afirmaciones especificas sobre:
+No encontré evidencia suficientemente sólida y verificable para usar en la charla afirmaciones específicas sobre:
 
 - Rappi
 - Kereqi o nombres parecidos mencionados oralmente
 
-Si aparecen luego fuentes primarias o reportes solidos, se pueden agregar. Por ahora conviene no citarlos como hecho.
+Si aparecen luego fuentes primarias o reportes sólidos, se pueden agregar. Por ahora conviene no citarlos como hecho.
 
 ## 3. Mini escenarios para usar en la charla
 
@@ -73,7 +73,7 @@ Supuesto mensual por persona:
 Lectura:
 
 - para 50 personas, el costo ya puede ser relevante
-- pero todavia no necesariamente justifica infraestructura propia
+- pero todavía no necesariamente justifica infraestructura propia
 - en muchos casos, la nube sigue ganando por simplicidad
 
 ### Escenario B: 200 personas, uso intensivo y agentes
@@ -96,11 +96,11 @@ Supuesto mensual por persona:
 
 Lectura:
 
-- a este nivel, la pregunta on-premise o privada deja de sonar exotica
+- a este nivel, la pregunta on-premise o privada deja de sonar exótica
 - no porque la nube sea mala
-- sino porque el gasto recurrente ya amerita una comparacion seria contra alternativas de infraestructura
+- sino porque el gasto recurrente ya amerita una comparación seria contra alternativas de infraestructura
 
-## 4. Que tendria que pasar para que on-premise tenga sentido
+## 4. Qué tendría que pasar para que on-premise tenga sentido
 
 On-premise o infraestructura controlada solo empieza a ser defendible si se cumplen varias condiciones al mismo tiempo:
 
@@ -108,7 +108,7 @@ On-premise o infraestructura controlada solo empieza a ser defendible si se cump
 2. volumen alto y recurrente
 3. modelo open source suficientemente bueno para el caso de uso
 4. capacidad de operar hardware, serving, monitoreo y seguridad
-5. tolerancia a menor elasticidad y a ciclos de renovacion de infraestructura
+5. tolerancia a menor elasticidad y a ciclos de renovación de infraestructura
 
 Si faltan esas condiciones, la nube suele seguir siendo mejor.
 
@@ -118,24 +118,24 @@ Si faltan esas condiciones, la nube suele seguir siendo mejor.
 
 - acceso inmediato a frontier models
 - elasticidad
-- cero operacion de hardware
+- cero operación de hardware
 - velocidad para experimentar
-- mejor opcion para equipos pequenos o demanda variable
+- mejor opción para equipos pequeños o demanda variable
 
-### Lo que podria ganar infraestructura controlada
+### Lo que podría ganar infraestructura controlada
 
 - costo marginal menor a alto volumen
-- mas control sobre datos y cumplimiento
+- más control sobre datos y cumplimiento
 - mejor previsibilidad de costos
 - posibilidad de ajustar o comprimir modelos open source
 
 ### Lo que cuesta volver
 
 - comprar o alquilar hardware especializado
-- tener equipo de plataforma o MLOps mas fuerte
+- tener equipo de plataforma o MLOps más fuerte
 - operar disponibilidad y capacidad
 - lidiar con refresh de infraestructura
-- aceptar que no siempre se tendra la calidad del mejor modelo frontier
+- aceptar que no siempre se tendrá la calidad del mejor modelo frontier
 
 ## 6. Tesis recomendada para la charla
 
@@ -145,15 +145,15 @@ La mejor tesis no es:
 
 La mejor tesis es:
 
-- "el costo de la inferencia LLM esta empujando a las empresas no a abandonar la nube, sino a redisenar sus arquitecturas hacia esquemas mas hibridos, mas disciplinados y mas sensibles al costo por workload"
+- "el costo de la inferencia LLM está empujando a las empresas no a abandonar la nube, sino a rediseñar sus arquitecturas hacia esquemas más híbridos, más disciplinados y más sensibles al costo por workload"
 
 ## 7. Conclusiones usables para la charla
 
-1. El problema no es el uso de IA, sino el uso sin finops ni gobierno.
+1. El problema no es el uso de IA, sino el uso sin FinOps ni gobierno.
 2. El primer movimiento racional no es volver a on-premise: es medir mejor.
 3. El segundo movimiento racional es segmentar workloads.
-4. Solo despues de eso tiene sentido evaluar infraestructura propia o privada.
-5. El retorno no es al datacenter clasico; es a una arquitectura hibrida con control economico.
+4. Solo después de eso tiene sentido evaluar infraestructura propia o privada.
+5. El retorno no es al datacenter clásico; es a una arquitectura híbrida con control económico.
 
 ## Fuentes principales
 

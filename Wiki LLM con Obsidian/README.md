@@ -22,9 +22,6 @@ Data Scientists y equipos tecnicos que trabajan con research, repositorios, deci
 
 ## Estado
 
-Research en curso con foco en:
+Pendiente de revision final.
 
-- patron original de Karpathy
-- implementaciones operativas recientes
-- estructura minima para usarlo en un repo real
-- limites, riesgos y cuando no conviene
+La tesis, el caso practico, la demo en Obsidian y el PPTX ya estan construidos. Falta validar la version final antes de marcar la charla como cerrada.

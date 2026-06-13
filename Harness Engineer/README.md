@@ -34,3 +34,7 @@ Data scientists y analistas tecnicos que trabajan en repositorios con SQL, Pytho
 - `Harness-Engineering-Data-Science.pptx`: presentacion final
 - `notes/`: narrativa, fuentes y bibliografia
 - `slides/`: fuente editable de la presentacion
+
+## Estado
+
+Revisada.

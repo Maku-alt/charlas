@@ -1,4 +1,8 @@
-# Review Final
+# Borrador de Review Final
+
+## Estado
+
+Pendiente de validacion final.
 
 ## Hallazgos priorizados
 

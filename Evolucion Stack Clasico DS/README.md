@@ -33,3 +33,7 @@ La charla debe priorizar:
 4. Que queda bloqueado hasta Python 3.11+
 5. Librerias que si traen mejoras de valor
 6. Recomendaciones de adopcion por prioridad
+
+## Estado
+
+Revisada.

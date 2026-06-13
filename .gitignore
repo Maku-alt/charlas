@@ -50,3 +50,6 @@ researcher.md
 **/validation/
 **/validation/**
 **/artifact-build-manifest.json
+
+# Obsidian local UI state
+**/.obsidian/workspace*.json

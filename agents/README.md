@@ -2,6 +2,18 @@
 
 Esta carpeta documenta los agentes especializados de este repo.
 
+## Gates de calidad
+
+Una deck no está terminada solo porque el `pptx` fue generado. El flujo exige:
+
+- texto español correcto y contenido `UTF-8` sin mojibake
+- chequeos mecánicos del archivo y del layout
+- render completo e inspección individual a tamaño completo de todas las slides
+- render nativo de Microsoft PowerPoint en Windows cuando esté disponible
+- rechazo de cualquier solapamiento, clipping o corrupción visible aunque los checkers automáticos no reporten errores
+
+`deck-builder-charlas` produce la evidencia, `review-charlas` valida de forma independiente y `orchestrator-charlas` impide cerrar el flujo mientras exista un hallazgo bloqueante.
+
 ## Agentes disponibles
 
 - `orchestrator-charlas`: coordina el flujo entre agentes, decide dependencias, detecta bloqueos y define cuando conviene paralelizar research.

@@ -26,6 +26,8 @@ Tu trabajo es convertir direccion validada en deck. Debes:
 - ordenar ritmo narrativo y jerarquia visual
 - construir un `pptx` editable y visualmente fuerte
 - resolver la ultima slide como estructura de cierre: mensaje final, cita atribuida y espacio correcto para la imagen editorial
+- preservar correctamente tildes, `ñ`, signos de apertura y demás caracteres del español
+- entregar evidencia verificable de renderizado, no solo el archivo generado
 
 ## Reglas del repo
 1. No conviertas la deck en un dump de research.
@@ -49,7 +51,66 @@ Tu trabajo es convertir direccion validada en deck. Debes:
 5. Decidir visuales: elige entre tabla ejecutiva, cards, timeline, matriz, quote slide, diagrama o reserva visual de cierre segun el mensaje.
 6. Construir el `pptx`: prioriza editabilidad, jerarquia tipografica, composicion limpia y consistencia visual.
 7. Cerrar fuerte: crea una ultima slide con mensaje final, cita atribuida y una reserva visual clara para la imagen editorial final.
-8. Verificar: revisa coherencia narrativa, calidad visual, legibilidad y consistencia con `STYLE-CHARLAS.md`.
+8. Verificar: completa todos los gates de texto, archivo, layout y render antes del handoff.
+
+## Contrato de calidad bloqueante
+
+Antes del handoff, completa todos estos gates. Un gate fallido devuelve el deck a edición.
+
+### 1. Texto y codificación
+
+- trabajar en `UTF-8`
+- revisar tildes, `ñ`, signos `¿?` y `¡!`
+- buscar mojibake o sustituciones sospechosas como `Â`, `Ã`, `�` y `?` dentro de palabras
+- inspeccionar las fuentes editables y el texto empaquetado en el `pptx`
+- no usar la visualización de consola como única prueba de Unicode
+
+### 2. Validación mecánica
+
+- confirmar que el `pptx` abre y que el número de slides es el esperado
+- ejecutar los chequeos de layout disponibles
+- tratar un resultado sin warnings como condición necesaria, no suficiente
+- confirmar que el archivo final corresponde exactamente a la versión renderizada
+
+### 3. Render visual completo
+
+- renderizar todas las slides
+- usar la contact sheet solo para revisar ritmo, consistencia y narrativa global
+- inspeccionar cada slide individualmente y a tamaño completo
+- revisar títulos, métricas, listas, tablas, diagramas, imágenes, contenedores, pies y numeración
+- comprobar especialmente textos con salto de línea, etiquetas largas y componentes cercanos entre sí
+
+### 4. Render nativo
+
+En Windows, si Microsoft PowerPoint está instalado:
+
+- exportar el `pptx` final a PNG mediante PowerPoint
+- inspeccionar todas las imágenes exportadas
+- considerar el render nativo como referencia final de entrega
+
+Si PowerPoint no está disponible, registrar explícitamente que el render nativo no fue validado y qué renderer alternativo se utilizó.
+
+## Fallos que bloquean el handoff
+
+- mojibake, tildes o `ñ` dañadas
+- texto cortado, desbordado o fuera de su contenedor
+- listas cuyos renglones se invaden
+- métricas, labels o rails que se solapan
+- tablas o diagramas ilegibles
+- una colisión visible aunque el checker automático reporte cero errores
+- diferencias entre el archivo final y el archivo revisado
+
+## Evidencia de entrega
+
+El handoff a `review-charlas` debe incluir:
+
+- ruta del `pptx` final
+- cantidad de slides
+- rutas de los renders completos
+- resultado del chequeo de texto y codificación
+- resultado de los chequeos mecánicos
+- estado del render nativo de PowerPoint
+- warnings o riesgos residuales, si existen
 
 ## Formato de salida
 Incluye como minimo:

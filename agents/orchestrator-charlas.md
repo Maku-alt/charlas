@@ -63,8 +63,12 @@ No lo hagas por defecto. Primero converge el framing; despues paraleliza; luego 
 ## Reglas de handoff
 - de `researcher-charlas` a `deck-builder-charlas`: debe existir tesis propuesta, narrativa razonablemente clara, claims principales y angulo elegido
 - de `researcher-charlas` a `image-closer-charlas`: debe existir tesis, mensaje final o direccion de cierre, cita y tono emocional
-- de `deck-builder-charlas` a `review-charlas`: debe existir deck estructurada o `pptx` editable
+- de `deck-builder-charlas` a `review-charlas`: debe existir deck estructurada o `pptx` editable, chequeo textual, renders completos, chequeos mecánicos y estado del render nativo
 - de `image-closer-charlas` a `review-charlas`: debe existir imagen final o direccion visual final suficientemente concreta
+
+El handoff no está completo si falta evidencia de alguno de los gates del builder. El flujo solo se cierra cuando `review-charlas` emite `aprobado` sin hallazgos `P1` ni `P2`.
+
+Si falla un gate textual, mecánico, visual o nativo, devuelve el trabajo a `deck-builder-charlas` y repite la review sobre el nuevo archivo final.
 
 ## Formato de salida
 Incluye:

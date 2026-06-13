@@ -2,20 +2,21 @@
 
 ## Fase actual
 
-Cerrada.
+Pendiente de revision final.
 
 ## Agentes ejecutados
 
 1. `researcher-charlas`
 2. `deck-builder-charlas`
 3. `image-closer-charlas`
-4. `review-charlas`
+4. `review-charlas` (primera pasada completada; validacion final pendiente)
 
 ## Por que este orden
 
 - la tesis ya estaba suficientemente convergida para pasar de research a caso practico y luego a deck
 - el cierre visual pudo correr en paralelo una vez fijados mensaje final y tono emocional
-- la review solo corrio despues de exportar el PPTX y revisar previews
+- existe una primera pasada de review sobre el PPTX y sus previews
+- la charla no se considera cerrada hasta completar la validacion final
 
 ## Insumos usados
 
