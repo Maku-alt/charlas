@@ -14,6 +14,7 @@ env/
 
 # Keep only the top-level repo guidance docs
 !README.md
+!maestro_charlas.md
 !AGENTS.md
 !STYLE-CHARLAS.md
 
@@ -21,6 +22,11 @@ env/
 Harness Engineer/**
 Evolucion Stack Clasico DS/**
 El Eterno Retorno/**
+Wiki LLM con Obsidian/**
+SDD-IAgentica/**
+IA Agentica de Conversacion a Sistema/**
+Knowledge Repo 01 - Cuando Documentar Tablas se Vuelve Arquitectura de Conocimiento/**
+Knowledge Repo 02 - Buscar No Es Entender/**
 
 # Re-include only the publishable structure per talk
 !Harness Engineer/
@@ -40,6 +46,56 @@ El Eterno Retorno/**
 !El Eterno Retorno/*.pptx
 !El Eterno Retorno/notes/
 !El Eterno Retorno/notes/**
+
+!Wiki LLM con Obsidian/
+!Wiki LLM con Obsidian/README.md
+!Wiki LLM con Obsidian/*.pptx
+!Wiki LLM con Obsidian/notes/
+!Wiki LLM con Obsidian/notes/**
+!Wiki LLM con Obsidian/review/
+!Wiki LLM con Obsidian/review/**
+!Wiki LLM con Obsidian/demo-charlas/
+!Wiki LLM con Obsidian/demo-charlas/**
+
+!SDD-IAgentica/
+!SDD-IAgentica/README.md
+!SDD-IAgentica/*.pptx
+!SDD-IAgentica/specs/
+!SDD-IAgentica/specs/**
+!SDD-IAgentica/notes/
+!SDD-IAgentica/notes/**
+!SDD-IAgentica/review/
+!SDD-IAgentica/review/**
+
+!IA Agentica de Conversacion a Sistema/
+!IA Agentica de Conversacion a Sistema/README.md
+!IA Agentica de Conversacion a Sistema/*.pptx
+!IA Agentica de Conversacion a Sistema/specs/
+!IA Agentica de Conversacion a Sistema/specs/**
+!IA Agentica de Conversacion a Sistema/notes/
+!IA Agentica de Conversacion a Sistema/notes/**
+!IA Agentica de Conversacion a Sistema/review/
+!IA Agentica de Conversacion a Sistema/review/**
+
+!Knowledge Repo 01 - Cuando Documentar Tablas se Vuelve Arquitectura de Conocimiento/
+!Knowledge Repo 01 - Cuando Documentar Tablas se Vuelve Arquitectura de Conocimiento/README.md
+!Knowledge Repo 01 - Cuando Documentar Tablas se Vuelve Arquitectura de Conocimiento/*.pptx
+!Knowledge Repo 01 - Cuando Documentar Tablas se Vuelve Arquitectura de Conocimiento/specs/
+!Knowledge Repo 01 - Cuando Documentar Tablas se Vuelve Arquitectura de Conocimiento/specs/**
+!Knowledge Repo 01 - Cuando Documentar Tablas se Vuelve Arquitectura de Conocimiento/notes/
+!Knowledge Repo 01 - Cuando Documentar Tablas se Vuelve Arquitectura de Conocimiento/notes/**
+!Knowledge Repo 01 - Cuando Documentar Tablas se Vuelve Arquitectura de Conocimiento/review/
+!Knowledge Repo 01 - Cuando Documentar Tablas se Vuelve Arquitectura de Conocimiento/review/**
+
+!Knowledge Repo 02 - Buscar No Es Entender/
+!Knowledge Repo 02 - Buscar No Es Entender/README.md
+!Knowledge Repo 02 - Buscar No Es Entender/*.pptx
+!Knowledge Repo 02 - Buscar No Es Entender/specs/
+!Knowledge Repo 02 - Buscar No Es Entender/specs/**
+!Knowledge Repo 02 - Buscar No Es Entender/notes/
+!Knowledge Repo 02 - Buscar No Es Entender/notes/**
+!Knowledge Repo 02 - Buscar No Es Entender/review/
+!Knowledge Repo 02 - Buscar No Es Entender/review/**
 
 # Explicit technical artifacts to keep out even if structure changes
 researcher.md

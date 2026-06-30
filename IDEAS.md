@@ -6,23 +6,6 @@ Backlog vivo de temas, hipotesis y lineas de investigacion que podrian convertir
 
 ## Ideas activas
 
-### Wiki LLM con Obsidian
-
-Pregunta:
-`Puede un stack personal o de equipo basado en Obsidian convertirse en una wiki LLM realmente util para trabajo de conocimiento?`
-
-Angulos posibles:
-
-- Obsidian como memoria externa para agentes o equipos
-- limites entre notas humanas, retrieval y contexto operativo
-- cuando una wiki mejora el trabajo y cuando solo agrega friccion
-- diferencias entre knowledge base pasiva y harness activo
-
-Valor potencial:
-
-- conecta trabajo de conocimiento, memoria operativa y tooling cotidiano
-- puede interesar tanto a Data Science como a equipos tecnicos mas amplios
-
 ### Harness versus LLM suelto
 
 Pregunta:
@@ -114,3 +97,13 @@ Antes de volverse charla, una idea deberia madurar al menos hasta:
 - audiencia
 - angulo diferencial
 - lista de fuentes o frentes de research
+
+## Ideas promovidas a charla
+
+### Wiki LLM con Obsidian
+
+Estado:
+`Wiki LLM con Obsidian/` ya existe como charla construida con PPTX, notas, review y demo Obsidian. El maestro la mantiene como pendiente de revision final.
+
+Pregunta original:
+`Puede un stack personal o de equipo basado en Obsidian convertirse en una wiki LLM realmente util para trabajo de conocimiento?`

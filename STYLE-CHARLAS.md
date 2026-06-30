@@ -87,23 +87,25 @@ Las familias de slide mas usadas en este repo son:
 - no usar nombres de empresas si no hay fuente firme
 - cuando una slide use mercado, combinar al menos un caso extremo con un caso corporativo conocido
 
-## Cierre recomendado
+## Cierre editorial
 
 Toda charla debe cerrar con:
 
 - una conclusion estrategica de una linea
-- una cita breve o un mensaje reflexivo atribuido
-- un fondo editorial que converse con el tema, no un wallpaper generico
+- una cita breve, real y atribuida a un referente del dominio
+- una imagen editorial protagonista que converse con la tesis
 
-### Reglas del fondo final
+Solo si no se encuentra una cita adecuada tras revisar fuentes y referentes, usa un claim propio como ultimo recurso, sin llamarlo cita ni atribuirlo.
 
-El fondo final:
+### Reglas de la imagen final
 
-- debe ser una sola imagen fuerte, no una slide tecnica escondida dentro de una imagen
-- no debe repetir tablas, dashboards, bullets ni diagramas ya vistos en la deck
-- debe reforzar la tesis de la charla desde una metafora visual
-- debe sentirse mas editorial que explicativo
-- debe dejar aire suficiente para superponer la cita o mensaje final
+La imagen final:
+
+- debe ser el elemento principal, idealmente full-bleed o casi full-bleed, aunque quede transparentada o parcialmente cubierta por texto
+- debe ser una sola escena fuerte, no una slide tecnica escondida dentro de una imagen
+- debe evitar tablas, dashboards, bullets, diagramas, iconografia repetida y metaforas genericas
+- debe amplificar la tesis con una metafora visual clara y memorable
+- debe dejar una zona de lectura limpia para un mensaje breve y la atribucion de la cita
 
 ### Diferenciacion entre charlas
 

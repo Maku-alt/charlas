@@ -1,0 +1,49 @@
+{
+  "confirmed_causes": [
+    "La sesion principal acumulo un prefijo grande y repetido: 17.74M input tokens, 16.81M cached input tokens y solo 42k output tokens.",
+    "La sesion principal uso multi-agent de forma intensa: 14 spawn_agent, 31 wait_agent y 12 close_agent, ademas de 127 checkpoints.",
+    "Los mayores saltos de la sesion principal fueron de aproximadamente 180k-195k tokens por checkpoint, casi todos cached input.",
+    "El hilo principal leyo roles, prompts, specs, agent-log y outputs de herramientas antes y durante la orquestacion; esos outputs quedaron en el transcript del padre.",
+    "Las fases de review visual amplificaron costo con view_image y renders, pero no explican por si solas la sesion principal mas cara, que no dependio de view_image."
+  ],
+  "likely_causes": [
+    "El orquestador reenvio un historial/prefijo enorme en turnos posteriores, y prompt caching oculto el costo operativo visible aunque siguio contando contra cuota.",
+    "Los handoffs y outputs de wait_agent/close_agent quedaron persistidos en el hilo principal con mas detalle del necesario para decidir pasa/no pasa.",
+    "El contrato SDD pidio contexto acotado, pero no impuso limites mecanicos de bytes/tokens para handoffs, agent-log, renders o evidencia de build.",
+    "fork_context=false no funciono como proteccion suficiente de cuota en este flujo, porque el padre siguio acumulando la coordinacion, resultados y evidencia.",
+    "La combinacion de subagentes secuenciales, rechecks, agent-log y renders produjo fan-out de sesiones mas costo acumulado en el hilo padre."
+  ],
+  "possible_causes": [
+    "Alguna parte de wait_agent o close_agent pudo haber devuelto mas historial del subagente que un resumen compacto, pero los JSONL locales no prueban si fue historial completo.",
+    "El reviewer y el builder pudieron releer evidencia de build y renders mas veces de lo necesario.",
+    "La lectura de skills completas y tool metadata al inicio elevo el prefijo base de algunas sesiones.",
+    "Los artefactos binarios no parecen serializados completos como texto, pero sus renders y salidas visuales si entraron como outputs grandes en sesiones de review."
+  ],
+  "unknowns": [
+    "La telemetria local no separa con precision facturacion interna de prompt cache versus reconstruccion de contexto.",
+    "No hay evidencia local suficiente para afirmar que Codex copio historial completo de subagentes al padre; solo se observa que el padre acumulo llamadas, handoffs y outputs.",
+    "No se pudo confirmar si existen limites internos de agents.max_threads o agents.max_depth no expuestos en config.toml."
+  ],
+  "recommended_changes": [
+    "Restringir subagentes por defecto: usarlos solo para research o review cuando el beneficio supere el costo; build de PPT deberia correr single-agent cuando la narrativa ya esta cerrada.",
+    "Reemplazar notes/agent-log.md por notes/phase-summary.md como unico contrato operativo leido por el padre.",
+    "Cambiar handoff a contrato duro: maximo 300-500 palabras, sin logs completos, sin comandos completos, sin renders embebidos, solo resumen, pasa/no pasa, rutas y siguiente accion.",
+    "Separar evidencia pesada de conversacion: guardar build-report, extracted-text y rutas de renders en archivos, y pasar al padre solo un manifiesto compacto.",
+    "Imponer limite de lectura del orquestador: leer solo notes/phase-summary.md; no leer agent-log ni reportes largos para decidir transiciones.",
+    "Limitar review visual: usar contact sheet una vez, inspeccion selectiva de slides riesgosas y rutas a renders, evitando view_image repetido salvo defecto concreto.",
+    "Agregar modo compact obligatorio para charlas con tesis clara y PPT de 8-10 slides.",
+    "Probar fork_context=true o modo chat separado para fases caras y comparar token usage antes/despues."
+  ],
+  "files_to_modify_later": [
+    "AGENTS.md",
+    "agents/orchestrator-charlas.md",
+    "agents/README.md",
+    "agents/deck-builder-charlas.md",
+    "agents/review-charlas.md",
+    "templates/charlas-sdd/README.md",
+    "templates/charlas-sdd/prompts/run-build.md",
+    "templates/charlas-sdd/prompts/run-review.md",
+    "templates/charlas-sdd/compact/build-review-package.md",
+    "Knowledge Repo 01 - Cuando Documentar Tablas se Vuelve Arquitectura de Conocimiento/notes/phase-summary.md"
+  ]
+}

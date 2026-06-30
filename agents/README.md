@@ -1,99 +1,71 @@
 # Agentes de Charlas
 
-Esta carpeta documenta los agentes especializados de este repo.
+Esta carpeta contiene roles especializados. El chat principal usa `orchestrator-charlas` para preparar el paquete de fase y no debe absorber el trabajo pesado de cada rol.
+
+## Roles
+- `orchestrator-charlas`: coordina fase, dependencias, launch, paralelizacion y bloqueos.
+- `researcher-charlas`: investiga, tensiona tesis y devuelve research discutible.
+- `narrative-charlas`: convierte research convergido en narrativa de `8-10 slides`.
+- `deck-builder-charlas`: construye `pptx` editable con la skill `pptx` y evidencia de QA.
+- `image-closer-charlas`: define metafora e imagen editorial de cierre.
+- `review-charlas`: valida el artefacto exacto antes de cerrar.
+
+## Paquete de fase
+Cada fase pesada debe ejecutarse con contexto acotado:
+
+- rol especializado desde `agents/*.md`
+- spec desde `specs/` o `templates/charlas-sdd/`
+- prompt desde `templates/charlas-sdd/prompts/`
+- artefactos previos estrictamente necesarios
+- `model`, `reasoning_effort` y `fork_context: false` explicitos
+
+El rol no es opcional. Por ejemplo, narrativa requiere `agents/narrative-charlas.md` ademas de `narrative-spec.md` y `run-narrative.md`.
+
+## Mapeo rapido
+| Fase | Rol | Spec | Prompt |
+|---|---|---|---|
+| research | `researcher-charlas` | `research-spec.md` | `run-research.md` |
+| narrativa | `narrative-charlas` | `narrative-spec.md` | `run-narrative.md` |
+| build | `deck-builder-charlas` | `build-spec.md` | `run-build.md` |
+| imagen final | `image-closer-charlas` | cierre en `narrative-spec.md` o `build-spec.md` | `run-image-close.md` |
+| review | `review-charlas` | `review-spec.md` | `run-review.md` |
+
+## Dependencias
+- `narrative-charlas` depende de research o tesis convergida.
+- `deck-builder-charlas` depende de narrativa aprobada.
+- `image-closer-charlas` depende de tesis, mensaje final, cita real de referente o fallback justificado, y tono claros.
+- `review-charlas` depende de deck parcial o final, cierre y evidencia de build.
+- Si hay duda sobre fase o dependencias, empezar por `orchestrator-charlas`.
+
+`deck-builder-charlas` e `image-closer-charlas` pueden correr en paralelo solo si mensaje final, cita/fallback y direccion de cierre ya existen o se fijan antes.
+
+## Artefactos obligatorios
+- Si hubo research externo, debe existir `notes/bibliografia.md`.
+- Si corrio cualquier fase pesada, debe existir `notes/agent-log.md`.
+- Cada entrada del log debe registrar fase, agente, `model`, `reasoning_effort`, estado, artefactos, errores o bloqueos, y siguiente accion.
 
 ## Gates de calidad
+Una deck no esta terminada solo porque existe un `pptx`. El flujo exige:
 
-Una deck no está terminada solo porque el `pptx` fue generado. El flujo exige:
+- texto espanol correcto y `UTF-8` sin mojibake
+- chequeos mecanicos de archivo y layout
+- render completo e inspeccion individual a tamano completo
+- render nativo de PowerPoint en Windows cuando este disponible
+- rechazo de solapamiento, clipping o corrupcion visible aunque los checkers no reporten errores
+- rechazo de decks mecanicamente correctas pero pobres: slides sin concepto visual, exceso de grillas o cierre sin imagen editorial real
+- bibliografia y `notes/agent-log.md` completos para las fases ejecutadas
 
-- texto español correcto y contenido `UTF-8` sin mojibake
-- chequeos mecánicos del archivo y del layout
-- render completo e inspección individual a tamaño completo de todas las slides
-- render nativo de Microsoft PowerPoint en Windows cuando esté disponible
-- rechazo de cualquier solapamiento, clipping o corrupción visible aunque los checkers automáticos no reporten errores
+`deck-builder-charlas` produce evidencia. `review-charlas` valida de forma independiente. `orchestrator-charlas` impide cerrar si hay hallazgos bloqueantes.
 
-`deck-builder-charlas` produce la evidencia, `review-charlas` valida de forma independiente y `orchestrator-charlas` impide cerrar el flujo mientras exista un hallazgo bloqueante.
+## Uso
+- Si llega feedback humano sobre una fase o deck existente, empieza por `orchestrator-charlas`; el orquestador clasifica y relanza el rol que corresponda.
+- Usa `researcher-charlas` si falta tesis, evidencia o angulo.
+- Usa `narrative-charlas` si toca decidir historia, slide order, titulos-conclusion y cierre antes de construir.
+- Usa `deck-builder-charlas` si la narrativa ya fue discutida y toca construir el `pptx`.
+- Usa `image-closer-charlas` si el cierre necesita una imagen editorial fuerte.
+- Usa `review-charlas` si ya existe artefacto concreto y toca decidir si se aprueba o itera.
 
-## Agentes disponibles
-
-- `orchestrator-charlas`: coordina el flujo entre agentes, decide dependencias, detecta bloqueos y define cuando conviene paralelizar research.
-- `researcher-charlas`: investiga un tema, propone tesis o hipotesis candidatas, ordena narrativa, separa claims fuertes de claims que requieren validacion y deja una direccion clara antes de construir la deck.
-- `deck-builder-charlas`: toma una tesis y narrativa ya convergidas y las convierte en una presentacion editable, visualmente fuerte y alineada con `STYLE-CHARLAS.md`.
-- `image-closer-charlas`: define la metafora visual y la imagen editorial de cierre para la ultima slide.
-- `review-charlas`: revisa narrativa, calidad visual, cierre e integracion de la imagen final antes de cerrar la charla.
-
-## Flujo recomendado
-
-1. Arrancar con `orchestrator-charlas` para identificar fase, dependencia y siguiente agente.
-2. Usar `researcher-charlas` para explorar el tema, elegir angulo y converger tesis.
-3. Si el framing ya esta claro, abrir research en paralelo solo para subpreguntas independientes.
-4. Pasar a `deck-builder-charlas` cuando la direccion ya este lo bastante clara.
-5. Usar `image-closer-charlas` para resolver la imagen editorial final cuando el cierre ya tenga mensaje, cita y tono.
-6. Cerrar con `review-charlas`.
-
-La salida de `researcher-charlas` no pasa automaticamente a la PPT. Primero sirve para discutir y converger.
-
-## Dependencias rapidas
-
-- `deck-builder-charlas` depende de una tesis y narrativa ya convergidas
-- `image-closer-charlas` depende de tesis, mensaje final, cita y tono razonablemente claros
-- `deck-builder-charlas` e `image-closer-charlas` solo deberian correr en paralelo si la cita y el mensaje final ya existen o se fijan antes
-- `review-charlas` depende de una deck parcial o final ya construida
-- si hay duda sobre la fase, empezar por `orchestrator-charlas`
-
-## Nota operativa
-
-- en Windows, si el builder de presentaciones resuelve mal `@oai/artifact-tool`, relanzar con `HOME=C:\\Users\\Victor` para que tome el runtime correcto
-
-## Cuando usar cada uno
-
-Usa `orchestrator-charlas` cuando:
-
-- quieres decidir en que fase esta la charla
-- quieres saber que agente corresponde ahora
-- necesitas coordinar dependencias o bifurcaciones
-- quieres evaluar si conviene paralelizar research
-
-Usa `researcher-charlas` cuando:
-
-- el tema todavia esta abierto
-- falta definir la tesis
-- hay que investigar el panorama, tradeoffs o evidencia reciente
-- quieres decidir que si merece entrar a la charla
-
-Usa `deck-builder-charlas` cuando:
-
-- la tesis principal ya esta razonablemente cerrada
-- la narrativa ya fue discutida
-- toca convertir direccion en slides, visuales y `pptx`
-
-Usa `image-closer-charlas` cuando:
-
-- la ultima slide ya necesita una imagen editorial fuerte
-- el cierre ya tiene mensaje, cita o tono definidos
-- quieres evitar una imagen generica o demasiado literal
-
-Usa `review-charlas` cuando:
-
-- ya existe deck parcial o final
-- quieres validar narrativa, consistencia visual y cierre
-- quieres detectar que esta flojo antes de cerrar
-
-## Cuando no usar estos agentes
-
-- no uses `orchestrator-charlas` para reemplazar el trabajo especializado de los otros agentes
-- no uses `researcher-charlas` para research general que no vaya a terminar en charla
-- no uses `deck-builder-charlas` para descubrir el tema desde cero
-- no uses `image-closer-charlas` para reemplazar la definicion de tesis o narrativa
-- no uses `review-charlas` sobre puro research o ideas abiertas
-- no uses ninguno para respuestas rapidas que no necesiten evidencia externa ni construccion de deck
-
-## Ejemplos de prompts
-
-- `Tengo una idea de charla, no se en que fase esta ni que agente deberia correr ahora.`
-- `Investiga el estado actual de los agentes LLM para Data Science y propon una tesis de charla.`
-- `Compara notebooks asistidos por IA versus harness engineering y ayudame a elegir el angulo.`
-- `Ya cerramos la tesis. Ahora convierte esto en una deck de 9 slides con cierre editorial fuerte.`
-- `Toma esta narrativa y armame un pptx editable con titulos-conclusion, comparacion central y cita final con autor.`
-- `Con esta tesis y este mensaje final, propon la imagen editorial de cierre y dame un prompt final de imagen.`
-- `Revisa esta deck y dime que esta descuadrado, flojo o fuera de lineamiento antes de cerrarla.`
+## Operacion local
+- En Windows, si `@oai/artifact-tool` resuelve mal, relanzar con `HOME=C:\\Users\\Victor`.
+- Si `soffice` no aparece en `PATH`, usar `scripts/resolve-soffice.ps1` o `C:\\Program Files\\LibreOffice\\program\\soffice.exe`.
+- Los specs y prompts reutilizables viven en `templates/charlas-sdd/`.

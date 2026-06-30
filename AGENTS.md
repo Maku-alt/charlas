@@ -1,107 +1,95 @@
 # AGENTS
 
-Este archivo captura como debe trabajar el agente dentro de este repositorio de charlas.
+Reglas de trabajo para este repo de charlas.
 
-## Contexto del repo
+## Contexto
+- Cada carpeta de primer nivel es una charla, salvo infraestructura como `agents/`, `templates/`, `outputs/` y carpetas ocultas.
+- Audiencia por defecto: gente que trabaja con datos, usualmente `Data Scientists`.
+- Tono por defecto: ejecutivo, tecnico, directo y claro.
+- No amarrar la narrativa a telco salvo pedido explicito.
 
-- Este repositorio contiene multiples charlas.
-- Cada carpeta de primer nivel representa una charla distinta.
-- Las charlas estan orientadas a Data Science, datos, IA aplicada, stack tecnico, mejores practicas y decisiones de arquitectura.
-- La audiencia objetivo es `Data Scientists` en general. No amarrar la narrativa a telco salvo que el usuario lo pida de forma explicita.
+## Flujo
+Toda charla debe pasar por tesis, research cuando haga falta, convergencia con el usuario, narrativa de `8-10 slides`, build `pptx`, cierre visual y review.
 
-## Flujo de trabajo esperado
+El research no pasa automaticamente a PPT. Primero se discute, se recorta y se fija el angulo.
 
-Cuando el usuario llegue con una idea de charla, el agente debe:
+Cada slide debe tener tesis, lectura ejecutiva, objeto visible y concepto visual. Si varias slides quedan como cajas, tablas o conectores sin idea visual clara, vuelve a narrativa o build antes de aprobar.
 
-1. ayudar a madurar la tesis central
-2. proponer una narrativa ejecutiva y tecnica
-3. estructurar la charla normalmente en `8-10 slides`
-4. crear o actualizar la carpeta de la charla
-5. dejar notas de soporte, baseline tecnico y material validado cuando corresponda
-6. construir un `pptx` editable y visualmente fuerte
+## Agentes
+- `orchestrator-charlas`: decide fase, dependencias, launch y bloqueo.
+- `researcher-charlas`: investiga, tensiona tesis y entrega research discutible.
+- `narrative-charlas`: convierte research convergido en narrativa aprobable.
+- `deck-builder-charlas`: construye `pptx` editable usando la skill `pptx`.
+- `image-closer-charlas`: define imagen editorial de cierre.
+- `review-charlas`: valida deck, texto, visuales, cierre y evidencia.
 
-Convencion minima recomendada dentro de cada carpeta de charla:
+## Estructura por charla
+Convencion recomendada:
 
-- `notes/`: narrativa, fuentes, claims, material validado y bibliografia
-- `slides/` o `deck/`: fuente editable y exportables de la presentacion
-- `assets/`: imagenes, prompts visuales y recursos de soporte cuando existan
-- `review/`: observaciones, ajustes y chequeos finales cuando existan
+- `specs/`: specs SDD propios de la charla, copiados o adaptados desde `templates/charlas-sdd/`
+- `notes/`: narrativa, claims, material validado, `bibliografia.md` y `agent-log.md`
+- `slides/` o `deck/`: fuente editable y exportables
+- `assets/`: imagenes, prompts visuales y recursos de soporte
+- `review/`: observaciones, ajustes y chequeos finales
 
-Cuando convenga, separar explicitamente el flujo en agentes especializados:
+La convencion aplica hacia adelante. No migres charlas antiguas salvo que se reabran.
 
-- `orchestrator-charlas`: coordinar el flujo, dependencias y bifurcaciones entre agentes
-- `researcher-charlas`: explorar el tema, investigar, proponer tesis y converger narrativa
-- `deck-builder-charlas`: tomar una direccion ya discutida y convertirla en deck editable
-- `image-closer-charlas`: resolver la metafora visual y la imagen editorial final del cierre
-- `review-charlas`: revisar deck, cierre e imagen final contra los lineamientos del repo
+`slides/` y `assets/` deben existir localmente cuando la charla los necesite, pero por defecto no se suben al remoto. El entregable publicable es el `pptx`, junto con notas, specs y review cuando corresponda.
 
-No asumir que todo hallazgo del research entra automaticamente a la presentacion.
+Si hubo research externo, `notes/bibliografia.md` es obligatorio. Si corrio una fase pesada, debe quedar una entrada en `notes/agent-log.md` con agente, modelo, esfuerzo, estado, artefactos, errores o bloqueos, y siguiente accion.
 
-Si el framing principal ya esta claro y existen subpreguntas independientes, el research puede paralelizarse antes de converger de nuevo en una sola narrativa.
+## Specs SDD
+La metodologia vive en `templates/charlas-sdd/`.
 
-Orden recomendado:
+Usa `full/` para charlas normales o complejas:
 
-1. `orchestrator-charlas`
-2. `researcher-charlas`
-3. research en paralelo si aplica
-4. `deck-builder-charlas`
-5. `image-closer-charlas`
-6. `review-charlas`
+- `thesis-spec.md`
+- `research-spec.md`
+- `narrative-spec.md`
+- `build-spec.md`
+- `review-spec.md`
 
-`deck-builder-charlas` e `image-closer-charlas` pueden bifurcarse en paralelo cuando la tesis, el mensaje final, la cita y el tono ya estan suficientemente claros.
+Usa `compact/` para charlas pequenas o con framing claro:
 
-## Patron narrativo preferido
+- `research-package.md`
+- `build-review-package.md`
 
-Por defecto, las charlas deben incluir:
+Los prompts de fase viven en `templates/charlas-sdd/prompts/`.
 
-- cover con tesis clara
-- slides de contexto o baseline
-- slides de comparacion o tradeoff
-- una recomendacion o lectura ejecutiva
-- una slide final de cierre con un solo mensaje fuerte
+## Ejecucion
+El chat principal orquesta. Las fases pesadas corren por defecto como subagente Codex con contexto acotado:
 
-## Regla de cierre
+- rol especializado desde `agents/*.md`
+- spec concreto desde `specs/` o `templates/charlas-sdd/`
+- prompt de fase desde `templates/charlas-sdd/prompts/`
+- artefactos estrictamente necesarios
+- `model: gpt-5.5`
+- `reasoning_effort: medium`
+- `fork_context: false`
 
-Toda charla debe cerrar con:
+El prompt de fase no reemplaza el rol especializado. El padre no debe completar `build` ni `review` si el subagente se bloquea.
 
-- una frase o cita breve
-- un mensaje de cierre que sintetice la tesis
-- una imagen editorial alineada con el tema
+El feedback humano posterior a una fase entra por `orchestrator-charlas`, que decide si relanza narrativa, build, imagen final o review.
 
-La imagen final:
+`modo chat separado` queda como alternativa si el usuario quiere ejecutar una fase manualmente y traer de vuelta solo el output compacto.
 
-- no debe repetir tablas, bullets o diagramas de la deck
-- no debe explicar literalmente la charla como si fuera otra slide tecnica
-- debe amplificar el mensaje conceptual o emocional del cierre
-- debe sentirse premium, editorial y deliberada
-- debe diferenciarse visualmente de otras charlas aunque comparta el mismo universo de estilo
+Research usa esfuerzo `standard` por defecto. Usa `quick` si el usuario pide algo rapido o de bajo riesgo; usa `deep` si el usuario lo pide o la complejidad lo amerita.
 
-## Como decidir la imagen final
+## Precondiciones
+- `build` requiere `specs/build-spec.md` y `specs/narrative-spec.md`.
+- `review` requiere `specs/review-spec.md`, deck objetivo, `notes/bibliografia.md` cuando aplique, `notes/agent-log.md` y evidencia de build.
+- Si falta un spec obligatorio, se corrige el contrato antes de lanzar la fase.
 
-El agente debe buscar una metafora visual que converse con la tesis:
+## Bloqueos
+Una fase bloqueada debe devolver: estado, fase, bloqueo concreto, artefactos, chequeos fallidos, chequeos exitosos, riesgos residuales y accion propuesta.
 
-- `evolucion del stack`: modernizacion, transicion, madurez tecnica
-- `nube vs on-premise`: costo, control, infraestructura, tension estrategica
-- `harness engineering`: motor, contexto, sistema, ejecucion
+El padre registra evidencia y decide si espera, relanza, devuelve a la fase anterior o escala al usuario. No absorbe una fase especializada.
 
-El objetivo no es decorar. El objetivo es que la ultima slide deje memoria.
+## Cierre y evidencia
+Toda charla debe tener tesis clara, comparacion o tradeoff, lectura ejecutiva y cierre editorial fuerte con mensaje breve e imagen alineada.
 
-## Nivel de evidencia
+Verifica con fuentes actuales cualquier claim sobre precios, releases, compatibilidad, costos actuales o casos corporativos recientes.
 
-Si una charla afirma:
+La imagen final no debe repetir tablas, bullets ni diagramas; debe amplificar el cierre y sentirse editorial, deliberada y distinta.
 
-- precios
-- releases
-- compatibilidad
-- costos actuales
-- casos corporativos recientes
-
-entonces el agente debe verificar con fuentes actuales antes de consolidar la narrativa.
-
-## Preferencias del usuario
-
-- tono ejecutivo tecnico
-- copy directo y claro
-- visuales de alto impacto
-- slides con tesis, no con titulos genericos
-- cierre editorial fuerte
+Cuando el build necesite LibreOffice en Windows, resolver `C:\Program Files\LibreOffice\program\soffice.exe` o usar `scripts/resolve-soffice.ps1` desde la raiz del repo.
