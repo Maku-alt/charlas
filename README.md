@@ -33,15 +33,15 @@ Dentro de cada charla se pueden incluir materiales como:
 
 Convencion minima recomendada por charla:
 
-- `specs/`: specs SDD propios de la charla cuando se trabaje con la metodologia nueva
 - `notes/`: narrativa, fuentes, claims validados y bibliografia
 - `slides/` o `deck/`: estructura, archivos editables y exportables
 - `assets/`: imagenes, prompts y recursos visuales cuando existan
-- `review/`: comentarios, observaciones y ajustes finales cuando existan
+- `specs/`: specs SDD locales cuando se trabaje con la metodologia nueva
+- `review/`: comentarios, observaciones y ajustes finales locales cuando existan
 
 Esta convencion no es retroactiva. Las charlas anteriores pueden no tener `specs/` o `review/`; se migran solo si se reabren o si aporta valor concreto.
 
-`slides/` y `assets/` pueden existir localmente, pero por defecto no se suben al repo remoto.
+`slides/`, `assets/`, `specs/` y `review/` pueden existir localmente, pero por defecto no se suben al repo remoto.
 
 Charlas actuales:
 

@@ -38,13 +38,13 @@ No omitas el rol especializado: el prompt de fase no reemplaza `agents/*.md`.
 ## Estructura por charla
 Convencion recomendada hacia adelante:
 
-- `specs/`: specs SDD copiados o adaptados desde `templates/charlas-sdd/`
 - `notes/`: narrativa, claims, material validado, `bibliografia.md` y `phase-summary.md`
 - `slides/` o `deck/`: fuente editable y exportables locales
 - `assets/`: imagenes, prompts visuales y recursos de soporte
-- `review/`: observaciones, ajustes y chequeos finales
+- `specs/`: specs SDD locales copiados o adaptados desde `templates/charlas-sdd/`
+- `review/`: observaciones, ajustes y chequeos finales locales
 
-No migres charlas antiguas salvo que se reabran. `slides/` y `assets/` deben existir localmente cuando la charla los necesite, pero por defecto no se suben al remoto.
+No migres charlas antiguas salvo que se reabran. `slides/`, `assets/`, `specs/` y `review/` deben existir localmente cuando la charla los necesite, pero por defecto no se suben al remoto.
 
 Si hubo research externo, `notes/bibliografia.md` es obligatorio. Si corrio una fase pesada, `notes/phase-summary.md` debe existir y representar el estado actual.
 
