@@ -1,0 +1,100 @@
+{
+  "meta": {
+    "title": "Renderer local para charlas",
+    "subtitle": "Ejemplo de 9 slides generado desde deck-spec.json",
+    "author": "charlas",
+    "date": "2026-07-05"
+  },
+  "slides": [
+    {
+      "layout": "cover",
+      "kicker": "Renderer local",
+      "title": "El LLM escribe la historia; el codigo arma el PowerPoint",
+      "subtitle": "Build normal desde JSON, versionado y validado con PowerPoint nativo."
+    },
+    {
+      "layout": "thesis",
+      "kicker": "Tesis",
+      "title": "El costo baja cuando la produccion deja de ser conversacion",
+      "statement": "La charla se piensa una vez y se renderiza muchas veces.",
+      "calloutLabel": "Cambio operativo",
+      "calloutValue": "1",
+      "calloutBody": "El spec se vuelve el contrato; el renderer hace el trabajo repetible.",
+      "takeaway": "El modelo queda para narrativa; el script queda para fabricacion."
+    },
+    {
+      "layout": "comparison",
+      "kicker": "Antes / despues",
+      "title": "El builder deja de interpretar todo el deck en cada correccion",
+      "left": {
+        "title": "LLM-heavy",
+        "items": ["Lee specs extensas", "Reconstruye contexto", "Revisa renders", "Vuelve a corregir"]
+      },
+      "right": {
+        "title": "Renderer local",
+        "items": ["Lee JSON", "Aplica layouts", "Genera PPTX", "Reporta fallas mecanicas"]
+      },
+      "takeaway": "La diferencia no es estetica; es control de proceso."
+    },
+    {
+      "layout": "process",
+      "kicker": "Pipeline",
+      "title": "Un deck normal usa cuatro pasos estables",
+      "steps": [
+        { "label": "Narrativa", "body": "Deck.md revisable." },
+        { "label": "Spec", "body": "JSON con layout y contenido." },
+        { "label": "Render", "body": "PPTX editable." },
+        { "label": "QA", "body": "Texto y PowerPoint gate." }
+      ]
+    },
+    {
+      "layout": "matrix",
+      "kicker": "Tradeoff",
+      "title": "El renderer apunta al camino medio",
+      "columns": ["Velocidad", "Calidad visual", "Trazabilidad"],
+      "rows": [
+        { "name": "Borrador", "values": ["Alta", "Media", "Baja"] },
+        { "name": "Deck normal", "values": ["Media", "Alta", "Media"] },
+        { "name": "Formal", "values": ["Baja", "Alta", "Alta"] }
+      ],
+      "takeaway": "Suficiente estructura para repetir sin convertir cada deck en una fase pesada."
+    },
+    {
+      "layout": "architecture",
+      "kicker": "Arquitectura",
+      "title": "El diseno vive en layouts versionados",
+      "nodes": [
+        { "name": "deck.md", "body": "Narrativa" },
+        { "name": "deck-spec.json", "body": "Contrato" },
+        { "name": "layouts", "body": "Reglas visuales" },
+        { "name": "pptx", "body": "Entregable" }
+      ],
+      "takeaway": "Si cambia el contenido, cambia el JSON; si cambia el sistema visual, cambia el renderer."
+    },
+    {
+      "layout": "evidence",
+      "kicker": "QA",
+      "title": "El archivo no pasa hasta abrir y exportar en PowerPoint",
+      "facts": [
+        "Conteo de slides esperado.",
+        "Texto extraible sin mojibake.",
+        "Assets requeridos presentes.",
+        "PowerPoint nativo exporta PNG."
+      ],
+      "takeaway": "La validacion final es nativa, no solo programatica."
+    },
+    {
+      "layout": "decision",
+      "kicker": "Decision",
+      "title": "PptxGenJS queda como renderer normal del repo",
+      "decision": "Usar scripts del repo para build normal y reservar skills para excepciones.",
+      "risks": ["assets reales", "overflow", "layouts nuevos", "fixes quirurgicos"]
+    },
+    {
+      "layout": "closing",
+      "kicker": "Cierre",
+      "title": "Menos ritual para producir; mas estructura para repetir",
+      "quote": "El deck se vuelve un artefacto compilable."
+    }
+  ]
+}

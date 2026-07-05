@@ -4,195 +4,160 @@ Research value: high
 
 ## Idea o pregunta investigada
 
-Como definir con precision un `knowledge repo` para equipos de datos y por que importa como paso evolutivo entre fichas Markdown sueltas, una wiki de navegacion humana y una memoria operacional util para humanos y agentes.
+Como definir con precision un `knowledge repo` para equipos de datos y por que importa como paso evolutivo entre fichas Markdown sueltas y una memoria operacional util para humanos y agentes.
 
 ## Modo de trabajo
 
-- `modo orientado a decision`
-- `modo estado del arte`
-
-## Nivel de esfuerzo
-
-`standard`
-
-Esta es una nueva corrida desde cero. No se usaron briefs anteriores ni outputs previos.
+- Modo: orientado a decision + estado del arte.
+- Nivel de esfuerzo: standard.
+- Decision de continuidad: seguir.
 
 ## Tesis propuesta
 
-Documentar tablas se vuelve arquitectura de conocimiento cuando el equipo deja de necesitar solo descripciones y empieza a necesitar memoria comun: fichas conectadas, versionadas, con ownership, vigencia, relaciones, evidencia y una interfaz de consulta acotada para humanos y agentes.
+Cuando un equipo documenta muchas tablas, la unidad de trabajo deja de ser "un archivo por tabla" y pasa a ser una memoria operacional: un repo con convenciones, relaciones, ownership, vigencia, historial e interfaces de consulta. Markdown puede ser el ladrillo correcto; la arquitectura aparece cuando el equipo define como se conectan, se mantienen y se consumen esas piezas por humanos y agentes.
 
-Formula breve:
+Formulacion breve:
 
-> Un `knowledge repo` no es mas documentacion. Es el contrato operativo que convierte lo que el equipo sabe sobre sus datos en algo mantenible, navegable y consultable.
+> Documentar tablas se vuelve arquitectura de conocimiento cuando el equipo necesita conectar, mantener y consultar lo que sabe.
 
 ## Resumen ejecutivo
 
-La hipotesis inicial se sostiene, con una correccion editorial: `Markdown`, `wiki`, `OKF` y `MCP/API` no compiten entre si. Son capas distintas.
+La hipotesis se sostiene. Las fuentes actuales separan con claridad cuatro capas: Markdown como formato legible y portable; wiki o segundo cerebro como navegacion humana; catalogos/metadatos como evidencia de que ownership, lineage, glossaries, calidad y versionado son parte del conocimiento operativo; y MCP/API como interfaz para exponer contexto y herramientas a agentes. OKF, publicado como draft v0.1 en junio de 2026, aporta una referencia emergente para bundles de Markdown con frontmatter, pero su valor debe presentarse como convencion portable, no como arquitectura completa ni como estandar maduro.
 
-- `Markdown` resuelve legibilidad, portabilidad y revision por Git, pero no define por si mismo ownership, vigencia, relaciones ni procesos.
-- Una `wiki` o segundo cerebro mejora navegacion humana, enlaces y descubrimiento, pero no garantiza memoria operacional gobernada.
-- Un `knowledge repo` aparece cuando hay convenciones explicitas: ficha minima, metadata, owners, estado de vigencia, relaciones, historial, criterios de revision y rutas de acceso.
-- `OKF` sirve como referencia portable para bundles de conocimiento en Markdown con frontmatter, enlaces y validacion; hoy debe tratarse como patron emergente, no como estandar corporativo universal.
-- `MCP/API` es la capa de acceso para agentes: permite buscar, leer y atravesar conocimiento preparado. No sustituye el repo ni su gobierno.
+El angulo recomendado no es "necesitamos una herramienta", sino "necesitamos separar responsabilidades". La charla debe ayudar a la audiencia a dejar de discutir si el destino es Markdown, wiki, catalogo o agente, y empezar a ver esas piezas como capas: formato, navegacion, gobierno, memoria y acceso.
 
 ## Panorama actual
 
-La evidencia converge en una separacion de responsabilidades:
+### 1. Markdown resuelve forma, no sistema
 
-| Capa | Rol | Lo que resuelve | Lo que no resuelve sola |
-|---|---|---|---|
-| Markdown | Formato base | Texto legible, versionable, revisable | Metadata obligatoria, ownership, freshness, relaciones |
-| Wiki / segundo cerebro | Navegacion humana | Links, backlinks, grafo, lectura exploratoria | Gobierno, fuente de verdad, proceso de mantenimiento |
-| Knowledge repo | Memoria operacional | Convenciones, ownership, vigencia, relaciones, revision | No es una UI por si mismo ni un agente |
-| OKF o formatos cercanos | Paquete portable | Markdown tipado, frontmatter, links, validacion | No define estrategia de gobierno ni modelo organizacional |
-| MCP/API | Interfaz de acceso | Herramientas para que agentes consulten conocimiento | No crea conocimiento confiable si el repo esta mal mantenido |
+Markdown tiene fuerza porque es texto plano: se lee en cualquier editor, difiere bien en Git y permite contenido estructurado sin plataforma pesada. CommonMark lo define como formato de texto plano para documentos estructurados. GitHub lo usa como lenguaje legible para prose y codigo. Eso justifica "un `.md` por tabla" como inicio.
+
+El limite es que Markdown no define por si mismo identidad canonica de cada activo, estructura minima obligatoria, ownership, vigencia, relaciones, procesos de revision, politicas de acceso ni semantica de consulta para agentes.
+
+Lectura: Markdown es formato de captura y versionado, no memoria operacional.
+
+### 2. Wiki y segundo cerebro mejoran navegacion humana
+
+Herramientas como Obsidian muestran bien el valor de enlazar notas: links internos, backlinks y redes de conocimiento ayudan a explorar contexto. Eso es valioso para humanos, especialmente cuando el conocimiento esta distribuido y la busqueda textual no alcanza.
+
+Pero una wiki no garantiza gobierno. Puede tener buenos enlaces y aun asi fallar en ownership, vigencia, autoridad, duplicados, control de cambios y criterios de inclusion. La wiki responde "como navego"; el knowledge repo debe responder tambien "que fuente vale", "quien mantiene", "cuando se actualizo" y "como se consume de forma confiable".
+
+Lectura: la wiki es una capa de navegacion, no necesariamente la fuente operacional gobernada.
+
+### 3. Los catalogos de datos prueban que la metadata relacional importa
+
+DataHub y OpenMetadata son evidencia conceptual fuerte. No hacen "documentacion de tabla" como texto aislado: modelan entidades, propietarios, tags, glossary terms, dominios, lineage, perfiles, calidad, tareas, uso, version history y custom properties. dbt exposures muestra el mismo principio desde otro angulo: documentar downstream uses como dashboards, aplicaciones o pipelines, y conectar esos usos con el DAG.
+
+El punto para la charla no es recomendar un catalogo especifico. Es usar esa madurez como prueba de que, cuando el volumen crece, el conocimiento sobre datos se vuelve relacional y operativo. Una ficha de tabla util no describe solo columnas: tambien registra relaciones, consumidores, riesgos, uso, owner, vigencia, joins frecuentes, terminos de negocio, calidad y decisiones previas.
+
+Lectura: si los catalogos modelan relaciones y gobierno, un repo de conocimiento serio no puede quedarse en texto suelto.
+
+### 4. OKF es referencia emergente, no destino final
+
+Google Cloud introdujo Open Knowledge Format (OKF) el 12 de junio de 2026. La especificacion v0.1 lo presenta como formato abierto, humano y agent-friendly para representar conocimiento como directorios de Markdown con YAML frontmatter. Sus campos recomendados cubren `type`, `title`, `description`, `resource`, `tags` y `timestamp`; permite links Markdown, `index.md` para disclosure progresivo y `log.md` para historial.
+
+La propia especificacion declara no objetivos importantes: no define taxonomia fija, no prescribe infraestructura de storage/serving/query y no reemplaza schemas de dominio como Avro, Protobuf u OpenAPI. Eso lo vuelve muy util para explicar "convencion portable", pero peligroso si se vende como solucion completa.
+
+Lectura: OKF puede ser el ejemplo moderno de "Markdown con contrato minimo para agentes"; no reemplaza el diseno del knowledge repo.
+
+### 5. MCP/API es interfaz de consulta, no memoria
+
+MCP, anunciado por Anthropic el 25 de noviembre de 2024 y documentado en la especificacion vigente 2025-06-18, estandariza como aplicaciones LLM comparten contexto, exponen herramientas y construyen integraciones. Su modelo distingue hosts, clients y servers; los servers ofrecen resources, prompts y tools.
+
+Eso encaja con la tesis: MCP sirve para exponer una memoria preparada a agentes, no para crear esa memoria. Si el repositorio esta desordenado, sin ownership ni vigencia, MCP solo hace mas facil consultar desorden. La interfaz no sustituye la arquitectura de conocimiento.
+
+Lectura: primero memoria gobernada; despues interfaz de agente.
 
 ## Hallazgos que si merecen slide
 
-- La distincion central no es herramienta contra herramienta; es capa contra capa. Markdown puede ser correcto y aun asi insuficiente.
-- `Una ficha por tabla` es buen primer ladrillo, pero escala mal si no hay indice, relaciones, owners, estado de vigencia y regla de revision.
-- La wiki organiza lectura humana; el knowledge repo organiza responsabilidad operacional.
-- Los catalogos y herramientas de datos modernas modelan ownership, lineage, descripciones, tests o freshness porque documentar datos no es solo escribir texto.
-- Para agentes, el problema no es "leer mas archivos"; es saber que buscar, que fuente es vigente, que relaciones seguir y que evidencia citar.
-- MCP debe entrar como interfaz, no como arquitectura: el agente invoca herramientas sobre una memoria preparada.
-- OKF puede ser una referencia util para explicar portabilidad y fichas tipadas, pero el argumento no debe depender de que OKF gane como estandar.
+1. "Un `.md` por tabla" es una buena primera decision, pero no una arquitectura.
+2. Hay cuatro responsabilidades distintas: formato, navegacion, gobierno e interfaz.
+3. La ficha de tabla minima deberia parecerse mas a metadata operacional que a descripcion larga.
+4. Los catalogos de datos ya modelan el problema como grafo de metadata.
+5. OKF muestra hacia donde se mueve el formato: Markdown + frontmatter + links + historial.
+6. MCP no arregla memoria mala; la expone.
+7. La decision ejecutiva es ownership antes que tooling.
 
 ## Mapa de contradicciones
 
-| Tension | Evidencia / lectura | Resolucion editorial |
+| Tension | Lectura fuerte | Resolucion editorial |
 |---|---|---|
-| Markdown es suficiente porque Git ya versiona | CommonMark muestra que Markdown es formato de texto estructurado; Git aporta historial, pero no define semantica operacional. | Presentar Markdown como ladrillo correcto, no como sistema completo. |
-| Wiki ya es knowledge repo | GitHub y Obsidian enfatizan documentacion, links, grafo y navegacion. Eso ayuda al humano, pero no obliga ownership, freshness ni contratos de mantenimiento. | Wiki = capa de descubrimiento; repo = memoria gobernada. |
-| Data catalogs ya resuelven esto | dbt/DataHub/OpenMetadata muestran metadata, lineage, ownership y freshness. Pero una charla sobre knowledge repo puede ser tool-agnostic: el repo puede complementar catalogos o servir como capa liviana. | No vender reemplazo de catalogo; hablar de contrato de conocimiento. |
-| OKF parece promesa demasiado nueva | Repos actuales lo presentan como Markdown tipado, agent-friendly y Git-diffable, pero el ecosistema aun es emergente. | Usarlo como ejemplo de patron portable, no como estandar obligatorio. |
-| MCP/API suena a solucion completa | La especificacion MCP define herramientas, recursos y mensajes; no define calidad del conocimiento subyacente. | MCP = puerta de acceso, no memoria. |
+| Markdown es simple vs. el sistema requiere gobierno | La simplicidad de Markdown es virtud, pero no alcanza para definir memoria. | "Markdown es el ladrillo; el repo es la arquitectura." |
+| Wiki navegable vs. memoria confiable | Links y backlinks reducen friccion humana, pero no prueban vigencia ni autoridad. | Separar navegacion de gobierno. |
+| Catalogo de datos vs. knowledge repo | El catalogo puede ser fuente de metadata; el repo puede capturar narrativa, decisiones y contexto operativo que no siempre vive en el catalogo. | Presentarlos como complementarios, no rivales. |
+| OKF como estandar vs. OKF como draft reciente | OKF v0.1 es prometedor, pero todavia emergente. | Usarlo como referencia de direccion, no como mandato. |
+| MCP conecta agentes vs. MCP resuelve conocimiento | MCP estandariza acceso a contexto/herramientas, pero no decide que contexto es valido. | "MCP es puerto de consulta, no memoria." |
+| Mas documentacion vs. menos friccion | Pedir mas campos puede matar adopcion. | Definir contrato minimo y crecimiento progresivo por valor. |
 
 ## Opciones o enfoques encontrados
 
 | Opcion | Madurez | Ventajas | Limitaciones | Lectura para la charla |
-|---|---|---|---|---|
-| Fichas Markdown sueltas | Alta como practica simple | Baratas, legibles, versionables | Se dispersan, pierden vigencia, no fuerzan relaciones | Buen inicio, no destino |
-| Wiki / Obsidian / GitHub Wiki | Alta como navegacion | Links, backlinks, grafo, edicion colaborativa | Puede volverse decorativa o inconsistente | Capa humana de descubrimiento |
-| Catalogo de datos / dbt metadata | Alta en stack de datos | Lineage, tests, freshness, owners, docs tecnicas | Puede no capturar conocimiento operativo narrativo | Evidencia de que metadata importa |
-| Knowledge repo | Media como patron organizacional | Une convenciones, revision, ownership y acceso | Requiere disciplina y mantenimiento | Tesis central de la charla |
-| OKF / bundles agent-ready | Emergente | Portable, Git-diffable, frontmatter, links, MCP posible | No consolidado como estandar universal | Referencia futura y cautelosa |
-| MCP/API sobre repo | Alta como protocolo emergente de acceso | Permite consultas acotadas por agentes | Depende de calidad y estructura del repo | Interfaz, no sustituto |
+|---|---:|---|---|---|
+| Fichas Markdown sueltas | Alta como formato, baja como sistema | Baratas, versionables, faciles de revisar | Escalan mal sin indice, relaciones y ownership | Buen inicio, insuficiente como destino |
+| Wiki / segundo cerebro | Alta para navegacion humana | Links, backlinks, graph view, descubrimiento | Puede volverse decorativa o stale sin gobierno | Capa de navegacion |
+| Knowledge repo gobernado | Media como practica, alta como patron software | Git, PRs, owners, historia, convenciones, CI posible | Requiere disciplina y contrato minimo | Tesis recomendada |
+| Catalogo de datos | Alta en data governance | Metadata relacional, lineage, owners, glossary, calidad | Puede no capturar decisiones, narrativa o conocimiento tacito | Evidencia conceptual y posible fuente |
+| OKF | Emergente, draft v0.1 | Markdown portable con frontmatter y convenciones para agentes | No define taxonomia, serving ni query | Referencia moderna, no solucion completa |
+| MCP/API | Alta adopcion emergente para integracion agente-herramienta | Estandariza acceso a resources, prompts y tools | No corrige contenido pobre o desactualizado | Interfaz de consulta |
 
 ## Direccion narrativa sugerida
 
-No es narrativa final ni build. Es direccion para `narrative-charlas`.
-
-1. Kicker: `El problema no es escribir tablas`.
-   Titulo con tesis: `Cuando las fichas crecen, documentar deja de ser redaccion y se vuelve arquitectura`.
-   Objeto visible: carpeta con muchas fichas `.md` y una pregunta imposible de responder.
-   Takeaway: el volumen cambia la naturaleza del problema.
-
-2. Kicker: `Primer ladrillo`.
-   Titulo con tesis: `Markdown hace el conocimiento revisable, pero no lo vuelve gobernado`.
-   Objeto visible: ficha de tabla con campos faltantes.
-   Takeaway: formato no equivale a memoria.
-
-3. Kicker: `Navegacion humana`.
-   Titulo con tesis: `Una wiki ayuda a encontrar, pero no decide que esta vigente`.
-   Objeto visible: grafo de notas con nodos huerfanos y enlaces utiles.
-   Takeaway: descubrimiento y gobierno son problemas distintos.
-
-4. Kicker: `Contrato minimo`.
-   Titulo con tesis: `El salto ocurre cuando cada ficha tiene owner, estado, relaciones y regla de revision`.
-   Objeto visible: ficha de tabla con frontmatter y secciones obligatorias.
-   Takeaway: el repo empieza cuando hay convencion mantenible.
-
-5. Kicker: `Trabajo real de datos`.
-   Titulo con tesis: `Los stacks de datos ya tratan ownership, lineage y freshness como metadata operacional`.
-   Objeto visible: ejemplo dbt/source freshness o catalogo con owner/lineage.
-   Takeaway: la documentacion tecnica madura como sistema de metadatos.
-
-6. Kicker: `Agentes`.
-   Titulo con tesis: `Un agente no necesita leer todo; necesita saber que fuente consultar y que relaciones seguir`.
-   Objeto visible: consulta acotada: tabla -> metricas -> riesgos -> owner.
-   Takeaway: memoria preparada reduce ambiguedad, no magia.
-
-7. Kicker: `Interfaz`.
-   Titulo con tesis: `MCP/API es la puerta, no la biblioteca`.
-   Objeto visible: agente llamando `search`, `read`, `neighbors` contra repo.
-   Takeaway: sin contrato de conocimiento, la interfaz solo expone desorden.
-
-8. Kicker: `Referencia portable`.
-   Titulo con tesis: `OKF muestra hacia donde va el patron: conocimiento legible por humanos y agentes`.
-   Objeto visible: bundle Markdown con YAML frontmatter, links y validacion.
-   Takeaway: usarlo como inspiracion, no como religion.
-
-9. Kicker: `Decision`.
-   Titulo con tesis: `La pregunta correcta no es que herramienta usar, sino que capa falta`.
-   Objeto visible: stack de capas: formato, navegacion, gobierno, acceso.
-   Takeaway: separar responsabilidades evita comprar o construir de mas.
-
-10. Kicker: `Cierre`.
-    Titulo con tesis: `El conocimiento que no se puede mantener tampoco se puede delegar a un agente`.
-    Objeto visible: archivo vivo convertido en mapa operativo.
-    Takeaway: preparar memoria es preparar autonomia.
+1. "Cuando las tablas se multiplican, documentar deja de ser escribir." Objeto: carpeta con decenas de fichas. Takeaway: el volumen cambia la naturaleza del problema.
+2. "La tabla que ves en SQL es solo la superficie." Objeto: tabla rodeada de owner, metricas, joins, riesgos y consumidores. Takeaway: el conocimiento relevante es relacional.
+3. "Markdown resuelve el formato, no la memoria." Objeto: archivo `.md` sin owner, status ni links. Takeaway: falta contrato operacional.
+4. "La navegacion humana no equivale a gobierno." Objeto: red de notas con una nota desactualizada. Takeaway: enlaces ayudan, pero no certifican verdad.
+5. "El conocimiento de datos se comporta como metadata relacional." Objeto: dataset conectado a owner, glossary, lineage, quality y consumers. Takeaway: una ficha seria debe modelar relaciones.
+6. "Un repo de conocimiento es memoria operada como software." Objeto: PR con cambios a ficha, owner, checklist, `log.md` e indice. Takeaway: versionado, revision y mantenimiento son parte del producto.
+7. "El formato portable ayuda cuando humanos y agentes consumen lo mismo." Objeto: YAML frontmatter + body + links + timestamp. Takeaway: estandarizar minima estructura reduce friccion.
+8. "MCP/API expone la memoria, no la reemplaza." Objeto: agente solicitando recursos acotados desde un repo curado. Takeaway: la interfaz amplifica la calidad o el desorden.
+9. "Arquitectura de conocimiento es decidir que vive donde." Objeto: matriz de capas: formato, navegacion, gobierno, acceso. Takeaway: el equipo sale con mapa de responsabilidades.
+10. "Despues de ordenar la memoria, recien vale razonar sobre ella." Objeto: biblioteca ordenada que habilita busqueda/RAG/grafo. Takeaway: cierre hacia charla 2.
 
 ## Claims a validar antes de cerrar la deck
 
-- No afirmar que OKF es un estandar ampliamente adoptado. Mejor: `patron emergente` o `referencia portable`.
-- No prometer reduccion cuantitativa de tokens, costo o tiempo sin evidencia propia.
-- No afirmar que MCP garantiza trazabilidad; MCP permite exponer herramientas y recursos, pero la trazabilidad depende del diseno del servidor y del repo.
-- No decir que wiki "no sirve"; decir que resuelve navegacion humana, no gobierno completo.
-- Si se menciona un producto especifico, validar fecha, version y claim en la fuente primaria antes de ponerlo en slide.
+- Si se menciona OKF, usar fecha exacta: Google Cloud lo introdujo el 12 de junio de 2026; spec v0.1 draft. No llamarlo "estandar consolidado".
+- Si se menciona MCP, usarlo como protocolo de integracion para contexto, tools y resources. No decir que "almacena memoria".
+- No prometer ahorro de tokens, tiempo o costo sin evidencia propia.
+- No decir que una wiki "no sirve"; decir que no garantiza gobierno por si sola.
+- No decir que un knowledge repo reemplaza catalogo de datos; decir que puede complementarlo o consumir metadata del catalogo.
+- Si se usa una cita de Karpathy sobre LLM wiki, verificar fuente primaria del gist al momento de build o usar parafrasis sin comillas.
 
 ## Riesgos y consideraciones
 
-- Riesgo de hype: convertir `knowledge repo` en etiqueta nueva para documentacion vieja. Mitigacion: definir criterios observables.
-- Riesgo de herramienta: que la charla parezca tutorial de Obsidian, GitHub Wiki, dbt, OKF o MCP. Mitigacion: cada uno ocupa una capa.
-- Riesgo de abstraccion: la audiencia necesita un ejemplo conductor, idealmente una tabla de clientes o transacciones.
-- Riesgo de sobreprometer agentes: un agente mejora si el conocimiento esta preparado; no compensa ausencia de ownership ni vigencia.
-- Riesgo de duplicacion con catalogo: presentar el repo como contrato complementario, no como reemplazo universal.
+- Riesgo de hype: OKF y MCP son temas calientes. Mantenerlos como capas concretas, no como centro de la charla.
+- Riesgo de abstraccion: usar una tabla conductora y mostrar objetos visibles.
+- Riesgo de sobregobierno: proponer contrato minimo y evolucion progresiva, no burocracia.
+- Riesgo de herramienta: evitar que parezca charla de Obsidian, Confluence, DataHub u OpenMetadata.
+- Riesgo de solapamiento con charla 2: RAG, embeddings y grafos solo como teaser final.
 
 ## Recomendacion
 
-Continuar a narrativa.
-
-La tesis esta suficientemente validada si se formula como separacion de capas:
-
-1. Markdown = formato.
-2. Wiki = navegacion humana.
-3. Knowledge repo = memoria operacional gobernada.
-4. OKF = referencia portable para paquetes de conocimiento.
-5. MCP/API = interfaz de acceso para agentes.
-
-La charla debe evitar discutir RAG, embeddings, grafos y orquestacion salvo como teaser de una segunda parte.
+Seguir a narrativa. La tesis esta validada y el angulo mas fuerte es una arquitectura por capas: Markdown captura, wiki navega, knowledge repo gobierna, OKF orienta portabilidad y MCP/API expone consulta para agentes. La narrativa debe mantener una tabla o dominio de ejemplo como hilo conductor para no caer en abstraccion.
 
 ## Cierre editorial propuesto
 
 Mensaje final:
 
-> Antes de pedirle memoria a un agente, hay que construir una memoria que el equipo pueda mantener.
+> Antes de pedirle a un agente que entienda tus datos, dale una memoria que tu propio equipo pueda mantener.
 
-Cita candidata real:
+Imagen editorial:
 
-> "The overriding design goal for Markdown's formatting syntax is to make it as readable as possible."
-> John Gruber, Markdown
-
-Uso sugerido: no como cierre literal sobre Markdown, sino como contraste. Markdown nacio para legibilidad; el knowledge repo agrega responsabilidad, vigencia y acceso.
-
-Metafora visual:
-
-Una biblioteca tecnica en construccion: no una pila de documentos, sino estanterias con etiquetas, fichas de mantenimiento, pasillos conectados y una puerta de consulta para humanos/agentes. Debe sentirse editorial, sobria y deliberada, no dashboard ni diagrama.
+Una sala de archivo moderna: estanterias sobrias con fichas conectadas por hilos finos de luz, una mesa central con una unica tarjeta de tabla abierta y una interfaz de consulta discreta al fondo. No debe verse como dashboard, diagrama ni tabla; debe sentirse como memoria organizada, humana y consultable.
 
 ## Donde profundizar despues
 
-- Ejemplo concreto de ficha minima para una tabla: frontmatter, owner, dominio, fuente, SLA/freshness, columnas criticas, joins validos, riesgos, preguntas respondidas, relaciones.
-- Relacion entre knowledge repo y catalogo de datos existente.
-- Como exponer `search/read/neighbors` via MCP sin permitir que el agente modifique conocimiento sin revision humana.
-- Charla 2: RAG, grafos, embeddings y recuperacion sobre knowledge repo.
+- Patrones de contrato minimo para fichas de tabla: campos obligatorios, owner, lifecycle, freshness, consumers, riesgos, joins y decisiones.
+- Integracion con catalogos: export/import de metadata desde DataHub/OpenMetadata/dbt hacia repo Markdown.
+- Validaciones automaticas: lint de frontmatter, links rotos, freshness, owners y status.
+- Charla 2: busqueda, RAG, grafos y agentes sobre una memoria ya ordenada.
 
 ## Self-review
 
-- Confidence score: 0.78
-- Weakest link: OKF como referencia actual; hay actividad reciente, pero adopcion y autoridad aun son heterogeneas.
-- Bias check: hay sesgo hacia docs-as-code y Git; se mitiga al presentar catalogos y wikis como capas validas.
-- Missing perspective: compliance/data governance formal en empresas reguladas; no profundizado porque esta fuera del alcance de la charla 1.
-- What would change my mind: evidencia de que el equipo ya tiene un catalogo de datos con ownership, freshness, docs, busqueda y agentes integrados; en ese caso la charla deberia enfocarse en extension de catalogo, no en repo independiente.
+- Confidence score: 0.82.
+- Weakest link: "knowledge repo" como termino no tiene una definicion industrial unica; debe presentarse como patron operativo definido por el equipo, no como categoria cerrada.
+- Bias check: las fuentes de OKF vienen de Google Cloud y empujan una vision favorable. Se compensa usando los non-goals de la propia spec y evidencia de catalogos independientes.
+- Missing perspective: experiencia empirica interna del equipo sobre volumen real de tablas, frecuencia de cambios y dolores de mantenimiento.
+- What would change my mind: evidencia de que el equipo tiene pocas tablas, baja rotacion y un catalogo ya gobernado que cubre todos los casos; en ese escenario un knowledge repo separado podria ser exceso.
 
 ## Fuentes consultadas
 
@@ -202,12 +167,8 @@ Ver `notes/bibliografia.md`.
 
 - `notes/research-brief.md`
 - `notes/bibliografia.md`
-- `notes/agent-log.md`
+- `notes/phase-summary.md`
 
 ## Nivel de confianza
 
-Alto para la tesis central y la separacion de capas. Moderado para OKF como referencia, por madurez y adopcion todavia emergentes.
-
-## Decision de continuidad
-
-`seguir`
+Alto para la tesis y la direccion narrativa. Medio para predicciones de adopcion de OKF, por ser una referencia publicada recientemente y en version draft.

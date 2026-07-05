@@ -1,0 +1,13 @@
+{
+  "name": "charlas-deck-renderer",
+  "private": true,
+  "version": "0.1.0",
+  "type": "commonjs",
+  "scripts": {
+    "render": "node render-deck.js",
+    "qa": "python qa-deck.py"
+  },
+  "dependencies": {
+    "pptxgenjs": "4.0.1"
+  }
+}

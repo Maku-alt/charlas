@@ -3,12 +3,16 @@
 ## Objetivo
 Investigar un tema con fuentes confiables y convertirlo en insumos utiles para una charla tecnica-ejecutiva, normalmente para gente que trabaja con datos.
 
-La salida no es `pptx` ni narrativa slide por slide. Es research discutible: tesis candidatas, claims relevantes, contradicciones, riesgos, validaciones pendientes, direccion de cierre, bibliografia y entrada para el log de agentes.
+La salida no es `pptx` ni narrativa slide por slide. Es research discutible: tesis candidatas, claims relevantes, contradicciones, riesgos, validaciones pendientes, direccion de cierre, bibliografia y `phase-summary`.
 
 ## Contrato SDD
 Cuando corra como fase aislada, debe recibir `research-spec.md` y, si existe, `thesis-spec.md`.
 
 El spec define que investigar. Este rol define como investigar, evaluar evidencia y entregar una salida que ayude al usuario y a `narrative-charlas` a cerrar angulo.
+
+Si corre en `modo chat separado` o hilo worker separado, el resultado operativo se comunica solo por archivos en disco. Debe sobrescribir `notes/phase-summary.md`, escribir `notes/.phase-research.done` al terminar y responder en chat solo `DONE: summary written` o `BLOCKED: summary written`. No pegues el summary en chat y no uses `agent-log.md`.
+
+Formato de `notes/phase-summary.md`: `Ultima fase`, `Estado` (`completado`, `requiere cambios` o `bloqueado`), `Pasa / no pasa`, `Resumen` de 1-3 frases, `Artefactos` con rutas, `Hallazgos bloqueantes` y `Siguiente accion`.
 
 ## Dinamica
 Puede arrancar desde tema, pregunta, intuicion o tesis formulada.
@@ -18,7 +22,8 @@ Puede arrancar desde tema, pregunta, intuicion o tesis formulada.
 - Su salida no pasa automaticamente a PPT; sirve para discutir, recortar y converger.
 - Debe dejar claro que esta listo para narrativa y que requiere decision o profundizacion.
 - Si uso fuentes externas, debe dejar o actualizar `notes/bibliografia.md`.
-- Debe dejar una entrada para `notes/agent-log.md` con agente, modelo, esfuerzo, estado, artefactos, errores o bloqueos, y siguiente accion.
+- Debe actualizar `notes/phase-summary.md` con estado, pasa/no pasa, resumen, rutas, hallazgos bloqueantes y siguiente accion.
+- En modo aislado, debe escribir `notes/.phase-research.done` al finalizar.
 
 ## Modos y esfuerzo
 Declara un modo al inicio:
@@ -109,7 +114,7 @@ Si aplica, usa:
 
 En `Direccion narrativa sugerida`, propone `8-10 slides` con `kicker`, `titulo con tesis`, `objeto de prueba visible` y `takeaway`, sin cerrar composicion final.
 
-En `Artefactos para notes`, entrega contenido listo para `notes/bibliografia.md` y una entrada de research para `notes/agent-log.md`.
+En `Artefactos para notes`, entrega contenido listo para `notes/bibliografia.md` y `notes/phase-summary.md`.
 
 ## Reglas adicionales
 - Toda charla parte de una tesis, no de un tema suelto.

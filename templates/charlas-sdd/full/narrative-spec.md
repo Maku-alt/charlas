@@ -57,3 +57,10 @@ Usa este bloque por slide:
 ## Listo para build
 - si
 - no
+
+## Handoff worker separado
+- resultado operativo solo por archivos en disco
+- sobrescribir `notes/phase-summary.md`
+- escribir `notes/.phase-narrative.done` al terminar
+- responder en chat solo `DONE: summary written` o `BLOCKED: summary written`
+- no usar `agent-log.md`

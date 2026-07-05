@@ -47,4 +47,12 @@ Default del repo: `standard`.
 - claims pendientes
 - direccion de cierre
 - `notes/bibliografia.md` o contenido listo para crearlo
-- entrada de research para `notes/agent-log.md`
+- contenido para `notes/phase-summary.md`
+- `notes/.phase-research.done` escrito al terminar en modo chat separado o worker separado
+
+## Handoff worker separado
+- resultado operativo solo por archivos en disco
+- sobrescribir `notes/phase-summary.md`
+- escribir `notes/.phase-research.done` al terminar
+- responder en chat solo `DONE: summary written` o `BLOCKED: summary written`
+- no usar `agent-log.md`

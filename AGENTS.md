@@ -1,95 +1,85 @@
 # AGENTS
 
-Reglas de trabajo para este repo de charlas.
+Contrato operativo corto para este repo de charlas.
 
-## Contexto
-- Cada carpeta de primer nivel es una charla, salvo infraestructura como `agents/`, `templates/`, `outputs/` y carpetas ocultas.
+## Contexto repo-wide
+- Cada carpeta de primer nivel suele ser una charla, salvo infraestructura como `agents/`, `templates/`, `scripts/`, `skills/` y carpetas ocultas.
 - Audiencia por defecto: gente que trabaja con datos, usualmente `Data Scientists`.
 - Tono por defecto: ejecutivo, tecnico, directo y claro.
 - No amarrar la narrativa a telco salvo pedido explicito.
+- Verifica con fuentes actuales cualquier claim sobre precios, releases, compatibilidad, costos actuales o casos corporativos recientes.
 
-## Flujo
-Toda charla debe pasar por tesis, research cuando haga falta, convergencia con el usuario, narrativa de `8-10 slides`, build `pptx`, cierre visual y review.
+## Flujo base
+Toda charla pasa por tesis, research cuando haga falta, convergencia con el usuario, narrativa de `8-10 slides`, build `pptx`, cierre visual y review.
 
-El research no pasa automaticamente a PPT. Primero se discute, se recorta y se fija el angulo.
+El research no pasa automaticamente a PPT: primero se discute, se recorta y se fija el angulo.
 
 Cada slide debe tener tesis, lectura ejecutiva, objeto visible y concepto visual. Si varias slides quedan como cajas, tablas o conectores sin idea visual clara, vuelve a narrativa o build antes de aprobar.
 
+## Donde vive cada regla
+- Roles especializados: `agents/*.md`.
+- Mapa de roles, paquetes y dependencias: `agents/README.md`.
+- Orquestacion de fases, prechecks, workers, sentinels y ciclo de correccion: `agents/orchestrator-charlas.md`.
+- Specs y prompts SDD reutilizables: `templates/charlas-sdd/`.
+- Renderer local, theme default y comandos de build/QA: `scripts/deck_renderer/README.md`.
+- Ejemplo de `deck-spec.json`: `templates/deck-renderer/deck-spec.example.json`.
+- Protocolo repo-local de workers separados: `skills/worker-handoff`.
+
 ## Agentes
-- `orchestrator-charlas`: decide fase, dependencias, launch y bloqueo.
+- `orchestrator-charlas`: decide fase, dependencias, launch, workers y bloqueo.
 - `researcher-charlas`: investiga, tensiona tesis y entrega research discutible.
 - `narrative-charlas`: convierte research convergido en narrativa aprobable.
-- `deck-builder-charlas`: construye `pptx` editable usando la skill `pptx`.
+- `deck-builder-charlas`: construye decks `pptx` y fixes puntuales.
 - `image-closer-charlas`: define imagen editorial de cierre.
 - `review-charlas`: valida deck, texto, visuales, cierre y evidencia.
 
-## Estructura por charla
-Convencion recomendada:
+No omitas el rol especializado: el prompt de fase no reemplaza `agents/*.md`.
 
-- `specs/`: specs SDD propios de la charla, copiados o adaptados desde `templates/charlas-sdd/`
-- `notes/`: narrativa, claims, material validado, `bibliografia.md` y `agent-log.md`
-- `slides/` o `deck/`: fuente editable y exportables
+## Estructura por charla
+Convencion recomendada hacia adelante:
+
+- `specs/`: specs SDD copiados o adaptados desde `templates/charlas-sdd/`
+- `notes/`: narrativa, claims, material validado, `bibliografia.md` y `phase-summary.md`
+- `slides/` o `deck/`: fuente editable y exportables locales
 - `assets/`: imagenes, prompts visuales y recursos de soporte
 - `review/`: observaciones, ajustes y chequeos finales
 
-La convencion aplica hacia adelante. No migres charlas antiguas salvo que se reabran.
+No migres charlas antiguas salvo que se reabran. `slides/` y `assets/` deben existir localmente cuando la charla los necesite, pero por defecto no se suben al remoto.
 
-`slides/` y `assets/` deben existir localmente cuando la charla los necesite, pero por defecto no se suben al remoto. El entregable publicable es el `pptx`, junto con notas, specs y review cuando corresponda.
-
-Si hubo research externo, `notes/bibliografia.md` es obligatorio. Si corrio una fase pesada, debe quedar una entrada en `notes/agent-log.md` con agente, modelo, esfuerzo, estado, artefactos, errores o bloqueos, y siguiente accion.
+Si hubo research externo, `notes/bibliografia.md` es obligatorio. Si corrio una fase pesada, `notes/phase-summary.md` debe existir y representar el estado actual.
 
 ## Specs SDD
 La metodologia vive en `templates/charlas-sdd/`.
 
-Usa `full/` para charlas normales o complejas:
+- Usa `full/` para charlas normales o complejas: `thesis-spec.md`, `research-spec.md`, `narrative-spec.md`, `build-spec.md` y `review-spec.md`.
+- Usa `compact/` para charlas pequenas o con framing claro: `research-package.md` y `build-review-package.md`.
+- Usa los prompts de `templates/charlas-sdd/prompts/` para acotar cada fase.
 
-- `thesis-spec.md`
-- `research-spec.md`
-- `narrative-spec.md`
-- `build-spec.md`
-- `review-spec.md`
+## Build PPTX
+Para decks `pptx` nuevos desde cero, el build normal usa el renderer local del repo:
 
-Usa `compact/` para charlas pequenas o con framing claro:
+`deck-spec.json` -> `scripts/deck_renderer/render-deck.js` -> `scripts/deck_renderer/qa-deck.py` -> `scripts/deck_renderer/validate-powerpoint.ps1`
 
-- `research-package.md`
-- `build-review-package.md`
+El theme default es `scripts/deck_renderer/theme-charlas.json`. Los detalles de instalacion, dependencias y comandos viven en `scripts/deck_renderer/README.md`.
 
-Los prompts de fase viven en `templates/charlas-sdd/prompts/`.
+La skill `pptx` queda solo para emergencia o diagnostico avanzado: inspeccion, extraccion, unpack/pack, reparacion puntual y diagnostico XML/estructura cuando los scripts del repo no expliquen el fallo.
 
-## Ejecucion
-El chat principal orquesta. Las fases pesadas corren por defecto como subagente Codex con contexto acotado:
+## Workers y handoff
+No cambies la politica de workers desde este archivo. Para `modo chat separado` o hilos worker separados, sigue `skills/worker-handoff` y `agents/orchestrator-charlas.md`.
 
-- rol especializado desde `agents/*.md`
-- spec concreto desde `specs/` o `templates/charlas-sdd/`
-- prompt de fase desde `templates/charlas-sdd/prompts/`
-- artefactos estrictamente necesarios
-- `model: gpt-5.5`
-- `reasoning_effort: medium`
-- `fork_context: false`
+Reglas repo-wide minimas:
 
-El prompt de fase no reemplaza el rol especializado. El padre no debe completar `build` ni `review` si el subagente se bloquea.
+- el padre observa archivos, no chats worker ni `read_thread`
+- `notes/phase-summary.md` es el handoff operativo oficial, salvo summaries temporales permitidos para `build` + `image-close` paralelos
+- la finalizacion se verifica con `Test-Path` sobre el sentinel esperado
+- el worker escribe el sentinel al terminar y responde solo `DONE: summary written` o `BLOCKED: summary written`
+- `fork_context: false` es el default para subagentes
 
-El feedback humano posterior a una fase entra por `orchestrator-charlas`, que decide si relanza narrativa, build, imagen final o review.
+Los tiempos de espera, sentinels, limpieza de sentinels viejos, consolidacion de summaries temporales y bloqueo de workers viven en `agents/orchestrator-charlas.md` y el protocolo `skills/worker-handoff`.
 
-`modo chat separado` queda como alternativa si el usuario quiere ejecutar una fase manualmente y traer de vuelta solo el output compacto.
+## Gates de cierre
+El entregable primario es un `pptx` editable compatible con PowerPoint nativo.
 
-Research usa esfuerzo `standard` por defecto. Usa `quick` si el usuario pide algo rapido o de bajo riesgo; usa `deep` si el usuario lo pide o la complejidad lo amerita.
+Una charla no se cierra sin tesis clara, comparacion o tradeoff, lectura ejecutiva, cierre editorial fuerte, bibliografia si hubo fuentes externas, `notes/phase-summary.md` actualizado y review aprobada del artefacto exacto.
 
-## Precondiciones
-- `build` requiere `specs/build-spec.md` y `specs/narrative-spec.md`.
-- `review` requiere `specs/review-spec.md`, deck objetivo, `notes/bibliografia.md` cuando aplique, `notes/agent-log.md` y evidencia de build.
-- Si falta un spec obligatorio, se corrige el contrato antes de lanzar la fase.
-
-## Bloqueos
-Una fase bloqueada debe devolver: estado, fase, bloqueo concreto, artefactos, chequeos fallidos, chequeos exitosos, riesgos residuales y accion propuesta.
-
-El padre registra evidencia y decide si espera, relanza, devuelve a la fase anterior o escala al usuario. No absorbe una fase especializada.
-
-## Cierre y evidencia
-Toda charla debe tener tesis clara, comparacion o tradeoff, lectura ejecutiva y cierre editorial fuerte con mensaje breve e imagen alineada.
-
-Verifica con fuentes actuales cualquier claim sobre precios, releases, compatibilidad, costos actuales o casos corporativos recientes.
-
-La imagen final no debe repetir tablas, bullets ni diagramas; debe amplificar el cierre y sentirse editorial, deliberada y distinta.
-
-Cuando el build necesite LibreOffice en Windows, resolver `C:\Program Files\LibreOffice\program\soffice.exe` o usar `scripts/resolve-soffice.ps1` desde la raiz del repo.
+PowerPoint nativo es el gate final de apertura/export. Los detalles de QA visual corresponden a `deck-builder-charlas`, `review-charlas` y `scripts/deck_renderer/README.md`; LibreOffice/Poppler son auxiliares y no aprueban build.

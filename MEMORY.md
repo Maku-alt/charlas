@@ -24,6 +24,7 @@ Los documentos raiz que gobiernan el trabajo son:
 - `STYLE-CHARLAS.md`: sistema visual y narrativo compartido
 - `agents/`: agentes especializados del flujo de charlas
 - `templates/charlas-sdd/`: metodologia SDD reutilizable para research, narrativa, build y review
+- `scripts/deck_renderer/`: renderer local para construir PPTX editables desde `deck-spec.json`
 
 ## Convencion por charla
 
@@ -82,19 +83,22 @@ Principio operativo:
 
 1. primero converger tesis y narrativa
 2. fijar una narrativa de `8-10 slides`
-3. despues construir la deck
+3. despues construir la deck con el renderer local
 4. luego resolver el cierre visual
 5. finalmente revisar el artefacto
 
 El research paralelo solo conviene cuando el framing ya esta claro y hay subpreguntas independientes.
 
-Por defecto, fases pesadas corren en modo Codex subagent con contexto acotado: spec, artefactos necesarios y prompt de fase. El modo chat separado queda como alternativa manual cuando el usuario quiera traer de vuelta solo el output compacto.
+Por defecto, las fases pesadas deben recibir contexto acotado: rol, spec, artefactos necesarios, prompt de fase, `notes/phase-summary.md` como handoff y `fork_context: false` cuando se use subagente. En workers separados, el padre espera el sentinel por archivos y no lee chats worker.
 
 ## Aprendizajes ya validados
 
 - no todo hallazgo del research pasa automaticamente a la PPT
 - el cierre visual debe existir como agente separado del deck builder
 - el review debe ocurrir sobre una deck o artefacto ya construido, no sobre ideas abiertas
+- el build normal de PPTX usa `scripts/deck_renderer/render-deck.js` desde `deck-spec.json`
+- PowerPoint nativo es el gate final de apertura/export
+- el padre debe esperar 180 segundos antes del primer `Test-Path` sobre un sentinel worker
 - `researcher.md` se conserva como pieza portable, pero no forma parte de la documentacion publica del flujo de `charlas`
 
 ## Test ya ejecutado
@@ -102,14 +106,14 @@ Por defecto, fases pesadas corren en modo Codex subagent con contexto acotado: s
 Se ejecuto un test end-to-end con una version temporal de `Harness Engineer 2`. El contenido del test fue eliminado despues de validarlo, pero dejo dos conclusiones utiles:
 
 - el flujo `research -> deck -> image -> review` funciono de punta a punta en un caso previo del repo
-- en Windows, si el builder de presentaciones resuelve mal `@oai/artifact-tool`, conviene relanzar con `HOME=C:\\Users\\Victor`
+- el build normal debe ser reproducible por script; si una herramienta auxiliar falla, no debe convertirse en default del flujo
 
 Ese aprendizaje operativo ya fue absorbido en la documentacion de `agents/`. El flujo vigente agrega la fase explicita `narrative-charlas` entre research y build; lo que esta en curso es la validacion de ese cambio.
 
 ## Higiene del repo
 
 - `researcher.md` debe quedar fuera de versionado
-- `outputs/`, `preview/`, `layout/`, `qa/`, `node_modules/` y entornos virtuales deben tratarse como temporales
+- `outputs/`, `analysis/`, `.codex/`, `.agents/`, `.ai/`, `preview/`, `layout/`, `qa/`, `node_modules/` y entornos virtuales deben tratarse como temporales
 
 ## Como usar esta memoria
 

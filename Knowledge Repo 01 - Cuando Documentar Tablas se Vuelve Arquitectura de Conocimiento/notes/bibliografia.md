@@ -1,79 +1,71 @@
 # Bibliografia
 
-Esta bibliografia corresponde a una nueva corrida de research desde cero ejecutada el 2026-06-28. No reutiliza briefs anteriores.
+## Fuentes principales
 
-## Fuentes primarias u oficiales
+1. Google Cloud Blog. "Introducing the Open Knowledge Format." 2026-06-12. https://cloud.google.com/blog/products/data-analytics/how-the-open-knowledge-format-can-improve-data-sharing
+   - Uso: fuente principal para OKF, fecha de anuncio, motivacion, bundles Markdown + YAML frontmatter y posicionamiento como formato, no plataforma.
+   - Nota: fuente de proveedor; usar con cuidado para no sobredimensionar adopcion o madurez.
 
-1. CommonMark. `CommonMark Spec`, version 0.31.2, 2024-01-28.
-   URL: https://spec.commonmark.org/0.31.2/
-   Uso: sustentar que Markdown es formato de texto estructurado y legible, no un sistema completo de gobierno de conocimiento.
-   Lectura critica: fuente primaria del formato; no habla de ownership, freshness, lineage ni procesos de mantenimiento.
+2. GoogleCloudPlatform / knowledge-catalog. "Open Knowledge Format (OKF) SPEC.md." Version 0.1, Draft. https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md
+   - Uso: fuente primaria para definicion de OKF, estructura de bundle, concept documents, fields, links, citations, goals y non-goals.
+   - Hallazgo clave: OKF no prescribe storage, serving, query infrastructure ni reemplaza schemas de dominio.
 
-2. John Gruber. `Markdown`.
-   URL: https://daringfireball.net/projects/markdown/
-   Uso: cita candidata sobre legibilidad como objetivo de Markdown.
-   Lectura critica: fuente historica del formato; util para framing, no para claims sobre arquitectura de conocimiento.
+3. Model Context Protocol. "Specification 2025-06-18." https://modelcontextprotocol.io/specification/2025-06-18
+   - Uso: fuente primaria para definir MCP como protocolo de integracion entre hosts, clients y servers, con resources, prompts y tools.
+   - Lectura para la charla: MCP expone contexto y capacidades; no sustituye la memoria gobernada.
 
-3. GitHub Docs. `About wikis`.
-   URL: https://docs.github.com/en/communities/documenting-your-project-with-wikis/about-wikis
-   Uso: sustentar que una wiki sirve para alojar documentacion de repositorios, editar contenido y permitir colaboracion, pero no implica por si misma gobierno operacional.
-   Lectura critica: fuente oficial de GitHub; sesgo hacia capacidades de GitHub.
+4. Anthropic. "Introducing the Model Context Protocol." 2024-11-25. https://www.anthropic.com/news/model-context-protocol
+   - Uso: origen publico de MCP y framing como estandar abierto para conectar asistentes con sistemas donde vive la data.
+   - Nota: fuente de creador/proveedor; usar para origen y motivacion, no como prueba unica de adopcion.
 
-4. Obsidian Help. `Internal links`.
-   URL: https://help.obsidian.md/links
-   Uso: sustentar links internos, notas conectadas y red de conocimiento como capa de navegacion humana.
-   Lectura critica: fuente oficial de producto; fuerte para navegacion, no para gobierno de datos.
+5. DataHub Docs. "The Metadata Model." https://docs.datahub.com/docs/metadata-modeling/metadata-model
+   - Uso: evidencia conceptual de modelado de metadata: entidades, aspectos, browse paths, ownership, descriptions, tags, glossary terms y versioned aspects.
+   - Lectura para la charla: el conocimiento de datos escala como entidad + relaciones + aspectos, no como texto aislado.
 
-5. Obsidian Help. `Graph view`.
-   URL: https://help.obsidian.md/plugins/graph
-   Uso: sustentar visualizacion de relaciones entre notas mediante nodos y links.
-   Lectura critica: fuente oficial de producto; no equivale a metadata operacional.
+6. OpenMetadata Docs. "Overview of Data Assets." Version v1.12.x. https://docs.open-metadata.org/v1.12.x/how-to-guides/guide-for-data-users/data-asset-tabs
+   - Uso: evidencia de que una vista de activo de datos incluye owner, tier, usage, description, schema, tasks, sample data, queries, profiler, lineage, custom properties y version history.
+   - Lectura para la charla: una ficha de tabla util debe mirar mas alla de columnas.
 
-6. dbt Labs Docs. `Add sources to your DAG`.
-   URL: https://docs.getdbt.com/docs/build/sources
-   Uso: evidencia concreta de que equipos de datos documentan fuentes, describen tablas/columnas, crean dependencias/lineage, testean supuestos y calculan freshness.
-   Lectura critica: fuente oficial de dbt; sesgo hacia ecosistema dbt, pero muy pertinente para equipos de datos.
+7. OpenMetadata Docs. "Glossary | OpenMetadata Data Glossary Guide." Version v1.12.x. https://docs.open-metadata.org/v1.12.x/how-to-guides/data-governance/glossary
+   - Uso: soporte para glosarios como vocabulario controlado, etiquetado de activos, descubrimiento, recuperacion, exploracion y gobierno.
+   - Lectura para la charla: definiciones de negocio son metadata relacional, no solo texto de soporte.
 
-7. DataHub Project. `Ownership.pdl`.
-   URL: https://github.com/datahub-project/datahub/blob/master/metadata-models/src/main/pegasus/com/linkedin/common/Ownership.pdl
-   Uso: evidencia primaria de que plataformas de metadata modelan ownership como aspecto de entidades y registran `lastModified`.
-   Lectura critica: fuente de codigo del proyecto; util para probar que ownership es metadata operacional, no solo texto.
+8. dbt Developer Hub. "Add Exposures to your DAG." Version v2.0. https://docs.getdbt.com/docs/build/exposures
+   - Uso: ejemplo de metadata como codigo para downstream uses: dashboards, aplicaciones y data science pipelines.
+   - Lectura para la charla: los consumidores y usos tambien son parte del contexto operacional de una tabla/modelo.
 
-8. Model Context Protocol. `Specification - Overview`.
-   URL: https://modelcontextprotocol.io/specification/draft/basic
-   Uso: sustentar que MCP separa protocolo, server features, tools, resources y mensajes; sirve como interfaz de acceso, no como memoria de conocimiento.
-   Lectura critica: especificacion primaria; cambia con versiones, validar antes de claims definitivos.
+9. Obsidian Help. "Internal links." https://obsidian.md/help/links
+   - Uso: evidencia sobre links internos y redes de conocimiento en wikis/segundos cerebros basados en notas.
+   - Lectura para la charla: navegacion humana es una capa real, pero distinta de gobierno y vigencia.
 
-9. Model Context Protocol. `Server Features - Tools`.
-   URL: https://modelcontextprotocol.io/specification/draft/server/tools
-   Uso: sustentar que MCP permite exponer herramientas invocables por modelos, con schemas, resultados y consideraciones de seguridad/human-in-the-loop.
-   Lectura critica: fuente primaria; no define calidad ni gobierno del contenido consultado.
+10. CommonMark. "What is Markdown?" https://commonmark.org/
+    - Uso: definicion base de Markdown como formato de texto plano para documentos estructurados.
+    - Lectura para la charla: Markdown es excelente como formato portable, pero no define por si mismo arquitectura de conocimiento.
 
-## Fuentes sobre OKF y ecosistema emergente
+11. GitHub Docs. "Basic writing and formatting syntax." https://docs.github.com/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax
+    - Uso: evidencia practica de Markdown como formato comun en repositorios y flujos GitHub.
+    - Lectura para la charla: versionar docs junto a codigo es natural, pero requiere convenciones adicionales.
 
-10. GoogleCloudPlatform. `knowledge-catalog / okf`.
-    URL: https://github.com/GoogleCloudPlatform/knowledge-catalog/tree/main/okf
-    Uso: referencia principal para Open Knowledge Format cuando este disponible. Debe revisarse directamente antes de usar claims especificos en slides.
-    Lectura critica: se trato como fuente primaria esperada; validar contenido puntual antes de deck final.
+12. Diataxis. "Diataxis." https://diataxis.fr/
+    - Uso: referencia secundaria para separar tipos de documentacion por necesidad del usuario.
+    - Lectura para la charla: ayuda a evitar mezclar referencia, explicacion y guia dentro de una sola ficha larga.
 
-11. OWOX. `OWOX Model Canvas`.
-    URL: https://github.com/OWOX/owox-model-canvas
-    Uso: ejemplo actual de herramienta que lee/escribe OKF, describe data marts como nodos, relaciones como edges y exporta bundles Markdown con YAML frontmatter.
-    Lectura critica: proyecto de proveedor; util como evidencia de implementacion, no como prueba de adopcion general.
+## Claims verificados y nivel de evidencia
 
-12. OKFy. `Open Knowledge Format for AI agents`.
-    URL: https://github.com/0dust/OKFy
-    Uso: ejemplo actual de OKF aplicado a bundles agent-readable con frontmatter, links, backlinks, fuente, freshness local y MCP read-only.
-    Lectura critica: proyecto comunitario reciente; fuerte para mostrar patron emergente, debil para claims de madurez.
+| Claim | Evidencia | Nivel |
+|---|---|---|
+| Markdown es portable y legible, pero no define ownership, vigencia ni relaciones | CommonMark, GitHub Docs; inferencia desde ausencia de esos conceptos en el formato | Alto para formato, medio para limite operacional |
+| Wiki/segundo cerebro mejora navegacion humana | Obsidian Help sobre links internos y red de conocimiento | Alto |
+| Wiki no equivale automaticamente a gobierno | Inferencia a partir de que links no cubren owner, vigencia, revision ni autoridad | Medio |
+| Metadata de datos es relacional y gobernada | DataHub, OpenMetadata, dbt Exposures | Alto |
+| OKF es emergente y debe presentarse como draft v0.1 | Google Cloud Blog y OKF SPEC.md | Alto |
+| OKF no reemplaza schemas ni infraestructura de query/serving | OKF SPEC.md non-goals | Alto |
+| MCP es interfaz para contexto, tools y resources, no memoria | MCP Specification y Anthropic announcement | Alto |
 
-## Fuentes complementarias a validar si entran en deck
+## Claims que no deben afirmarse sin evidencia propia
 
-13. OpenMetadata Docs. `Table entity / metadata schemas`.
-    URL: https://docs.open-metadata.org/
-    Uso potencial: ownership, columns, lineage, glossary y metadata operacional en catalogos de datos.
-    Estado: consulta web parcial tuvo problemas de conexion; validar de nuevo antes de usar en slide.
-
-14. DataHub Docs. `Metadata model / dataset concepts`.
-    URL: https://datahubproject.io/docs/
-    Uso potencial: completar ejemplos de ownership, lineage, glossary y dataset metadata desde docs narrativas.
-    Estado: se uso una fuente primaria de codigo para ownership; validar docs narrativas si se quiere citar en slide.
+- Reduccion cuantitativa de costos, tokens o tiempo por usar knowledge repo.
+- Adopcion amplia de OKF fuera del ecosistema inicial.
+- Que MCP sea suficiente para resolver calidad del conocimiento.
+- Que una wiki simple fracase siempre.
+- Que un knowledge repo reemplace un catalogo de datos corporativo.

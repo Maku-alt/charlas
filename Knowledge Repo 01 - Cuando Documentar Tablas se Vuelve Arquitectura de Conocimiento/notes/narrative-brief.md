@@ -1,147 +1,166 @@
 # Narrative Brief
 
+Run id: `knowledge-repo-01-full-rebuild-20260704`
+
 ## Tesis propuesta
 
-Documentar tablas se vuelve arquitectura de conocimiento cuando el equipo deja de producir paginas descriptivas y empieza a operar una memoria comun: una base mantenible de decisiones, relaciones, vigencia y ownership que humanos y agentes pueden consultar sin improvisar contexto.
+Documentar tablas se vuelve arquitectura de conocimiento cuando el equipo necesita conectar, mantener y consultar lo que sabe.
 
-La lectura editorial cambia el centro de la charla: no es una escalera de herramientas (`Markdown -> wiki -> repo -> MCP`), sino el paso de un inventario de fichas a un sistema operativo de conocimiento. Las capas importan, pero entran como responsabilidades dentro de un loop: capturar, conectar, validar, mantener y consultar.
+La formulacion operativa para build es:
+
+> Una ficha de tabla deja de ser documentacion aislada cuando declara identidad, ownership, relaciones, vigencia, historial e interfaz de consulta.
 
 ## Lectura narrativa
 
-La charla debe sentirse como una decision de arquitectura liviana para equipos de datos que ya tienen demasiadas tablas, demasiadas respuestas tacitas y demasiadas preguntas repetidas. El problema no empieza con la herramienta; empieza cuando una pregunta real ya no cabe en una ficha.
+La charla no debe vender una herramienta ni atacar Markdown. Debe mostrar una evolucion: Markdown es el ladrillo correcto; la wiki ayuda a navegar; el knowledge repo introduce contrato operativo; OKF sirve como referencia emergente de portabilidad; MCP/API expone la memoria a agentes, pero no la reemplaza.
 
-El arco nuevo parte de la presion operacional: una persona o agente pregunta algo concreto sobre una tabla y descubre que la respuesta vive repartida entre columnas, dashboards, owners, freshness, decisiones pasadas y riesgos conocidos. Desde ahi, la charla construye el contrato minimo de una memoria mantenible y solo despues ubica Markdown, wiki, catalogos, OKF y MCP como piezas de acceso o soporte.
+El hilo conductor es `clientes`: empieza como una ficha simple y termina como una pieza de memoria operacional conectada a metricas, owners, riesgos, decisiones, consumidores y acceso para agentes.
 
 ## Audiencia y cambio esperado
 
-Audiencia: Data Scientists, analistas, data engineers, analytics engineers y lideres tecnicos que trabajan con muchas tablas, conocimiento tacito y uso creciente de asistentes o agentes.
+Audiencia: Data Scientists, analistas, data engineers, analytics engineers y lideres tecnicos que trabajan con muchas tablas y conocimiento tacito.
 
-Cambio esperado: dejar de preguntar "donde escribimos la documentacion?" y empezar a preguntar "que memoria operacional necesita el equipo para que otra persona, o un agente, continue el razonamiento con contexto confiable?".
+Cambio esperado:
+
+- Antes: "hagamos un `.md` por tabla".
+- Despues: "definamos que capa cumple cada rol: formato, navegacion, gobierno, memoria operacional e interfaz para agentes".
+
+La decision que debe quedar instalada es empezar por contrato minimo y ownership, no por herramienta ni por RAG.
 
 ## Comparacion o tension central
 
-Tension central: inventario de paginas versus memoria operable.
+La tension central es `archivo suelto` versus `memoria operacional gobernada`.
 
-- Inventario de paginas: describe objetos, depende de heroes locales, envejece en silencio y obliga a reconstruir contexto en cada pregunta.
-- Memoria operable: declara identidad, ownership, vigencia, relaciones, evidencia, historial y rutas de consulta.
-
-La pregunta de decision no es "Markdown o catalogo?" sino "que parte del razonamiento queremos poder reutilizar sin volver a entrevistar al equipo?".
+| Capa | Sirve para | Riesgo si se confunde |
+|---|---|---|
+| Markdown | formato portable y versionable | creer que formato equivale a memoria |
+| Wiki | discovery humano y navegacion | tener enlaces sin autoridad ni vigencia |
+| Knowledge repo | contrato, ownership, relaciones, historial | sobregobernar antes de encontrar valor |
+| OKF | referencia emergente de bundle Markdown + frontmatter | tratar un draft como estandar corporativo final |
+| MCP/API | interfaz de consulta para agentes | exponer desorden mas rapido |
 
 ## Lo que queda fuera
 
 - RAG, embeddings y grafos como tema principal.
-- Tutorial de Obsidian, GitHub Wiki, dbt, catalogos, OKF o MCP.
+- LangGraph u orquestacion avanzada.
+- Tutorial de Obsidian.
 - Comparativa competitiva entre herramientas.
-- Implementacion tecnica detallada de un servidor MCP.
-- Claims cuantitativos de ahorro de tokens, tiempo o costo sin evidencia propia.
-- Presentar OKF como estandar ampliamente adoptado; solo puede aparecer como patron emergente o referencia portable.
+- Implementacion tecnica detallada.
+- Promesas cuantitativas de ahorro, costo, tokens o tiempo.
+- Claims de adopcion amplia de OKF.
+
+RAG/grafos aparecen solo como puente hacia la charla 2: primero memoria ordenada, despues busqueda y razonamiento.
 
 ## Narrativa propuesta de la charla
 
 ### Slide 1
 
-- kicker: Punto de quiebre
-- titulo con tesis: Una tabla deja de estar documentada cuando nadie puede reconstruir su contexto
-- concepto visual: una ficha de tabla en primer plano, rodeada por sombras de preguntas no resueltas; la imagen debe comunicar que el problema no es ausencia de texto sino perdida de contexto.
-- objeto de prueba visible: pregunta conductora: `puedo usar clientes para entrenar este modelo y explicar el KPI del dashboard?`
-- takeaway: el volumen de tablas convierte la documentacion en un problema de memoria comun.
-- notas de soporte: abrir con una situacion reconocible, no con definiciones. La pregunta debe cruzar uso, metrica, owner, freshness, riesgo y decision pasada.
+- kicker: Tesis
+- titulo con tesis: Documentar tablas deja de ser documentacion cuando el equipo necesita memoria comun
+- concepto visual: cover editorial donde una ficha `clientes.md` se multiplica y empieza a formar un mapa curado, no un caos de archivos
+- objeto de prueba visible: una ficha de tabla en primer plano y varias fichas conectadas por trazos discretos hacia metricas, owners y decisiones
+- takeaway: el problema no es escribir mas; es conectar y mantener lo que el equipo ya sabe
+- notas de soporte: abrir con el cambio de escala: pocas tablas toleran notas sueltas; muchas tablas exigen memoria compartida.
 
 ### Slide 2
 
-- kicker: Falso avance
-- titulo con tesis: Escribir mas fichas no arregla una memoria que no tiene contrato
-- concepto visual: una mesa editorial con fichas Markdown prolijas pero desalineadas; algunas tienen huecos visibles en owner, vigencia o relaciones.
-- objeto de prueba visible: tres fichas `.md` con campos inconsistentes: una tiene owner, otra freshness, otra decision historica.
-- takeaway: Markdown hace el conocimiento revisable; el contrato lo vuelve mantenible.
-- notas de soporte: cuidar que no suene anti-Markdown. Markdown sigue siendo el formato base correcto por legibilidad, portabilidad y Git.
+- kicker: Baseline
+- titulo con tesis: Markdown es el primer ladrillo correcto, pero no define el edificio
+- concepto visual: una ficha Markdown limpia, util y limitada, como pieza inicial de arquitectura
+- objeto de prueba visible: `clientes.md` con descripcion, columnas principales y usos conocidos
+- takeaway: Markdown aporta portabilidad, lectura humana y versionado; todavia no aporta gobierno
+- notas de soporte: cuidar el framing: Markdown no es el problema. El problema es pedirle que resuelva identidad, vigencia, ownership y relaciones sin contrato adicional.
 
 ### Slide 3
 
-- kicker: Pregunta real
-- titulo con tesis: La unidad de valor no es la ficha, es el camino que permite responder
-- concepto visual: una ruta iluminada que parte de `clientes` y toca metrica, dashboard, owner, lineage, freshness, riesgo y decision.
-- objeto de prueba visible: mapa de una consulta: `tabla -> columnas criticas -> joins validos -> KPI -> dashboard -> owner -> dudas resueltas`.
-- takeaway: documentar datos es conservar rutas de razonamiento, no solo describir objetos.
-- notas de soporte: esta slide reemplaza la vieja "friccion" por una escena de investigacion operativa. El foco es el camino reutilizable.
+- kicker: Friccion
+- titulo con tesis: El dolor real aparece cuando una pregunta cruza tablas, metricas y decisiones pasadas
+- concepto visual: la ficha `clientes` como centro de una mesa de investigacion con preguntas pegadas alrededor
+- objeto de prueba visible: owner, freshness, joins frecuentes, dashboards, metricas, riesgos, consumidores y dudas ya resueltas
+- takeaway: la unidad de valor deja de ser la ficha; pasa a ser la red de contexto que permite decidir
+- notas de soporte: usar preguntas concretas: "puedo joinear esto con ventas?", "quien valida churn?", "esta columna sigue vigente?", "que dashboard depende de esto?".
 
 ### Slide 4
 
-- kicker: Contrato minimo
-- titulo con tesis: Un knowledge repo empieza cuando cada tabla declara que promete mantener
-- concepto visual: una ficha como contrato firmado, no como pagina; frontmatter arriba, cuerpo narrativo al centro, relaciones y revision al pie.
-- objeto de prueba visible: plantilla minima con `id`, `owner`, `dominio`, `estado`, `freshness`, `relaciones`, `decisiones`, `riesgos`, `revision`.
-- takeaway: la arquitectura vive en convenciones observables, no en el nombre de la herramienta.
-- notas de soporte: conectar con research: ownership, vigencia, relaciones, historial y criterios de revision son los criterios que separan memoria de notas.
+- kicker: Distincion
+- titulo con tesis: Una wiki ayuda a encontrar conocimiento; no garantiza que ese conocimiento sea vigente
+- concepto visual: comparacion editorial entre un grafo de notas navegable y un control operacional de vigencia
+- objeto de prueba visible: panel izquierdo con links/backlinks; panel derecho con owner, status, fecha de revision, fuente canonica y decision registrada
+- takeaway: navegar y gobernar son problemas distintos
+- notas de soporte: no desacreditar wikis. Funcionan para discovery humano; el salto a memoria operacional requiere autoridad, mantenimiento y criterios de inclusion.
 
 ### Slide 5
 
-- kicker: Loop operativo
-- titulo con tesis: La memoria comun escala cuando tiene ciclo de vida, no cuando tiene mas enlaces
-- concepto visual: ciclo sobrio de cinco estaciones: capturar, conectar, validar, revisar, retirar; cada estacion deja una marca sobre la ficha.
-- objeto de prueba visible: loop de mantenimiento con estados: `draft`, `vigente`, `requiere revision`, `deprecated`.
-- takeaway: wiki y backlinks ayudan a navegar; el knowledge repo tambien debe decidir que sigue vigente.
-- notas de soporte: esta es la distincion wiki/repo sin repetir una comparacion frontal de paneles. La clave es que navegacion no equivale a gobierno.
+- kicker: Contrato
+- titulo con tesis: Un knowledge repo empieza cuando cada ficha declara identidad, relaciones y responsabilidad
+- concepto visual: una ficha partida en tres capas editables: frontmatter, cuerpo narrativo y bitacora de cambios
+- objeto de prueba visible: YAML con `id`, `owner`, `domain`, `status`, `freshness`, `related_metrics`, `consumers`, `last_reviewed`; cuerpo Markdown con decisiones y links
+- takeaway: la arquitectura vive en el contrato minimo, no en la herramienta
+- notas de soporte: enfatizar progresividad: pocos campos obligatorios, crecimiento por valor y revision via Git/PR cuando aplique.
 
 ### Slide 6
 
-- kicker: Senal externa
-- titulo con tesis: Los stacks de datos ya muestran que la metadata importante es operacional
-- concepto visual: una misma tabla conectada a senales de sistema: lineage, tests, freshness, owner, consumidores, contrato y dashboards.
-- objeto de prueba visible: inventario de capacidades observables en catalogos/dbt/data platforms: owners, lineage, freshness, tests, glossary, consumidores.
-- takeaway: el knowledge repo no inventa burocracia; traduce una necesidad real a una escala portable.
-- notas de soporte: no vender reemplazo de catalogo. Presentarlo como contrato complementario o capa liviana cuando el catalogo no captura conocimiento narrativo.
+- kicker: Evidencia
+- titulo con tesis: Los catalogos modernos muestran que el conocimiento de datos ya es relacional
+- concepto visual: activo de datos como nodo sobrio conectado a aspectos operativos, no como diagrama tecnico saturado
+- objeto de prueba visible: tabla conectada a owner, glossary, lineage, quality, contract, dashboard, consumidores y version history
+- takeaway: no se trata de inventar burocracia; se trata de capturar a escala pequena lo que los catalogos modelan a escala grande
+- notas de soporte: presentar DataHub, OpenMetadata y dbt exposures como evidencia conceptual, no como recomendacion de compra ni reemplazo del repo.
 
 ### Slide 7
 
-- kicker: Agentes
-- titulo con tesis: Un agente no necesita mas documentos; necesita una memoria que se pueda consultar con precision
-- concepto visual: un agente frente a una ventanilla de consulta, no navegando una pila infinita; la ventanilla ofrece `search`, `read` y `neighbors`.
-- objeto de prueba visible: flujo `pregunta -> search -> read -> neighbors -> evidencia citada -> owner si hay duda`.
-- takeaway: MCP/API es una puerta de acceso; la confiabilidad viene del contrato del repo.
-- notas de soporte: evitar prometer trazabilidad automatica. La interfaz expone recursos y herramientas, pero no arregla conocimiento mal mantenido.
+- kicker: Portabilidad
+- titulo con tesis: OKF apunta a una idea util: Markdown con estructura explicita para humanos y agentes
+- concepto visual: bundle de conocimiento como carpeta ordenada, con `index.md`, ficha Markdown, frontmatter y `log.md`
+- objeto de prueba visible: ejemplo conceptual de bundle OKF-style con campos `type`, `title`, `description`, `resource`, `tags`, `timestamp` y links
+- takeaway: OKF sirve como referencia emergente de convencion portable; no es un estandar corporativo final ni una plataforma completa
+- notas de soporte: usar fecha si se menciona en build: Google Cloud lo introdujo el 12 de junio de 2026; spec v0.1 draft. Incluir non-goals: no prescribe storage, serving ni query.
 
 ### Slide 8
 
-- kicker: Decision de arquitectura
-- titulo con tesis: Separar responsabilidades evita convertir una herramienta en estrategia
-- concepto visual: tablero de decision con cinco responsabilidades, no matriz de productos: formato, navegacion, gobierno, portabilidad, acceso.
-- objeto de prueba visible: decision map: `Markdown = formato`, `wiki = exploracion`, `knowledge repo = gobierno`, `OKF = paquete portable`, `MCP/API = acceso`.
-- takeaway: la decision correcta es asignar roles; no declarar un ganador universal.
-- notas de soporte: OKF entra con cautela como patron emergente para bundles Markdown tipados, no como estandar corporativo probado.
+- kicker: Agentes
+- titulo con tesis: MCP/API abre la puerta al agente, pero no convierte desorden en memoria
+- concepto visual: un agente consulta una puerta estrecha y confiable, no una carpeta infinita de Markdown
+- objeto de prueba visible: agente -> MCP/API -> indice curado -> ficha versionada -> owner/relaciones/decisiones
+- takeaway: un agente no necesita leerlo todo; necesita entradas confiables y contexto ensamblable
+- notas de soporte: MCP se explica como interfaz para resources, prompts y tools. No decir que almacena memoria ni que resuelve calidad del contenido.
 
 ### Slide 9
 
-- kicker: Cierre editorial
-- titulo con tesis: Antes de pedirle memoria a un agente, hay que construir una memoria que el equipo pueda mantener
-- concepto visual: biblioteca tecnica en construccion: estantes etiquetados, fichas con marcas de revision, pasillos conectados y una puerta de consulta; una sola escena editorial, sin dashboards ni robots protagonistas.
-- objeto de prueba visible: frase final sobre banda oscura + cita breve de John Gruber como contraste sobre legibilidad de Markdown.
-- takeaway: delegar razonamiento exige primero conservar decisiones reutilizables.
-- notas de soporte: usar la cita real de Markdown como contraste, no como autoridad sobre knowledge repos. Cierre emocional: disciplina operativa, calma estrategica y claridad.
+- kicker: Cierre
+- titulo con tesis: La documentacion que escala no guarda paginas: conserva decisiones reutilizables
+- concepto visual: imagen editorial protagonista de una memoria organizada, humana y consultable; debe sentirse como archivo curado, no dashboard
+- objeto de prueba visible: sala o mesa de archivo moderna con una tarjeta de tabla abierta, caminos sutiles hacia decisiones y una interfaz discreta al fondo
+- takeaway: antes de pedirle a un agente que entienda tus datos, dale una memoria que tu equipo pueda mantener
+- notas de soporte: cerrar con mensaje editorial propio, no como cita atribuida: "Una memoria comun sirve cuando alguien que no estuvo en la decision puede continuar el razonamiento."
 
 ## Estructura de cierre
 
-- mensaje final: `Antes de pedirle memoria a un agente, hay que construir una memoria que el equipo pueda mantener.`
-- cita real sugerida: John Gruber sobre Markdown: el objetivo de diseno es que la sintaxis sea "as readable as possible".
-- uso editorial de la cita: Markdown nacio para legibilidad; esta charla dice que la legibilidad es necesaria pero no suficiente cuando el equipo necesita memoria operacional.
-- metafora visual dominante: biblioteca tecnica en construccion, con estantes, etiquetas, fichas de mantenimiento y una puerta de consulta.
-- rol protagonista de la imagen: la escena final debe amplificar la tesis; no debe ser diagrama, tabla, dashboard, robot ni collage de iconos.
+Mensaje final:
+
+> Antes de pedirle a un agente que entienda tus datos, dale una memoria que tu propio equipo pueda mantener.
+
+Mensaje secundario:
+
+> Una memoria comun sirve cuando alguien que no estuvo en la decision puede continuar el razonamiento.
+
+Tratamiento visual: imagen editorial fuerte, preferentemente full-bleed o semi-bleed, con aire para el mensaje. Evitar robots, grafos tecnicos, dashboards, tablas o wallpaper abstracto. La imagen debe amplificar disciplina operativa y continuidad de razonamiento.
+
+No usar frase propia como cita. Si en build se encuentra una cita real y verificable de un referente pertinente, puede reemplazar el mensaje secundario; si no, mantenerlo como mensaje editorial.
 
 ## Riesgos narrativos
 
-- Riesgo: parecer que se descarta Markdown. Mitigacion: decir explicitamente que Markdown es el formato base correcto, pero no el contrato completo.
-- Riesgo: sonar como venta de knowledge repo como herramienta nueva. Mitigacion: definirlo por responsabilidades y criterios observables.
-- Riesgo: duplicar funciones de catalogo de datos. Mitigacion: ubicar catalogos como evidencia de metadata operacional y al repo como contrato complementario o liviano.
-- Riesgo: sobredimensionar OKF. Mitigacion: tratarlo como patron emergente y referencia portable, no como estandar adoptado.
-- Riesgo: prometer agentes autonomos. Mitigacion: MCP/API aparece como interfaz de consulta, dependiente de la calidad del repo.
-- Riesgo: abstraccion excesiva. Mitigacion: sostener la charla con la pregunta conductora sobre `clientes` y un camino de respuesta visible.
+- Anti-Markdown: mitigado al presentarlo como primer ladrillo correcto.
+- Venta de herramienta: mitigado al hablar de capas y responsabilidades.
+- Sobregobierno: mitigado con contrato minimo progresivo.
+- OKF sobredimensionado: mitigado al llamarlo referencia emergente v0.1, no estandar corporativo final.
+- MCP sobredimensionado: mitigado al tratarlo como interfaz, no memoria.
+- Solapamiento con charla 2: mitigado dejando RAG, embeddings y grafos solo como teaser.
 
-## Entrada para agent-log
+## Phase summary
 
-Ver entrada agregada en `notes/agent-log.md`.
+La fase narrative deja una narrativa de 9 slides lista para build, con tesis clara, tension por capas, objetos visibles por slide y cierre editorial alineado a la serie. La siguiente fase recomendada es build del PPTX editable.
 
 ## Listo para build
 
-Decision: `listo para build`.
-
-Condicion para build: preservar el arco nuevo de "inventario de paginas -> memoria operable -> puerta de consulta". No reconstruir la secuencia como una simple lista de capas ni convertir la slide 8 en una tabla plana sin idea visual.
+Si.

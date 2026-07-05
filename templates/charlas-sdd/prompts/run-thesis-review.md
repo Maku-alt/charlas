@@ -10,7 +10,7 @@ Devuelve:
 - riesgos de framing
 - preguntas abiertas
 - cambios sugeridos al Thesis Spec
-- entrada para `notes/agent-log.md` con fase, agente, modelo, esfuerzo, estado, artefactos, errores o bloqueos, y siguiente accion
+- `notes/phase-summary.md` actualizado con fase, estado, pasa/no pasa, resumen, rutas, hallazgos bloqueantes y siguiente accion
 - decision de continuidad: `seguir`, `reformular tesis` o `descartar`
 
 No devuelvas explicaciones fuera de ese formato.

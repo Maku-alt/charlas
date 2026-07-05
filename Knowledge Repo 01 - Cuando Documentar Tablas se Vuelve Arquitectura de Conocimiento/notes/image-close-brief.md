@@ -1,98 +1,85 @@
 # Image Close Brief
 
+Run id: `knowledge-repo-01-full-rebuild-20260704`
+
 ## Tesis que debe amplificar
 
-Documentar tablas se vuelve arquitectura de conocimiento cuando el equipo deja de producir paginas descriptivas y empieza a operar una memoria comun: una base mantenible de decisiones, relaciones, vigencia y ownership que humanos y agentes pueden consultar sin improvisar contexto.
+Documentar tablas se vuelve arquitectura de conocimiento cuando el equipo necesita conectar, mantener y consultar lo que sabe.
+
+Formulacion operativa:
+
+> Una ficha de tabla deja de ser documentacion aislada cuando declara identidad, ownership, relaciones, vigencia, historial e interfaz de consulta.
 
 ## Mensaje final
 
-Antes de pedirle memoria a un agente, hay que construir una memoria que el equipo pueda mantener.
+Mensaje principal para slide:
 
-## Cita real o fallback justificado
+> La documentacion que escala no guarda paginas: conserva decisiones reutilizables.
 
-Cita real sugerida:
+Mensaje editorial de apoyo:
 
-> "The overriding design goal for Markdown's formatting syntax is to make it as readable as possible."
-> John Gruber, Markdown
+> Antes de pedirle a un agente que entienda tus datos, dale una memoria que tu propio equipo pueda mantener.
 
-Uso editorial: la cita no debe usarse como autoridad sobre `knowledge repos`. Debe funcionar como contraste: Markdown nacio para legibilidad; la charla sostiene que la legibilidad es necesaria, pero no suficiente cuando el equipo necesita memoria operacional, vigencia y acceso confiable.
+Mensaje secundario, si el layout lo permite:
 
-Si el build decide no usar cita, usar el mensaje final como claim editorial propio sin atribuirlo como cita externa.
+> Una memoria comun sirve cuando alguien que no estuvo en la decision puede continuar el razonamiento.
+
+No tratar estos mensajes como cita atribuida. Son cierre editorial propio.
+
+## Cita real con autor/fuente o fallback
+
+No se usa cita externa. Fallback justificado: el `Narrative Spec` indica no usar frase propia como cita y mantener mensaje editorial propio si no hay cita real verificada. Para evitar una atribucion debil o decorativa, el cierre queda como declaracion editorial del deck.
 
 ## Tono emocional
 
-Calma estrategica, disciplina operativa y continuidad. El cierre debe sentirse como una decision madura de arquitectura liviana: no hype, no magia de agentes, no nostalgia de archivo. La emocion buscada es "ahora el equipo puede continuar el razonamiento sin volver a empezar".
+Calma estrategica, disciplina operativa y claridad editorial. La imagen debe sentirse mantenible, humana y deliberada, no futurista ni promocional.
 
 ## Metaforas visuales candidatas
 
-### 1. Biblioteca tecnica en construccion con puerta de consulta
-
-Una biblioteca tecnica sobria, todavia en construccion pero ya operable. Estantes etiquetados, tarjetas de revision, marcas de vigencia, pasillos conectados y una puerta de consulta luminosa al fondo. La escena sugiere que la memoria no es una pila de paginas: es infraestructura mantenida para que otro pueda entrar, consultar y continuar.
-
-Fortaleza: sostiene todo el arco nuevo: inventario, memoria operable y puerta de acceso. Es editorial, amplia y distinta de la corrida fallida de `archivo vivo sobre mesa editorial`.
-
-Riesgo: puede caer en biblioteca generica si no aparecen senales de mantenimiento y consulta.
-
-### 2. Sala de mapas de conocimiento con umbral operativo
-
-Una sala arquitectonica con grandes mapas fisicos, indices, rutas marcadas y una puerta lateral de consulta. La memoria aparece como territorio navegable, no como interfaz. La escena enfatiza caminos reutilizables de razonamiento.
-
-Fortaleza: refuerza la idea de rutas y relaciones.
-
-Riesgo: se acerca demasiado a grafo/mapa conceptual y puede parecer otra slide tecnica.
-
-### 3. Archivo tecnico con andamios y mostrador de referencia
-
-Un archivo institucional curado, con andamios discretos, cajas etiquetadas, fichas de mantenimiento y un pequeno mostrador de referencia para consultas. Comunica que el sistema se construye y se gobierna a la vez.
-
-Fortaleza: enfatiza disciplina y mantenimiento.
-
-Riesgo: puede parecer almacenamiento documental y volver al territorio de la metafora fallida si el encuadre se concentra en papeles o mesa.
+1. Archivo editorial vivo: una mesa o sala de archivo moderna donde fichas curadas se conectan mediante luz tenue hacia decisiones, owners y metricas.
+2. Memoria de decisiones reutilizables: tarjetas fisicas sobre una superficie sobria, con un camino luminoso que sugiere continuidad de razonamiento entre personas.
+3. Indice consultable, no dashboard: una escena fisica con una interfaz discreta al fondo, donde la interfaz acompana a la memoria pero no la domina.
 
 ## Direccion recomendada
 
-Usar la direccion 1: `biblioteca tecnica en construccion con puerta de consulta`.
-
-La imagen debe ser una sola escena editorial, no un diagrama. El foco no son los documentos sino el espacio que permite consultar conocimiento mantenido. La biblioteca debe verse deliberadamente tecnica: estantes con etiquetas discretas, fichas de revision, senales de vigencia, rutas de pasillo y una puerta de consulta al fondo. No debe haber robots protagonistas. Si aparece una figura humana, debe ser pequena y secundaria, entrando o consultando desde la puerta, para sugerir continuidad del razonamiento.
-
-La diferencia clave contra la corrida fallida es que no hay `archivo vivo sobre mesa editorial`, no hay mesa central ni pila de paginas como protagonista. El protagonista es la arquitectura del espacio: biblioteca, pasillos, mantenimiento y umbral de consulta.
+Usar la direccion 1: archivo editorial vivo. Es la mas fuerte para el cierre porque convierte la documentacion en memoria operacional sin caer en grafos tecnicos, dashboards ni robots. La ficha abierta funciona como ancla visual, mientras las tarjetas y caminos de luz sugieren decisiones reutilizables y continuidad entre equipos.
 
 ## Composicion de slide sugerida
 
-- Formato: imagen full-bleed o semi-bleed para slide 16:9.
-- Encuadre: plano amplio, ligeramente cinematografico, con profundidad hacia una puerta o umbral luminoso en el tercio derecho.
-- Zona de texto: banda oscura o panel semitransparente en el tercio izquierdo inferior, con aire suficiente para el mensaje final y la cita breve.
-- Jerarquia: la puerta de consulta debe atraer la mirada despues del texto; las etiquetas y fichas deben leerse como textura editorial, no como microtexto real.
-- Paleta: azul profundo, arena suave, tinta oscura y acento naranja muy contenido; mantener familia de `STYLE-CHARLAS.md`.
-- Densidad: media-baja. Debe sentirse curada y sobria, no abarrotada.
-- Relacion con cita: la cita de Gruber puede ir debajo del mensaje como contraste pequeno; no debe competir con el mensaje final.
+- Imagen full-bleed o semi-bleed en 16:9.
+- Texto superpuesto en el tercio izquierdo, donde la imagen deja aire oscuro y limpio.
+- Objeto principal en centro-derecha/bajo-derecha: ficha de tabla abierta, tarjetas curadas y luz sutil.
+- Overlay recomendado: caja o velo sobrio muy transparente si hace falta legibilidad, evitando tapar la ficha principal.
+- No agregar una cita atribuida salvo que el build valide una fuente real.
 
 ## Prompt final de imagen
 
-Editorial cinematic scene for the closing slide of a technical data talk: a sober technical library under construction but already operational, wide 16:9 composition, deep blue and warm sand palette, tall labeled shelves, discreet maintenance cards, revision marks, small signs of freshness and ownership, connected aisles leading toward a clean luminous consultation doorway on the right side. The space should feel like maintained knowledge infrastructure, not a pile of documents. No dashboards, no tables, no charts, no bullet points, no robots as protagonists, no software UI. Leave clean negative space on the lower-left third for a dark translucent text band. Calm strategic mood, architectural depth, editorial magazine quality, deliberate lighting, restrained orange accent, high legibility, refined and sober.
+```text
+Use case: productivity-visual
+Asset type: closing slide editorial bitmap, 16:9 landscape, suitable for PowerPoint full-bleed or semi-bleed
+Primary request: Create a strong editorial image for a technical executive talk about turning table documentation into knowledge architecture. The image should feel like a living curated archive or sober modern worktable where reusable decisions are preserved, not just pages stored.
+Scene/backdrop: A quiet modern archive/worktable environment with tactile paper cards, a few curated data-table notes, small owner/metric/decision markers represented visually without readable text, and subtle paths of warm light connecting them. Include a discreet, softly out-of-focus interface or index surface in the background, but keep the scene primarily human, physical, and editorial.
+Subject: One open data-table card as the foreground anchor, surrounded by carefully arranged note cards and decision artifacts. The scene should imply maintained knowledge, continuity of reasoning, and operational discipline.
+Style/medium: premium editorial photography / cinematic still life, realistic materials, intentional composition, sophisticated and sober, not stock imagery.
+Composition/framing: 16:9 landscape; leave generous clean negative space on the left third and upper-left area for overlaid Spanish closing copy; place the main worktable/archive subject in the center-right and lower-right. Strong visual hierarchy, low clutter, no dense diagrams.
+Lighting/mood: calm strategic, focused, soft directional light with subtle warm light trails between artifacts; quiet confidence, not hype.
+Color palette: warm off-white paper, deep navy shadows, slate ink, muted orange and green accents, aligned with #F4F0E8, #0F172A, #102A43, #C75C2A, #2D6A4F.
+Materials/textures: paper grain, matte cards, fine pencil/ink marks, glass or brushed metal accents, soft shadows.
+Text: no readable text, no letters, no numbers, no logos, no watermarks.
+Constraints: Must not look like a dashboard, technical graph, node graph, database UI, robot scene, AI assistant, generic abstract wallpaper, or bullet/table slide. Avoid literal tables, chart axes, neon cyber style, crowded connectors, and any in-image copy. The image must be strong enough as a closing slide background and leave clean space for overlay text.
+```
 
-## Negative prompt / evitar
+## Artefacto generado
 
-- No repetir `archivo vivo sobre mesa editorial`.
-- No mesa editorial como objeto central.
-- No pila de documentos como protagonista.
-- No dashboards, tablas, bullets, grafos tecnicos ni interfaces de software.
-- No robot humanoide ni agente como heroe visual.
-- No biblioteca generica romantica o fantasia; debe sentirse tecnica, mantenida y operable.
-- No texto legible inventado dentro de la imagen; las etiquetas deben ser marcas visuales discretas.
-- No saturacion de iconos, conectores o pantallas.
+- `assets/closing-knowledge-repo.png`
 
-## Chequeo de coherencia
+## Riesgos o cosas a evitar
 
-- Amplifica la tesis: si, convierte documentacion en infraestructura de memoria mantenible.
-- Sostiene el arco nuevo: si, conecta inventario, contrato operativo y puerta de consulta.
-- Diferente de la corrida fallida: si, evita mesa editorial y centra la arquitectura de una biblioteca tecnica.
-- Cita atribuida: si, John Gruber / Markdown, usada como contraste y no como claim externo propio.
-- Imagen protagonista: si, pensada para full-bleed o semi-bleed con overlay sobrio.
-- Riesgo principal: que el generador produzca una biblioteca decorativa. Mitigacion: insistir en mantenimiento, etiquetas, revision, ownership y puerta de consulta.
+- No saturar la slide con overlays, labels o conectores adicionales.
+- No convertir la imagen en explicacion tecnica; debe cerrar emocionalmente la tesis.
+- Evitar recortes que eliminen el aire izquierdo, porque ahi vive el mensaje.
+- Si se oscurece para texto, mantener visible la ficha y el camino de luz para que la metafora siga activa.
 
 ## Decision
 
-`listo para build`
-
-La direccion recomendada puede pasar a `deck-builder-charlas` como cierre visual, siempre que el build mantenga la imagen como protagonista y no la reduzca a fondo decorativo.
+Listo para build.

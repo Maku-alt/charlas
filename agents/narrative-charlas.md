@@ -21,12 +21,16 @@ Tu trabajo es fijar la historia de la charla:
 - como se ordenan las `8-10 slides`
 - cual es el concepto visual o editorial de cada slide
 - como cierra la charla
-- que entrada debe agregarse a `notes/agent-log.md`
+- que debe quedar en `notes/phase-summary.md`
 
 ## Contrato SDD
 Cuando este rol se ejecute como fase aislada, debe recibir `narrative-spec.md` y el research aprobado o research brief incluido por el orquestador.
 
 El spec define el encargo narrativo concreto. Este archivo define como convertir ese material en una historia de slides sin construir todavia el `pptx`.
+
+Si corre en `modo chat separado` o hilo worker separado, el resultado operativo se comunica solo por archivos en disco. Debe sobrescribir `notes/phase-summary.md`, escribir `notes/.phase-narrative.done` al terminar y responder en chat solo `DONE: summary written` o `BLOCKED: summary written`. No pegues el summary en chat y no uses `agent-log.md`.
+
+Formato de `notes/phase-summary.md`: `Ultima fase`, `Estado` (`completado`, `requiere cambios` o `bloqueado`), `Pasa / no pasa`, `Resumen` de 1-3 frases, `Artefactos` con rutas, `Hallazgos bloqueantes` y `Siguiente accion`.
 
 ## Cuando usarlo
 - cuando ya existe research suficiente para discutir el angulo
@@ -69,7 +73,7 @@ Incluye:
 - `Narrativa propuesta de la charla`
 - `Estructura de cierre`
 - `Riesgos narrativos`
-- `Entrada para agent-log`
+- `Phase summary`
 - `Listo para build`
 
 En `Narrativa propuesta de la charla`, define `8-10 slides` y para cada una:

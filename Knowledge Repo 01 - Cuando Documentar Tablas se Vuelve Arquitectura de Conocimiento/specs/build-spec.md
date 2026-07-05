@@ -32,7 +32,7 @@
 - uso de tablas: solo para tradeoffs o matrices de capas
 - uso de charts: no usar charts cuantitativos; no hay benchmark propio
 - uso de imagenes: usar una imagen editorial fuerte solo en el cierre; el resto debe apoyarse en diagramas, matrices, fichas y objetos visuales editables
-- tratamiento de cierre: imagen full-bleed o semi-bleed con overlay sobrio, mensaje final y cita editorial con aire suficiente
+- tratamiento de cierre: imagen full-bleed o semi-bleed con overlay sobrio, mensaje final y aire suficiente
 
 ## Restricciones
 
@@ -59,58 +59,80 @@
 ## Slides a construir
 
 ### Slide 1
+
 - kicker: Tesis
 - titulo: Documentar tablas deja de ser documentacion cuando el equipo necesita memoria comun
-- objeto visible: una ficha de tabla que se multiplica hasta convertirse en un mapa de conocimiento
+- objeto visible: una ficha de tabla en primer plano y varias fichas conectadas hacia metricas, owners y decisiones
+- concepto visual: cover editorial donde una ficha `clientes.md` se multiplica y empieza a formar un mapa curado
 - takeaway: el problema no es escribir mas; es conectar y mantener lo que el equipo ya sabe
 
 ### Slide 2
+
 - kicker: Baseline
-- titulo: Una ficha Markdown por tabla resuelve el primer 20 por ciento, no el sistema
-- objeto visible: `clientes.md` simple con descripcion, columnas y usos
-- takeaway: Markdown es buen formato base porque es portable y versionable
+- titulo: Markdown es el primer ladrillo correcto, pero no define el edificio
+- objeto visible: `clientes.md` con descripcion, columnas principales y usos conocidos
+- concepto visual: ficha Markdown limpia, util y limitada, tratada como pieza inicial de arquitectura
+- takeaway: Markdown aporta portabilidad, lectura humana y versionado; todavia no aporta gobierno
 
 ### Slide 3
+
 - kicker: Friccion
-- titulo: El dolor aparece cuando la pregunta cruza tablas, metricas y decisiones pasadas
-- objeto visible: preguntas alrededor de `clientes`: owner, vigencia, joins, riesgos, dashboards, dudas resueltas y metricas relacionadas
-- takeaway: la unidad de valor ya no es la ficha; es la red de conocimiento
+- titulo: El dolor real aparece cuando una pregunta cruza tablas, metricas y decisiones pasadas
+- objeto visible: owner, freshness, joins frecuentes, dashboards, metricas, riesgos, consumidores y dudas ya resueltas alrededor de `clientes`
+- concepto visual: la ficha `clientes` como centro de una mesa de investigacion con preguntas pegadas alrededor
+- takeaway: la unidad de valor deja de ser la ficha; pasa a ser la red de contexto que permite decidir
 
 ### Slide 4
+
 - kicker: Distincion
-- titulo: Wiki no es lo mismo que memoria operacional
-- objeto visible: dos paneles, grafo humano versus checklist operacional
-- takeaway: navegar conocimiento y gobernarlo son problemas distintos
+- titulo: Una wiki ayuda a encontrar conocimiento; no garantiza que ese conocimiento sea vigente
+- objeto visible: panel izquierdo con links/backlinks; panel derecho con owner, status, fecha de revision, fuente canonica y decision registrada
+- concepto visual: comparacion editorial entre grafo de notas navegable y control operacional de vigencia
+- takeaway: navegar y gobernar son problemas distintos
 
 ### Slide 5
+
 - kicker: Contrato
 - titulo: Un knowledge repo empieza cuando cada ficha declara identidad, relaciones y responsabilidad
-- objeto visible: YAML frontmatter + cuerpo Markdown + links a metricas, dominios y owners
+- objeto visible: YAML con `id`, `owner`, `domain`, `status`, `freshness`, `related_metrics`, `consumers`, `last_reviewed`; cuerpo Markdown con decisiones y links
+- concepto visual: ficha partida en frontmatter, cuerpo narrativo y bitacora de cambios
 - takeaway: la arquitectura vive en el contrato minimo, no en la herramienta
 
 ### Slide 6
-- kicker: Ecosistema
-- titulo: Los catalogs modernos confirman que la metadata util es relacional
-- objeto visible: una tabla conectada a owner, glossary, lineage, quality, contract, dashboard y consumidores
-- takeaway: no estamos inventando burocracia; estamos bajando capacidades de catalogo a una escala operable
+
+- kicker: Evidencia
+- titulo: Los catalogos modernos muestran que el conocimiento de datos ya es relacional
+- objeto visible: tabla conectada a owner, glossary, lineage, quality, contract, dashboard, consumidores y version history
+- concepto visual: activo de datos como nodo sobrio conectado a aspectos operativos, sin saturar la composicion
+- takeaway: no se trata de inventar burocracia; se trata de capturar a escala pequena lo que los catalogos modelan a escala grande
+- fuente visible: DataHub, OpenMetadata, dbt exposures
 
 ### Slide 7
-- kicker: Agentes
-- titulo: Un agente no necesita leerlo todo: necesita una entrada confiable y contexto ensamblable
-- objeto visible: agente -> MCP/API -> knowledge repo -> fichas, versionado y owners
-- takeaway: preparar memoria reduce improvisacion y contexto irrelevante
+
+- kicker: Portabilidad
+- titulo: OKF apunta a una idea util: Markdown con estructura explicita para humanos y agentes
+- objeto visible: ejemplo conceptual de bundle OKF-style con `index.md`, ficha Markdown, frontmatter, `log.md` y links
+- concepto visual: bundle de conocimiento como carpeta ordenada y portable
+- takeaway: OKF sirve como referencia emergente de convencion portable; no es un estandar corporativo final ni una plataforma completa
+- fuente visible: Google Cloud OKF, 2026-06-12; OKF spec v0.1 draft
 
 ### Slide 8
-- kicker: Tradeoff
-- titulo: La decision no es Markdown versus catalogo: es que capa cumple cada rol
-- objeto visible: matriz de capas con `Markdown`, `Wiki`, `Knowledge repo`, `OKF-style bundle`, `MCP/API`
-- takeaway: separar capas evita comprar herramienta o sobrediseniar antes de tiempo
+
+- kicker: Agentes
+- titulo: MCP/API abre la puerta al agente, pero no convierte desorden en memoria
+- objeto visible: agente -> MCP/API -> indice curado -> ficha versionada -> owner/relaciones/decisiones
+- concepto visual: un agente consulta una puerta estrecha y confiable, no una carpeta infinita de Markdown
+- takeaway: un agente no necesita leerlo todo; necesita entradas confiables y contexto ensamblable
+- fuente visible: Model Context Protocol specification 2025-06-18
 
 ### Slide 9
+
 - kicker: Cierre
 - titulo: La documentacion que escala no guarda paginas: conserva decisiones reutilizables
 - objeto visible: imagen editorial final alineada con `notes/image-close-brief.md` o, si falta, con la direccion visual del `narrative-spec`
-- mensaje editorial: Una memoria comun sirve cuando alguien que no estuvo en la decision puede continuar el razonamiento.
+- concepto visual: archivo editorial moderno con una tarjeta de tabla abierta, caminos sutiles hacia decisiones y una interfaz discreta al fondo
+- mensaje editorial: Antes de pedirle a un agente que entienda tus datos, dale una memoria que tu propio equipo pueda mantener.
+- mensaje secundario: Una memoria comun sirve cuando alguien que no estuvo en la decision puede continuar el razonamiento.
 - fuente visible: no presentar frase editorial propia como cita; usar `Mensaje editorial` o una cita real atribuible si se valida externamente
 - takeaway: una memoria comun vale cuando permite que otro continue el razonamiento
 
@@ -142,4 +164,4 @@ La imagen:
 
 ## Decision de continuidad
 
-- listo para build
+Listo para build.

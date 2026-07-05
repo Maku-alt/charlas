@@ -1,0 +1,111 @@
+{
+  "meta": {
+    "title": "Renderer local para charlas",
+    "subtitle": "Prueba realista de 9 slides con PptxGenJS",
+    "author": "Codex",
+    "date": "2026-07-05"
+  },
+  "theme": {
+    "background": "F4F0E8",
+    "ink": "0F172A",
+    "muted": "475569",
+    "blue": "102A43",
+    "blue2": "16324F",
+    "orange": "C75C2A",
+    "orange2": "E07A3F",
+    "green": "2D6A4F",
+    "red": "B42318",
+    "white": "FFFDF8",
+    "sand": "EADBC8"
+  },
+  "slides": [
+    {
+      "layout": "cover",
+      "kicker": "Prueba de renderer",
+      "title": "El LLM escribe la historia; el código arma el PowerPoint",
+      "subtitle": "Objetivo: bajar tokens sin perder control visual ni compatibilidad nativa.",
+      "image": "smoke-asset.png"
+    },
+    {
+      "layout": "thesis",
+      "kicker": "Tesis",
+      "title": "El costo no está en pensar la charla, está en reconstruirla mecánicamente",
+      "statement": "Si cada corrección vuelve a activar un builder completo, una tilde termina costando millones de tokens.",
+      "takeaway": "Separar narrativa de render permite corregir contenido sin rehacer producción."
+    },
+    {
+      "layout": "comparison",
+      "kicker": "Antes / después",
+      "title": "El cambio clave es pasar de agente constructor a renderer determinístico",
+      "left": {
+        "title": "Flujo LLM-heavy",
+        "items": ["Lee specs extensas", "Decide layout slide por slide", "Regenera evidencia", "Corrige con contexto amplio"]
+      },
+      "right": {
+        "title": "Flujo renderer",
+        "items": ["Lee deck-spec.json", "Aplica layouts fijos", "Exporta PowerPoint", "Reporta fallas mecánicas"]
+      },
+      "takeaway": "El modelo conserva el trabajo conceptual; el script absorbe la producción repetible."
+    },
+    {
+      "layout": "process",
+      "kicker": "Pipeline",
+      "title": "Un deck normal debería moverse por cuatro pasos estables",
+      "steps": [
+        { "label": "Narrativa", "body": "Deck.md revisable por humanos." },
+        { "label": "Spec", "body": "JSON estricto con layout y contenido." },
+        { "label": "Render", "body": "PptxGenJS genera el archivo editable." },
+        { "label": "QA", "body": "PowerPoint abre, exporta y reporta defectos." }
+      ]
+    },
+    {
+      "layout": "matrix",
+      "kicker": "Tradeoff",
+      "title": "No todos los decks necesitan el mismo nivel de ceremonia",
+      "columns": ["Velocidad", "Calidad visual", "Trazabilidad"],
+      "rows": [
+        { "name": "Borrador", "values": ["Alta", "Media", "Baja"] },
+        { "name": "Deck normal", "values": ["Media", "Alta", "Media"] },
+        { "name": "Entrega formal", "values": ["Baja", "Alta", "Alta"] }
+      ],
+      "takeaway": "El renderer apunta al punto medio: suficiente calidad, menos tokens, menos ritual."
+    },
+    {
+      "layout": "architecture",
+      "kicker": "Arquitectura",
+      "title": "El contrato vive en JSON; el diseño vive en layouts versionados",
+      "nodes": [
+        { "name": "deck.md", "body": "Lectura narrativa" },
+        { "name": "deck-spec.json", "body": "Contrato ejecutable" },
+        { "name": "layouts", "body": "Reglas visuales" },
+        { "name": "pptx", "body": "Entregable editable" }
+      ]
+    },
+    {
+      "layout": "evidence",
+      "kicker": "Gate técnico",
+      "title": "El renderer no se aprueba porque genera un archivo; se aprueba porque PowerPoint lo exporta",
+      "facts": [
+        "PowerPoint COM abre el PPTX sin reparación.",
+        "Exporta todas las slides a PNG 1920x1080.",
+        "Los renders no están en blanco.",
+        "El texto mantiene tildes: conversación, análisis, revisión, pequeños."
+      ],
+      "takeaway": "La compatibilidad nativa es el gate final."
+    },
+    {
+      "layout": "decision",
+      "kicker": "Decisión",
+      "title": "PptxGenJS pasa a candidato principal si supera un deck realista",
+      "decision": "Usarlo como renderer para decks normales, manteniendo python-pptx para patches y diagnóstico.",
+      "risks": ["probar assets reales", "controlar overflow", "fijar versión npm", "evitar APIs frágiles"]
+    },
+    {
+      "layout": "closing",
+      "kicker": "Cierre",
+      "title": "Menos agentes para producir; más estructura para repetir",
+      "quote": "La presentación deja de ser una conversación larga y pasa a ser un artefacto compilable.",
+      "image": "smoke-asset.png"
+    }
+  ]
+}

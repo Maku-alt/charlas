@@ -1,0 +1,19 @@
+{
+  "run_id": "knowledge-repo-01-full-rebuild-20260704",
+  "phase": "review",
+  "thread_id": "",
+  "session_jsonl": "",
+  "started_at": "",
+  "completed_at": "2026-07-04T19:09:48.5532404-05:00",
+  "total_tokens": null,
+  "input_tokens": null,
+  "cached_input_tokens": null,
+  "output_tokens": null,
+  "function_calls": {},
+  "artifacts": [
+    "review/review-report.md",
+    "notes/phase-summary.md"
+  ],
+  "sentinel": "notes/.phase-review.done",
+  "status": "done"
+}

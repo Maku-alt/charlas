@@ -1,0 +1,127 @@
+{"kind": "slide", "slide": 1, "title": "TESIS", "textShapes": 17}
+{"kind": "textbox", "slide": 1, "text": "TESIS", "textPreview": "TESIS", "textChars": 5, "textLines": 1}
+{"kind": "textbox", "slide": 1, "text": "Documentar tablas deja de ser documentación cuando el equipo necesita memoria común", "textPreview": "Documentar tablas deja de ser documentación cuando el equipo necesita memoria común", "textChars": 83, "textLines": 1}
+{"kind": "textbox", "slide": 1, "text": "El problema no es escribir más; es conectar y mantener lo que el equipo ya sabe.", "textPreview": "El problema no es escribir más; es conectar y mantener lo que el equipo ya sabe.", "textChars": 80, "textLines": 1}
+{"kind": "textbox", "slide": 1, "text": "clientes.md", "textPreview": "clientes.md", "textChars": 11, "textLines": 1}
+{"kind": "textbox", "slide": 1, "text": "owner", "textPreview": "owner", "textChars": 5, "textLines": 1}
+{"kind": "textbox", "slide": 1, "text": "growth-data", "textPreview": "growth-data", "textChars": 11, "textLines": 1}
+{"kind": "textbox", "slide": 1, "text": "freshness", "textPreview": "freshness", "textChars": 9, "textLines": 1}
+{"kind": "textbox", "slide": 1, "text": "diaria", "textPreview": "diaria", "textChars": 6, "textLines": 1}
+{"kind": "textbox", "slide": 1, "text": "uso", "textPreview": "uso", "textChars": 3, "textLines": 1}
+{"kind": "textbox", "slide": 1, "text": "churn / ventas", "textPreview": "churn / ventas", "textChars": 14, "textLines": 1}
+{"kind": "textbox", "slide": 1, "text": "métricas", "textPreview": "métricas", "textChars": 8, "textLines": 1}
+{"kind": "textbox", "slide": 1, "text": "decisiones", "textPreview": "decisiones", "textChars": 10, "textLines": 1}
+{"kind": "textbox", "slide": 1, "text": "owners", "textPreview": "owners", "textChars": 6, "textLines": 1}
+{"kind": "textbox", "slide": 1, "text": "riesgos", "textPreview": "riesgos", "textChars": 7, "textLines": 1}
+{"kind": "textbox", "slide": 1, "text": "dashboards", "textPreview": "dashboards", "textChars": 10, "textLines": 1}
+{"kind": "textbox", "slide": 1, "text": "Knowledge Repo 01", "textPreview": "Knowledge Repo 01", "textChars": 17, "textLines": 1}
+{"kind": "textbox", "slide": 1, "text": "01", "textPreview": "01", "textChars": 2, "textLines": 1}
+{"kind": "slide", "slide": 2, "title": "BASELINE", "textShapes": 11}
+{"kind": "textbox", "slide": 2, "text": "BASELINE", "textPreview": "BASELINE", "textChars": 8, "textLines": 1}
+{"kind": "textbox", "slide": 2, "text": "Markdown es el primer ladrillo correcto, pero no define el edificio", "textPreview": "Markdown es el primer ladrillo correcto, pero no define el edificio", "textChars": 67, "textLines": 1}
+{"kind": "textbox", "slide": 2, "text": "clientes.md", "textPreview": "clientes.md", "textChars": 11, "textLines": 1}
+{"kind": "textbox", "slide": 2, "text": "descripción: clientes activos y prospectos\ncolumnas: cliente_id, segmento, alta, estado\nusos: churn, ventas, soporte", "textPreview": "descripción: clientes activos y prospectos | columnas: cliente_id, segmento, alta, estado | usos: churn, ventas, soporte", "textChars": 116, "textLines": 3}
+{"kind": "textbox", "slide": 2, "text": "Aporta", "textPreview": "Aporta", "textChars": 6, "textLines": 1}
+{"kind": "textbox", "slide": 2, "text": "portabilidad\nlectura humana\nversionado", "textPreview": "portabilidad | lectura humana | versionado", "textChars": 38, "textLines": 3}
+{"kind": "textbox", "slide": 2, "text": "Todavía no aporta", "textPreview": "Todavía no aporta", "textChars": 17, "textLines": 1}
+{"kind": "textbox", "slide": 2, "text": "ownership\nvigencia\nrelaciones\ngobierno", "textPreview": "ownership | vigencia | relaciones | gobierno", "textChars": 38, "textLines": 4}
+{"kind": "textbox", "slide": 2, "text": "Markdown es buen formato de captura; la arquitectura aparece cuando hay contrato.", "textPreview": "Markdown es buen formato de captura; la arquitectura aparece cuando hay contrato.", "textChars": 81, "textLines": 1}
+{"kind": "textbox", "slide": 2, "text": "Knowledge Repo 01", "textPreview": "Knowledge Repo 01", "textChars": 17, "textLines": 1}
+{"kind": "textbox", "slide": 2, "text": "02", "textPreview": "02", "textChars": 2, "textLines": 1}
+{"kind": "slide", "slide": 3, "title": "FRICCIÓN", "textShapes": 14}
+{"kind": "textbox", "slide": 3, "text": "FRICCIÓN", "textPreview": "FRICCIÓN", "textChars": 8, "textLines": 1}
+{"kind": "textbox", "slide": 3, "text": "El dolor real aparece cuando una pregunta cruza tablas, métricas y decisiones pasadas", "textPreview": "El dolor real aparece cuando una pregunta cruza tablas, métricas y decisiones pasadas", "textChars": 85, "textLines": 1}
+{"kind": "textbox", "slide": 3, "text": "¿puedo joinear esto\ncon ventas?", "textPreview": "¿puedo joinear esto | con ventas?", "textChars": 31, "textLines": 2}
+{"kind": "textbox", "slide": 3, "text": "¿quien valida\nchurn?", "textPreview": "¿quien valida | churn?", "textChars": 20, "textLines": 2}
+{"kind": "textbox", "slide": 3, "text": "¿esta columna\nsigue vigente?", "textPreview": "¿esta columna | sigue vigente?", "textChars": 28, "textLines": 2}
+{"kind": "textbox", "slide": 3, "text": "¿que dashboard\ndepende de esto?", "textPreview": "¿que dashboard | depende de esto?", "textChars": 31, "textLines": 2}
+{"kind": "textbox", "slide": 3, "text": "riesgos conocidos", "textPreview": "riesgos conocidos", "textChars": 17, "textLines": 1}
+{"kind": "textbox", "slide": 3, "text": "joins frecuentes", "textPreview": "joins frecuentes", "textChars": 16, "textLines": 1}
+{"kind": "textbox", "slide": 3, "text": "decisiones previas", "textPreview": "decisiones previas", "textChars": 18, "textLines": 1}
+{"kind": "textbox", "slide": 3, "text": "clientes", "textPreview": "clientes", "textChars": 8, "textLines": 1}
+{"kind": "textbox", "slide": 3, "text": "tabla central", "textPreview": "tabla central", "textChars": 13, "textLines": 1}
+{"kind": "textbox", "slide": 3, "text": "La unidad de valor deja de ser la ficha; pasa a ser la red de contexto que permite decidir.", "textPreview": "La unidad de valor deja de ser la ficha; pasa a ser la red de contexto que permite decidir.", "textChars": 91, "textLines": 1}
+{"kind": "textbox", "slide": 3, "text": "Knowledge Repo 01", "textPreview": "Knowledge Repo 01", "textChars": 17, "textLines": 1}
+{"kind": "textbox", "slide": 3, "text": "03", "textPreview": "03", "textChars": 2, "textLines": 1}
+{"kind": "slide", "slide": 4, "title": "DISTINCIÓN", "textShapes": 21}
+{"kind": "textbox", "slide": 4, "text": "DISTINCIÓN", "textPreview": "DISTINCIÓN", "textChars": 10, "textLines": 1}
+{"kind": "textbox", "slide": 4, "text": "Una wiki ayuda a encontrar conocimiento; no garantiza que ese conocimiento sea vigente", "textPreview": "Una wiki ayuda a encontrar conocimiento; no garantiza que ese conocimiento sea vigente", "textChars": 86, "textLines": 1}
+{"kind": "textbox", "slide": 4, "text": "Navegar", "textPreview": "Navegar", "textChars": 7, "textLines": 1}
+{"kind": "textbox", "slide": 4, "text": "Gobernar", "textPreview": "Gobernar", "textChars": 8, "textLines": 1}
+{"kind": "textbox", "slide": 4, "text": "clientes", "textPreview": "clientes", "textChars": 8, "textLines": 1}
+{"kind": "textbox", "slide": 4, "text": "ventas", "textPreview": "ventas", "textChars": 6, "textLines": 1}
+{"kind": "textbox", "slide": 4, "text": "churn", "textPreview": "churn", "textChars": 5, "textLines": 1}
+{"kind": "textbox", "slide": 4, "text": "métricas", "textPreview": "métricas", "textChars": 8, "textLines": 1}
+{"kind": "textbox", "slide": 4, "text": "owner", "textPreview": "owner", "textChars": 5, "textLines": 1}
+{"kind": "textbox", "slide": 4, "text": "growth-data", "textPreview": "growth-data", "textChars": 11, "textLines": 1}
+{"kind": "textbox", "slide": 4, "text": "status", "textPreview": "status", "textChars": 6, "textLines": 1}
+{"kind": "textbox", "slide": 4, "text": "vigente", "textPreview": "vigente", "textChars": 7, "textLines": 1}
+{"kind": "textbox", "slide": 4, "text": "revisión", "textPreview": "revisión", "textChars": 8, "textLines": 1}
+{"kind": "textbox", "slide": 4, "text": "2026-07-04", "textPreview": "2026-07-04", "textChars": 10, "textLines": 1}
+{"kind": "textbox", "slide": 4, "text": "fuente canónica", "textPreview": "fuente canónica", "textChars": 15, "textLines": 1}
+{"kind": "textbox", "slide": 4, "text": "repo/data-docs", "textPreview": "repo/data-docs", "textChars": 14, "textLines": 1}
+{"kind": "textbox", "slide": 4, "text": "decisión", "textPreview": "decisión", "textChars": 8, "textLines": 1}
+{"kind": "textbox", "slide": 4, "text": "usa churn_v2", "textPreview": "usa churn_v2", "textChars": 12, "textLines": 1}
+{"kind": "textbox", "slide": 4, "text": "Links y backlinks reducen fricción; autoridad y vigencia requieren reglas operativas.", "textPreview": "Links y backlinks reducen fricción; autoridad y vigencia requieren reglas operativas.", "textChars": 85, "textLines": 1}
+{"kind": "textbox", "slide": 4, "text": "Knowledge Repo 01", "textPreview": "Knowledge Repo 01", "textChars": 17, "textLines": 1}
+{"kind": "textbox", "slide": 4, "text": "04", "textPreview": "04", "textChars": 2, "textLines": 1}
+{"kind": "slide", "slide": 5, "title": "CONTRATO", "textShapes": 11}
+{"kind": "textbox", "slide": 5, "text": "CONTRATO", "textPreview": "CONTRATO", "textChars": 8, "textLines": 1}
+{"kind": "textbox", "slide": 5, "text": "Un knowledge repo empieza cuando cada ficha declara identidad, relaciones y responsabilidad", "textPreview": "Un knowledge repo empieza cuando cada ficha declara identidad, relaciones y responsabilidad", "textChars": 91, "textLines": 1}
+{"kind": "textbox", "slide": 5, "text": "frontmatter", "textPreview": "frontmatter", "textChars": 11, "textLines": 1}
+{"kind": "textbox", "slide": 5, "text": "id: data.clientes\nowner: growth-data\ndomain: customer\nstatus: active\nfreshness: daily\nrelated_metrics: [churn]\nconsumers: [ventas]\nlast_reviewed: 2026-07-04", "textPreview": "id: data.clientes | owner: growth-data | domain: customer | status: active | freshness: daily | related_metrics: [churn] | consumers: [ventas] | last_reviewed: 2026-07-04", "textChars": 156, "textLines": 8}
+{"kind": "textbox", "slide": 5, "text": "cuerpo narrativo", "textPreview": "cuerpo narrativo", "textChars": 16, "textLines": 1}
+{"kind": "textbox", "slide": 5, "text": "uso, decisiones,\nlinks y criterios", "textPreview": "uso, decisiones, | links y criterios", "textChars": 34, "textLines": 2}
+{"kind": "textbox", "slide": 5, "text": "bitácora", "textPreview": "bitácora", "textChars": 8, "textLines": 1}
+{"kind": "textbox", "slide": 5, "text": "qué cambió,\npor qué y quién", "textPreview": "qué cambió, | por qué y quién", "textChars": 27, "textLines": 2}
+{"kind": "textbox", "slide": 5, "text": "La arquitectura vive en el contrato mínimo, no en la herramienta.", "textPreview": "La arquitectura vive en el contrato mínimo, no en la herramienta.", "textChars": 65, "textLines": 1}
+{"kind": "textbox", "slide": 5, "text": "Knowledge Repo 01", "textPreview": "Knowledge Repo 01", "textChars": 17, "textLines": 1}
+{"kind": "textbox", "slide": 5, "text": "05", "textPreview": "05", "textChars": 2, "textLines": 1}
+{"kind": "slide", "slide": 6, "title": "EVIDENCIA", "textShapes": 14}
+{"kind": "textbox", "slide": 6, "text": "EVIDENCIA", "textPreview": "EVIDENCIA", "textChars": 9, "textLines": 1}
+{"kind": "textbox", "slide": 6, "text": "Los catálogos modernos muestran que el conocimiento de datos ya es relacional", "textPreview": "Los catálogos modernos muestran que el conocimiento de datos ya es relacional", "textChars": 77, "textLines": 1}
+{"kind": "textbox", "slide": 6, "text": "owner", "textPreview": "owner", "textChars": 5, "textLines": 1}
+{"kind": "textbox", "slide": 6, "text": "glossary", "textPreview": "glossary", "textChars": 8, "textLines": 1}
+{"kind": "textbox", "slide": 6, "text": "lineage", "textPreview": "lineage", "textChars": 7, "textLines": 1}
+{"kind": "textbox", "slide": 6, "text": "quality", "textPreview": "quality", "textChars": 7, "textLines": 1}
+{"kind": "textbox", "slide": 6, "text": "contract", "textPreview": "contract", "textChars": 8, "textLines": 1}
+{"kind": "textbox", "slide": 6, "text": "dashboard", "textPreview": "dashboard", "textChars": 9, "textLines": 1}
+{"kind": "textbox", "slide": 6, "text": "version history", "textPreview": "version history", "textChars": 15, "textLines": 1}
+{"kind": "textbox", "slide": 6, "text": "tabla / activo\nde datos", "textPreview": "tabla / activo | de datos", "textChars": 23, "textLines": 2}
+{"kind": "textbox", "slide": 6, "text": "No es burocracia nueva: es capturar en pequeño lo que DataHub, OpenMetadata y dbt exposures ya modelan a escala.", "textPreview": "No es burocracia nueva: es capturar en pequeño lo que DataHub, OpenMetadata y dbt exposures ya modelan a escala.", "textChars": 112, "textLines": 1}
+{"kind": "textbox", "slide": 6, "text": "Knowledge Repo 01", "textPreview": "Knowledge Repo 01", "textChars": 17, "textLines": 1}
+{"kind": "textbox", "slide": 6, "text": "06", "textPreview": "06", "textChars": 2, "textLines": 1}
+{"kind": "textbox", "slide": 6, "text": "Fuentes: DataHub, OpenMetadata, dbt exposures", "textPreview": "Fuentes: DataHub, OpenMetadata, dbt exposures", "textChars": 45, "textLines": 1}
+{"kind": "slide", "slide": 7, "title": "PORTABILIDAD", "textShapes": 13}
+{"kind": "textbox", "slide": 7, "text": "PORTABILIDAD", "textPreview": "PORTABILIDAD", "textChars": 12, "textLines": 1}
+{"kind": "textbox", "slide": 7, "text": "OKF apunta a una idea útil: Markdown con estructura explícita para humanos y agentes", "textPreview": "OKF apunta a una idea útil: Markdown con estructura explícita para humanos y agentes", "textChars": 84, "textLines": 1}
+{"kind": "textbox", "slide": 7, "text": "/knowledge-bundle", "textPreview": "/knowledge-bundle", "textChars": 17, "textLines": 1}
+{"kind": "textbox", "slide": 7, "text": "index.md", "textPreview": "index.md", "textChars": 8, "textLines": 1}
+{"kind": "textbox", "slide": 7, "text": "clientes.md", "textPreview": "clientes.md", "textChars": 11, "textLines": 1}
+{"kind": "textbox", "slide": 7, "text": "frontmatter.yaml", "textPreview": "frontmatter.yaml", "textChars": 16, "textLines": 1}
+{"kind": "textbox", "slide": 7, "text": "log.md", "textPreview": "log.md", "textChars": 6, "textLines": 1}
+{"kind": "textbox", "slide": 7, "text": "links", "textPreview": "links", "textChars": 5, "textLines": 1}
+{"kind": "textbox", "slide": 7, "text": "type: concept\ntitle: clientes\ndescription: fuente cliente\nresource: table\n tags: [customer, churn]\ntimestamp: 2026-06-12", "textPreview": "type: concept | title: clientes | description: fuente cliente | resource: table |  tags: [customer, churn] | timestamp: 2026-06-12", "textChars": 120, "textLines": 6}
+{"kind": "textbox", "slide": 7, "text": "Referencia emergente de formato portable; no estándar corporativo final ni plataforma completa.", "textPreview": "Referencia emergente de formato portable; no estándar corporativo final ni plataforma completa.", "textChars": 95, "textLines": 1}
+{"kind": "textbox", "slide": 7, "text": "Knowledge Repo 01", "textPreview": "Knowledge Repo 01", "textChars": 17, "textLines": 1}
+{"kind": "textbox", "slide": 7, "text": "07", "textPreview": "07", "textChars": 2, "textLines": 1}
+{"kind": "textbox", "slide": 7, "text": "Fuente: Google Cloud OKF, 2026-06-12; spec v0.1 draft", "textPreview": "Fuente: Google Cloud OKF, 2026-06-12; spec v0.1 draft", "textChars": 53, "textLines": 1}
+{"kind": "slide", "slide": 8, "title": "AGENTES", "textShapes": 11}
+{"kind": "textbox", "slide": 8, "text": "AGENTES", "textPreview": "AGENTES", "textChars": 7, "textLines": 1}
+{"kind": "textbox", "slide": 8, "text": "MCP/API abre la puerta al agente, pero no convierte desorden en memoria", "textPreview": "MCP/API abre la puerta al agente, pero no convierte desorden en memoria", "textChars": 71, "textLines": 1}
+{"kind": "textbox", "slide": 8, "text": "agente", "textPreview": "agente", "textChars": 6, "textLines": 1}
+{"kind": "textbox", "slide": 8, "text": "MCP / API", "textPreview": "MCP / API", "textChars": 9, "textLines": 1}
+{"kind": "textbox", "slide": 8, "text": "índice curado", "textPreview": "índice curado", "textChars": 13, "textLines": 1}
+{"kind": "textbox", "slide": 8, "text": "ficha versionada", "textPreview": "ficha versionada", "textChars": 16, "textLines": 1}
+{"kind": "textbox", "slide": 8, "text": "owner + decisiones", "textPreview": "owner + decisiones", "textChars": 18, "textLines": 1}
+{"kind": "textbox", "slide": 8, "text": "Un agente no necesita leerlo todo; necesita entradas confiables y contexto ensamblable.", "textPreview": "Un agente no necesita leerlo todo; necesita entradas confiables y contexto ensamblable.", "textChars": 87, "textLines": 1}
+{"kind": "textbox", "slide": 8, "text": "Knowledge Repo 01", "textPreview": "Knowledge Repo 01", "textChars": 17, "textLines": 1}
+{"kind": "textbox", "slide": 8, "text": "08", "textPreview": "08", "textChars": 2, "textLines": 1}
+{"kind": "textbox", "slide": 8, "text": "Fuente: Model Context Protocol specification 2025-06-18", "textPreview": "Fuente: Model Context Protocol specification 2025-06-18", "textChars": 55, "textLines": 1}
+{"kind": "slide", "slide": 9, "title": "CIERRE", "textShapes": 6}
+{"kind": "textbox", "slide": 9, "text": "CIERRE", "textPreview": "CIERRE", "textChars": 6, "textLines": 1}
+{"kind": "textbox", "slide": 9, "text": "La documentación que escala no guarda páginas: conserva decisiones reutilizables", "textPreview": "La documentación que escala no guarda páginas: conserva decisiones reutilizables", "textChars": 80, "textLines": 1}
+{"kind": "textbox", "slide": 9, "text": "Antes de pedirle a un agente que entienda tus datos, dale una memoria que tu propio equipo pueda mantener.", "textPreview": "Antes de pedirle a un agente que entienda tus datos, dale una memoria que tu propio equipo pueda mantener.", "textChars": 106, "textLines": 1}
+{"kind": "textbox", "slide": 9, "text": "Una memoria común sirve cuando alguien que no estuvo en la decisión puede continuar el razonamiento.", "textPreview": "Una memoria común sirve cuando alguien que no estuvo en la decisión puede continuar el razonamiento.", "textChars": 100, "textLines": 1}
+{"kind": "textbox", "slide": 9, "text": "Knowledge Repo 01", "textPreview": "Knowledge Repo 01", "textChars": 17, "textLines": 1}
+{"kind": "textbox", "slide": 9, "text": "09", "textPreview": "09", "textChars": 2, "textLines": 1}

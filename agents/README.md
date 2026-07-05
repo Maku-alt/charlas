@@ -6,9 +6,17 @@ Esta carpeta contiene roles especializados. El chat principal usa `orchestrator-
 - `orchestrator-charlas`: coordina fase, dependencias, launch, paralelizacion y bloqueos.
 - `researcher-charlas`: investiga, tensiona tesis y devuelve research discutible.
 - `narrative-charlas`: convierte research convergido en narrativa de `8-10 slides`.
-- `deck-builder-charlas`: construye `pptx` editable con la skill `pptx` y evidencia de QA.
+- `deck-builder-charlas`: construye decks `pptx` nuevos con el renderer local del repo desde `deck-spec.json` y evidencia de QA; `pptx` queda solo para emergencia o diagnostico avanzado.
 - `image-closer-charlas`: define metafora e imagen editorial de cierre.
 - `review-charlas`: valida el artefacto exacto antes de cerrar.
+
+## Fuentes de verdad
+- Contrato repo-wide corto: `AGENTS.md`.
+- Transiciones de fase, prechecks, workers, sentinels y ciclo de correccion: `agents/orchestrator-charlas.md`.
+- Build normal, fixes y QA de builder: `agents/deck-builder-charlas.md`.
+- Gate de aprobacion, review-report y severidades: `agents/review-charlas.md`.
+- Renderer local, theme default y comandos: `scripts/deck_renderer/README.md`.
+- Specs y prompts reutilizables: `templates/charlas-sdd/`.
 
 ## Paquete de fase
 Cada fase pesada debe ejecutarse con contexto acotado:
@@ -17,7 +25,8 @@ Cada fase pesada debe ejecutarse con contexto acotado:
 - spec desde `specs/` o `templates/charlas-sdd/`
 - prompt desde `templates/charlas-sdd/prompts/`
 - artefactos previos estrictamente necesarios
-- `model`, `reasoning_effort` y `fork_context: false` explicitos
+- `notes/phase-summary.md` como handoff operativo, salvo summaries temporales de `build` + `image-close` paralelos
+- `model`, `reasoning_effort` y `fork_context: false` explicitos cuando se use subagente
 
 El rol no es opcional. Por ejemplo, narrativa requiere `agents/narrative-charlas.md` ademas de `narrative-spec.md` y `run-narrative.md`.
 
@@ -39,21 +48,24 @@ El rol no es opcional. Por ejemplo, narrativa requiere `agents/narrative-charlas
 
 `deck-builder-charlas` e `image-closer-charlas` pueden correr en paralelo solo si mensaje final, cita/fallback y direccion de cierre ya existen o se fijan antes.
 
+En hilos worker separados, el padre sigue `skills/worker-handoff` y las reglas concretas de `orchestrator-charlas`: verifica sentinels con `Test-Path`, no usa `read_thread` ni chat worker, y consolida summaries temporales solo en la bifurcacion `build` + `image-close`.
+
 ## Artefactos obligatorios
 - Si hubo research externo, debe existir `notes/bibliografia.md`.
-- Si corrio cualquier fase pesada, debe existir `notes/agent-log.md`.
-- Cada entrada del log debe registrar fase, agente, `model`, `reasoning_effort`, estado, artefactos, errores o bloqueos, y siguiente accion.
+- Si corrio cualquier fase pesada, debe existir `notes/phase-summary.md`.
+- `phase-summary.md` debe ser escueto y contener estado actual, pasa/no pasa, resumen, rutas de artefactos, hallazgos bloqueantes y siguiente accion.
+- El padre lee solo `phase-summary.md` para decidir transiciones. La evidencia pesada queda referenciada por rutas. No usar `agent-log.md` como handoff operativo.
 
 ## Gates de calidad
 Una deck no esta terminada solo porque existe un `pptx`. El flujo exige:
 
 - texto espanol correcto y `UTF-8` sin mojibake
 - chequeos mecanicos de archivo y layout
-- render completo e inspeccion individual a tamano completo
-- render nativo de PowerPoint en Windows cuando este disponible
+- PowerPoint nativo como gate final de apertura/export para `pptx`, segun `deck-builder-charlas`, `review-charlas` y `scripts/deck_renderer/README.md`
+- LibreOffice/Poppler solo como auxiliares
 - rechazo de solapamiento, clipping o corrupcion visible aunque los checkers no reporten errores
 - rechazo de decks mecanicamente correctas pero pobres: slides sin concepto visual, exceso de grillas o cierre sin imagen editorial real
-- bibliografia y `notes/agent-log.md` completos para las fases ejecutadas
+- bibliografia y `notes/phase-summary.md` completos para las fases ejecutadas
 
 `deck-builder-charlas` produce evidencia. `review-charlas` valida de forma independiente. `orchestrator-charlas` impide cerrar si hay hallazgos bloqueantes.
 
@@ -66,6 +78,6 @@ Una deck no esta terminada solo porque existe un `pptx`. El flujo exige:
 - Usa `review-charlas` si ya existe artefacto concreto y toca decidir si se aprueba o itera.
 
 ## Operacion local
-- En Windows, si `@oai/artifact-tool` resuelve mal, relanzar con `HOME=C:\\Users\\Victor`.
+- Build normal de decks nuevos: renderer local desde `deck-spec.json`.
 - Si `soffice` no aparece en `PATH`, usar `scripts/resolve-soffice.ps1` o `C:\\Program Files\\LibreOffice\\program\\soffice.exe`.
 - Los specs y prompts reutilizables viven en `templates/charlas-sdd/`.

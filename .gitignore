@@ -1,5 +1,9 @@
 # Root repo hygiene
 outputs/
+analysis/
+.codex/
+.agents/
+.ai/
 .venv/
 venv/
 env/
@@ -11,6 +15,25 @@ env/
 **/layout/**
 **/qa/
 **/qa/**
+
+# Version local deck renderer source; ignore only installed deps and generated outputs
+!scripts/
+!scripts/deck_renderer/
+!scripts/deck_renderer/README.md
+!scripts/deck_renderer/package.json
+!scripts/deck_renderer/package-lock.json
+!scripts/deck_renderer/render-deck.js
+!scripts/deck_renderer/theme-charlas.json
+!scripts/deck_renderer/qa-deck.py
+!scripts/deck_renderer/validate-powerpoint.ps1
+!scripts/deck_renderer/patch-pptx-text.py
+scripts/deck_renderer/node_modules/
+scripts/deck_renderer/node_modules/**
+
+# Version renderer templates
+!templates/
+!templates/deck-renderer/
+!templates/deck-renderer/**
 
 # Keep only the top-level repo guidance docs
 !README.md

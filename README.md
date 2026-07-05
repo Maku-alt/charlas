@@ -21,7 +21,7 @@ Los temas pueden incluir, por ejemplo:
 - seguridad, gobernanza y control en sistemas basados en datos o IA
 
 ## Estructura del repositorio
-Cada carpeta de primer nivel representa una charla distinta, salvo carpetas de infraestructura como `agents/`, `templates/` y `outputs/`.
+Cada carpeta de primer nivel representa una charla distinta, salvo carpetas de infraestructura como `agents/`, `templates/`, `scripts/` y `skills/`.
 
 Dentro de cada charla se pueden incluir materiales como:
 
@@ -93,7 +93,7 @@ El flujo recomendado es:
 2. `researcher-charlas` para explorar el tema, tensionar la tesis y devolver insumos discutibles
 3. research en paralelo solo cuando el framing ya esta claro y existan subpreguntas independientes
 4. `narrative-charlas` para convertir el research convergido en una historia de `8-10 slides`
-5. `deck-builder-charlas` para construir la deck con la skill `pptx` como capa de ejecucion
+5. `deck-builder-charlas` para construir decks nuevos con el renderer local desde `deck-spec.json`; la skill `pptx` queda solo para emergencia o diagnostico avanzado
 6. `image-closer-charlas` para resolver la imagen editorial final
 7. `review-charlas` para revisar narrativa, visuales y cierre antes de cerrar la charla
 

@@ -1,0 +1,13 @@
+{
+  "name": "charlas-pptx-renderer-smoke",
+  "private": true,
+  "version": "0.1.0",
+  "type": "commonjs",
+  "scripts": {
+    "build:pptxgenjs": "node pptxgenjs-smoke.js",
+    "build:real": "node pptxgenjs-real-deck.js"
+  },
+  "dependencies": {
+    "pptxgenjs": "4.0.1"
+  }
+}
