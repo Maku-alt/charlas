@@ -1,6 +1,7 @@
 # Root repo hygiene
 outputs/
 analysis/
+DeckLab/
 .codex/
 .agents/
 .ai/
