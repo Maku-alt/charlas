@@ -204,28 +204,29 @@ Expected repo conventions:
 
 ```text
 notes/phase-summary.md
-notes/.phase-<phase>.done
+notes/.phase-<phase>.done (JSON, validated against the execution package)
 review/<run-id>/
 slides/<run-id>/
 ```
 
-Expected phases are inferred from the user request, orchestration package, `phase-summary.md`, sentinel files, run folders, and artifacts. Common charla phases include `thesis`, `research`, `narrative`, `build`, `image-close`, `review`, `build-fix`, and `review-final`.
+Expected phases and sentinel names come from `agents/workflow-contract.json`. Expected charla phases include `thesis-review`, `research`, `narrative`, `image-close`, `build`, `review`, `build-fix`, `review-final`, and `release`.
 
-When auditing a relaunch, require timestamp or explicit stale-sentinel handling evidence. Some flows reuse base sentinels such as `.phase-build.done` and `.phase-review.done`; others may use phase-specific sentinels such as `.phase-build-fix.done` or `.phase-review-final.done`. Do not assume one convention without checking the run contract.
+For every completed phase, use `scripts/agent_workflow/validate-workflow.py` to validate the summary and sentinel. A sentinel confirms completion only when its run ID, phase, attempt and summary path match the execution package; existence or timestamp alone is insufficient.
 
 For PPTX flows, validate:
 
 - final PPTX exists
 - final PPTX SHA256
 - filename has no experimental suffix when promoted
-- `phase-summary.md` declares current phase and pass/fail
+- `phase-summary.md` declares the current phase, execution status, decision and review verdict
 - PowerPoint native opened/exported final PPTX
 - exported slide count
 - contact sheet evidence
 - review report and review-final report
 - maximum one `review -> build-fix -> review-final` cycle unless explicitly authorized
-- Presentations / `@oai/artifact-tool` used for new deck creation
-- `pptxgenjs` not used for new deck creation
+- New decks use `deck-spec.json` -> `scripts/deck_renderer/render-deck.js`.
+- `qa-deck.py` and `validate-powerpoint.ps1` provide mechanical and native evidence.
+- PowerPoint native remains the final gate.
 - LibreOffice/Poppler only auxiliary, not final gate
 
 Known baselines for this repo:

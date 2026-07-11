@@ -656,6 +656,16 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertEqual(1, result.returncode)
         self.assertIn("pasa / no pasa", result.stdout.lower())
 
+    def test_worker_flow_audit_charlas_adapter_matches_renderer_and_run_aware_sentinels(self):
+        skill = (ROOT / "skills" / "worker-flow-audit" / "SKILL.md").read_text(encoding="utf-8")
+
+        self.assertIn("`deck-spec.json` -> `scripts/deck_renderer/render-deck.js`", skill)
+        self.assertIn("`qa-deck.py` and `validate-powerpoint.ps1`", skill)
+        self.assertIn("PowerPoint native remains the final gate", skill)
+        self.assertIn("run ID, phase, attempt and summary path", skill)
+        self.assertNotIn("@oai/artifact-tool", skill)
+        self.assertNotIn("`pptxgenjs` not used", skill)
+
 
 if __name__ == "__main__":
     unittest.main()
