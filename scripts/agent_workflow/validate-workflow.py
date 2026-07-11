@@ -15,6 +15,15 @@ SPEC = importlib.util.spec_from_file_location("workflow_contract", MODULE)
 workflow_contract = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(workflow_contract)
 
+ROLE_PATHS = {
+    "orchestrator-charlas": "agents/orchestrator-charlas.md",
+    "researcher-charlas": "agents/researcher-charlas.md",
+    "narrative-charlas": "agents/narrative-charlas.md",
+    "image-closer-charlas": "agents/image-closer-charlas.md",
+    "deck-builder-charlas": "agents/deck-builder-charlas.md",
+    "review-charlas": "agents/review-charlas.md",
+}
+
 
 def main() -> int:
     parser = argparse.ArgumentParser()
@@ -42,15 +51,23 @@ def main() -> int:
                     errors.append("Release must be an explicit orchestrator-owned embedded contract")
                 continue
 
-            if not isinstance(phase.get("role"), str) or not phase["role"].strip():
+            role = phase.get("role")
+            if not isinstance(role, str) or not role.strip():
                 errors.append(f"Phase {phase_name} is missing a declared role")
+            else:
+                for role_name in role.split(" or "):
+                    role_path = ROLE_PATHS.get(role_name)
+                    if role_path is None or not (root / role_path).is_file():
+                        errors.append(f"Phase {phase_name} references missing role: {role_name}")
             spec = phase.get("spec")
             if not isinstance(spec, str) or not spec.strip():
                 errors.append(f"Phase {phase_name} is missing a declared spec")
             elif not (root / "templates" / "charlas-sdd" / "full" / spec).is_file():
                 errors.append(f"Phase {phase_name} references missing spec: {spec}")
             prompt = phase.get("prompt")
-            if prompt != "not_applicable" and not (root / "templates" / "charlas-sdd" / "prompts" / prompt).is_file():
+            if prompt == "not_applicable":
+                errors.append(f"Phase {phase_name} may use prompt not_applicable only for release")
+            elif not isinstance(prompt, str) or not (root / "templates" / "charlas-sdd" / "prompts" / prompt).is_file():
                 errors.append(f"Phase {phase_name} references missing prompt: {prompt}")
 
         for role_name, role in contract.get("auxiliary_roles", {}).items():

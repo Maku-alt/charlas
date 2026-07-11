@@ -369,6 +369,41 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertEqual(0, result.returncode, result.stdout)
         self.assertIn("VALID ORCHESTRATOR RELEASE release", result.stdout)
 
+    def test_phase_asset_check_rejects_nonexistent_canonical_role(self):
+        contract_path = ROOT / "agents" / ".task-7-role-contract.json"
+        contract = json.loads((ROOT / "agents" / "workflow-contract.json").read_text(encoding="utf-8"))
+        contract["phases"]["research"]["role"] = "missing-charlas"
+        contract_path.write_text(json.dumps(contract), encoding="utf-8")
+        self.addCleanup(contract_path.unlink, missing_ok=True)
+
+        result = subprocess.run(
+            [sys.executable, str(CLI_PATH), "--contract", str(contract_path), "--check-phase-assets"],
+            capture_output=True, text=True, check=False,
+        )
+
+        self.assertEqual(1, result.returncode)
+        self.assertIn("Phase research references missing role", result.stdout)
+
+    def test_phase_asset_check_rejects_missing_or_not_applicable_worker_prompt(self):
+        for prompt, expected in (
+            ("missing-prompt.md", "references missing prompt"),
+            ("not_applicable", "may use prompt not_applicable only for release"),
+        ):
+            with self.subTest(prompt=prompt):
+                contract_path = ROOT / "agents" / f".task-7-prompt-{prompt.replace('.', '-')}.json"
+                contract = json.loads((ROOT / "agents" / "workflow-contract.json").read_text(encoding="utf-8"))
+                contract["phases"]["research"]["prompt"] = prompt
+                contract_path.write_text(json.dumps(contract), encoding="utf-8")
+                self.addCleanup(contract_path.unlink, missing_ok=True)
+
+                result = subprocess.run(
+                    [sys.executable, str(CLI_PATH), "--contract", str(contract_path), "--check-phase-assets"],
+                    capture_output=True, text=True, check=False,
+                )
+
+                self.assertEqual(1, result.returncode)
+                self.assertIn(f"Phase research {expected}", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()
