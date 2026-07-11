@@ -11,6 +11,9 @@ Paquete acotado para una sola corrida aislada. Completar todos los campos antes 
 ## phase
 <canonical phase name from agents/workflow-contract.json>
 
+## workflow mode
+<full | compact; compact activates independent build/review boundary validation>
+
 ## role
 <agents/<role>.md>
 

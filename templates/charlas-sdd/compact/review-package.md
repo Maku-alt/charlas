@@ -9,6 +9,7 @@ Usa este paquete exclusivamente para revisar, de manera independiente, una charl
 - build evidence: <paths>
 
 ## Review worker identity
+- workflow mode: compact
 - worker_id: <stable worker identifier distinct from build worker_id>
 - session_id: <isolated session identifier distinct from build session_id>
 

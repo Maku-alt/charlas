@@ -96,7 +96,8 @@ class WorkflowContractTests(unittest.TestCase):
             "## Candidate artifact\nslides/candidate.pptx"
             f"\n\n## Candidate SHA256\n{candidate_sha256}"
             f"\n\n## Worker ID\n{worker_id}"
-            f"\n\n## Session ID\n{session_id}",
+            f"\n\n## Session ID\n{session_id}"
+            "\n\n## Workflow mode\ncompact",
         )
         summary.write_text(text, encoding="utf-8")
 
@@ -474,6 +475,33 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("worker_id", result.stdout)
         self.assertFalse((notes / ".phase-review.done").exists())
 
+    def test_full_build_and_review_publication_do_not_require_compact_boundary_fields(self):
+        temp_dir = tempfile.TemporaryDirectory()
+        notes = Path(temp_dir.name) / "notes"
+        notes.mkdir()
+        summary = notes / "phase-summary.md"
+        self.addCleanup(temp_dir.cleanup)
+        text = (FIXTURES / "valid-phase-summary.md").read_text(encoding="utf-8")
+        summary.write_text(
+            text.replace("## Phase\nreview-final", "## Phase\nbuild")
+            .replace("## Review verdict\napproved", "## Review verdict\nnot_applicable")
+            .replace("## Next phase\nrelease", "## Next phase\nreview"),
+            encoding="utf-8",
+        )
+        build = self.complete_phase(summary, phase="build")
+        self.assertEqual(0, build.returncode, build.stdout)
+        summary.write_text(
+            text.replace("## Phase\nreview-final", "## Phase\nreview")
+            .replace("## Review verdict\napproved", "## Review verdict\nrequires_changes")
+            .replace("## Next phase\nrelease", "## Next phase\nbuild-fix"),
+            encoding="utf-8",
+        )
+
+        review = self.complete_phase(summary, phase="review")
+
+        self.assertEqual(0, review.returncode, review.stdout)
+        self.assertTrue((notes / ".phase-review.done").exists())
+
     def test_compact_review_publication_rejects_mismatched_candidate_hash(self):
         temp_dir = tempfile.TemporaryDirectory()
         notes = Path(temp_dir.name) / "notes"
@@ -514,6 +542,7 @@ class WorkflowContractTests(unittest.TestCase):
             summary,
             review_sentinel,
             "review",
+            workflow_mode="compact",
             worker_id="builder-7",
             session_id="build-session-12",
             candidate_artifact="slides/candidate.pptx",

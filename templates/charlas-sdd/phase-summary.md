@@ -44,6 +44,9 @@ Sobrescribir este archivo con el estado operativo actual. No usarlo como log app
 ## Session ID
 <isolated session identifier | none when no compact boundary applies>
 
+## Workflow mode
+<full | compact; omit only for legacy full summaries>
+
 ## Final artifact
 <path | none>
 

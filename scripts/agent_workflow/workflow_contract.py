@@ -18,6 +18,8 @@ REQUIRED_FIELDS = (
 )
 ARTIFACT_PHASES = {"build", "review", "review-final", "build-fix"}
 COMPACT_BOUNDARY_PHASES = {"build", "review"}
+WORKFLOW_MODES = {"full", "compact"}
+COMPACT_WORKFLOW_MODE = "compact"
 
 
 def validate_compact_review_independence(
@@ -59,6 +61,14 @@ def _scalar(summary: dict[str, str], name: str) -> str:
     return _value(summary, name).splitlines()[0].strip() if _value(summary, name) else ""
 
 
+def is_compact_boundary(summary: dict[str, str]) -> bool:
+    """Return whether this build/review summary opted into compact boundary gates."""
+    return (
+        _scalar(summary, "phase") in COMPACT_BOUNDARY_PHASES
+        and _scalar(summary, "workflow mode").lower() == COMPACT_WORKFLOW_MODE
+    )
+
+
 def _candidate_path(summary: dict[str, str], summary_path: Path) -> Path | None:
     candidate = _scalar(summary, "candidate artifact")
     if not candidate or candidate == "none":
@@ -97,6 +107,8 @@ def validate_compact_review_boundary(summary: dict[str, str], summary_path: Path
         return ["Compact review build sentinel must contain valid JSON"]
     if not isinstance(build, dict) or build.get("phase") != "build":
         return ["Compact review requires a build sentinel"]
+    if build.get("workflow_mode") != COMPACT_WORKFLOW_MODE:
+        return ["Compact review requires a compact build sentinel"]
 
     review_identity = {
         "worker_id": _scalar(summary, "worker id"),
@@ -117,7 +129,7 @@ def validate_compact_review_boundary(summary: dict[str, str], summary_path: Path
 def validate_publication(summary: dict[str, str], contract: dict[str, Any], summary_path: Path) -> list[str]:
     """Validate runtime-bound build/review fields before a phase sentinel is published."""
     phase = _scalar(summary, "phase")
-    if phase not in COMPACT_BOUNDARY_PHASES:
+    if not is_compact_boundary(summary):
         return []
     errors = _candidate_identity_errors(summary, summary_path)
     if phase == "review":
@@ -144,6 +156,9 @@ def validate_transition(summary: dict[str, str], contract: dict[str, Any]) -> li
         errors.append("Invalid execution status")
     if _scalar(summary, "decision") not in contract.get("decisions", []):
         errors.append("Invalid decision")
+    workflow_mode = _scalar(summary, "workflow mode").lower()
+    if workflow_mode and workflow_mode not in WORKFLOW_MODES:
+        errors.append("Invalid workflow mode")
 
     verdict = _scalar(summary, "review verdict")
     if verdict not in contract.get("review_verdicts", []):
@@ -207,8 +222,9 @@ def _validate_sentinel(
         if values.get(field) != expected_value:
             errors.append(f"Sentinel {field.replace('_', ' ')} does not match summary")
 
-    if _scalar(summary, "phase") in COMPACT_BOUNDARY_PHASES:
+    if is_compact_boundary(summary):
         for sentinel_field, summary_field in (
+            ("workflow_mode", "workflow mode"),
             ("worker_id", "worker id"),
             ("session_id", "session id"),
             ("candidate_artifact", "candidate artifact"),

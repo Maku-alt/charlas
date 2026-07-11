@@ -18,6 +18,7 @@ Usa este paquete exclusivamente para construir una charla pequena con narrativa 
 - closing treatment:
 
 ## Build worker identity
+- workflow mode: compact
 - worker_id: <stable worker identifier>
 - session_id: <isolated session identifier>
 

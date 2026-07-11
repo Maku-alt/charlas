@@ -142,8 +142,9 @@ def main() -> int:
             "summary": f"{summary_path.parent.name}/{summary_path.name}",
             "completed_at": datetime.now(launched_at.tzinfo).isoformat(),
         }
-        if args.phase in workflow_contract.COMPACT_BOUNDARY_PHASES:
+        if workflow_contract.is_compact_boundary(summary):
             payload.update({
+                "workflow_mode": workflow_contract.COMPACT_WORKFLOW_MODE,
                 "worker_id": _scalar(summary, "worker id"),
                 "session_id": _scalar(summary, "session id"),
                 "candidate_artifact": _scalar(summary, "candidate artifact"),

@@ -18,6 +18,8 @@ Usa `compact/` cuando la charla sea pequena, tenga tesis clara o no tenga claims
 2. `build-package.md`
 3. `review-package.md`
 
+Los paquetes compactos deben publicar `Workflow mode: compact` en su phase summary. Solo ese discriminador activa la validacion de identidad y hash entre build y review; la ausencia conserva el flujo full por compatibilidad.
+
 ## Paquete de ejecucion
 Cada fase pesada debe recibir:
 
