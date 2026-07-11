@@ -33,4 +33,3 @@ Usa este paquete exclusivamente para construir una charla pequena con narrativa 
 ## Constraints
 - Do not perform review or approve the deck.
 - Do not advance automatically; hand off the completed build summary, candidate path, and candidate SHA256 to the independent compact review.
-

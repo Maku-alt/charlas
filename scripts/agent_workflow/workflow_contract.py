@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -16,6 +17,7 @@ REQUIRED_FIELDS = (
     "next action",
 )
 ARTIFACT_PHASES = {"build", "review", "review-final", "build-fix"}
+COMPACT_BOUNDARY_PHASES = {"build", "review"}
 
 
 def validate_compact_review_independence(
@@ -55,6 +57,72 @@ def _value(summary: dict[str, str], name: str) -> str:
 
 def _scalar(summary: dict[str, str], name: str) -> str:
     return _value(summary, name).splitlines()[0].strip() if _value(summary, name) else ""
+
+
+def _candidate_path(summary: dict[str, str], summary_path: Path) -> Path | None:
+    candidate = _scalar(summary, "candidate artifact")
+    if not candidate or candidate == "none":
+        return None
+    path = (summary_path.parent.parent / candidate).resolve()
+    talk_root = summary_path.parent.parent.resolve()
+    try:
+        path.relative_to(talk_root)
+    except ValueError:
+        return None
+    return path
+
+
+def _candidate_identity_errors(summary: dict[str, str], summary_path: Path) -> list[str]:
+    errors: list[str] = []
+    for field in ("worker id", "session id", "candidate sha256"):
+        if not _scalar(summary, field):
+            errors.append(f"Missing compact boundary field: {field}")
+    candidate = _candidate_path(summary, summary_path)
+    if candidate is None or not candidate.is_file():
+        return [*errors, "Candidate artifact must be an existing file inside the talk directory"]
+    actual_sha256 = hashlib.sha256(candidate.read_bytes()).hexdigest()
+    if _scalar(summary, "candidate sha256") != actual_sha256:
+        errors.append("Candidate SHA256 does not match the candidate artifact")
+    return errors
+
+
+def validate_compact_review_boundary(summary: dict[str, str], summary_path: Path) -> list[str]:
+    """Validate the completed build handoff consumed by a compact review."""
+    build_sentinel = summary_path.parent / ".phase-build.done"
+    if not build_sentinel.is_file():
+        return ["Compact review requires a completed build sentinel"]
+    try:
+        build = json.loads(build_sentinel.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return ["Compact review build sentinel must contain valid JSON"]
+    if not isinstance(build, dict) or build.get("phase") != "build":
+        return ["Compact review requires a build sentinel"]
+
+    review_identity = {
+        "worker_id": _scalar(summary, "worker id"),
+        "session_id": _scalar(summary, "session id"),
+    }
+    errors = validate_compact_review_independence(
+        {"worker_id": str(build.get("worker_id", "")), "session_id": str(build.get("session_id", ""))},
+        review_identity,
+        independence_required=True,
+    )
+    if build.get("candidate_artifact") != _scalar(summary, "candidate artifact"):
+        errors.append("Compact review candidate artifact does not match completed build")
+    if build.get("candidate_sha256") != _scalar(summary, "candidate sha256"):
+        errors.append("Compact review Candidate SHA256 does not match completed build")
+    return errors
+
+
+def validate_publication(summary: dict[str, str], contract: dict[str, Any], summary_path: Path) -> list[str]:
+    """Validate runtime-bound build/review fields before a phase sentinel is published."""
+    phase = _scalar(summary, "phase")
+    if phase not in COMPACT_BOUNDARY_PHASES:
+        return []
+    errors = _candidate_identity_errors(summary, summary_path)
+    if phase == "review":
+        errors.extend(validate_compact_review_boundary(summary, summary_path))
+    return errors
 
 
 def validate_transition(summary: dict[str, str], contract: dict[str, Any]) -> list[str]:
@@ -139,6 +207,16 @@ def _validate_sentinel(
         if values.get(field) != expected_value:
             errors.append(f"Sentinel {field.replace('_', ' ')} does not match summary")
 
+    if _scalar(summary, "phase") in COMPACT_BOUNDARY_PHASES:
+        for sentinel_field, summary_field in (
+            ("worker_id", "worker id"),
+            ("session_id", "session id"),
+            ("candidate_artifact", "candidate artifact"),
+            ("candidate_sha256", "candidate sha256"),
+        ):
+            if values.get(sentinel_field) != _scalar(summary, summary_field):
+                errors.append(f"Sentinel {sentinel_field.replace('_', ' ')} does not match summary")
+
     run_id = expected["run_id"]
     launch = _run_launch_timestamp(run_id)
     if launch is None:
@@ -152,6 +230,7 @@ def _validate_summary(path: str | Path, contract: dict[str, Any], sentinel: Path
     summary_path = Path(path)
     summary = parse_summary(summary_path)
     errors = validate_transition(summary, contract)
+    errors.extend(validate_publication(summary, contract, summary_path))
     phase = _scalar(summary, "phase")
     phase_contract = contract.get("phases", {}).get(phase)
     if phase_contract:

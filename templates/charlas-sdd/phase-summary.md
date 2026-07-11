@@ -35,6 +35,15 @@ Sobrescribir este archivo con el estado operativo actual. No usarlo como log app
 ## Candidate artifact
 <path | none>
 
+## Candidate SHA256
+<lowercase SHA256 | none when no candidate applies>
+
+## Worker ID
+<stable worker identifier | none when no compact boundary applies>
+
+## Session ID
+<isolated session identifier | none when no compact boundary applies>
+
 ## Final artifact
 <path | none>
 

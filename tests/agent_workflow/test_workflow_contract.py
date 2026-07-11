@@ -1,4 +1,5 @@
 import importlib.util
+import hashlib
 import json
 import msvcrt
 import os
@@ -80,6 +81,39 @@ class WorkflowContractTests(unittest.TestCase):
             self.complete_phase_command(summary, **overrides),
             capture_output=True, text=True, check=False,
         )
+
+    def write_compact_phase_summary(
+        self, summary, *, phase, worker_id, session_id, candidate_sha256,
+    ):
+        review_verdict = "not_applicable" if phase == "build" else "requires_changes"
+        next_phase = "review" if phase == "build" else "build-fix"
+        text = (FIXTURES / "valid-phase-summary.md").read_text(encoding="utf-8")
+        text = text.replace("## Phase\nreview-final", f"## Phase\n{phase}")
+        text = text.replace("## Review verdict\napproved", f"## Review verdict\n{review_verdict}")
+        text = text.replace("## Next phase\nrelease", f"## Next phase\n{next_phase}")
+        text = text.replace(
+            "## Candidate artifact\nslides/candidate.pptx",
+            "## Candidate artifact\nslides/candidate.pptx"
+            f"\n\n## Candidate SHA256\n{candidate_sha256}"
+            f"\n\n## Worker ID\n{worker_id}"
+            f"\n\n## Session ID\n{session_id}",
+        )
+        summary.write_text(text, encoding="utf-8")
+
+    def publish_compact_build(self, summary, candidate, *, worker_id="builder-7", session_id="build-session-12"):
+        candidate.parent.mkdir(exist_ok=True)
+        candidate.write_bytes(b"compact candidate")
+        candidate_sha256 = hashlib.sha256(candidate.read_bytes()).hexdigest()
+        self.write_compact_phase_summary(
+            summary,
+            phase="build",
+            worker_id=worker_id,
+            session_id=session_id,
+            candidate_sha256=candidate_sha256,
+        )
+        result = self.complete_phase(summary, phase="build")
+        self.assertEqual(0, result.returncode, result.stdout)
+        return candidate_sha256
 
     def hold_publish_lock(self, sentinel):
         lock_path = sentinel.parent / f"{sentinel.name}.lock"
@@ -418,6 +452,78 @@ class WorkflowContractTests(unittest.TestCase):
                     independence_required=True,
                 )
                 self.assertTrue(any(expected in error for error in errors), errors)
+
+    def test_compact_review_publication_rejects_shared_build_identity(self):
+        temp_dir = tempfile.TemporaryDirectory()
+        notes = Path(temp_dir.name) / "notes"
+        notes.mkdir()
+        summary = notes / "phase-summary.md"
+        self.addCleanup(temp_dir.cleanup)
+        candidate_sha256 = self.publish_compact_build(summary, Path(temp_dir.name) / "slides" / "candidate.pptx")
+        self.write_compact_phase_summary(
+            summary,
+            phase="review",
+            worker_id="builder-7",
+            session_id="review-session-13",
+            candidate_sha256=candidate_sha256,
+        )
+
+        result = self.complete_phase(summary, phase="review")
+
+        self.assertEqual(1, result.returncode)
+        self.assertIn("worker_id", result.stdout)
+        self.assertFalse((notes / ".phase-review.done").exists())
+
+    def test_compact_review_publication_rejects_mismatched_candidate_hash(self):
+        temp_dir = tempfile.TemporaryDirectory()
+        notes = Path(temp_dir.name) / "notes"
+        notes.mkdir()
+        summary = notes / "phase-summary.md"
+        self.addCleanup(temp_dir.cleanup)
+        self.publish_compact_build(summary, Path(temp_dir.name) / "slides" / "candidate.pptx")
+        self.write_compact_phase_summary(
+            summary,
+            phase="review",
+            worker_id="reviewer-8",
+            session_id="review-session-13",
+            candidate_sha256="0" * 64,
+        )
+
+        result = self.complete_phase(summary, phase="review")
+
+        self.assertEqual(1, result.returncode)
+        self.assertIn("SHA256", result.stdout)
+        self.assertFalse((notes / ".phase-review.done").exists())
+
+    def test_compact_review_validation_rejects_shared_identity_and_mismatched_hash(self):
+        temp_dir = tempfile.TemporaryDirectory()
+        notes = Path(temp_dir.name) / "notes"
+        notes.mkdir()
+        summary = notes / "phase-summary.md"
+        self.addCleanup(temp_dir.cleanup)
+        self.publish_compact_build(summary, Path(temp_dir.name) / "slides" / "candidate.pptx")
+        self.write_compact_phase_summary(
+            summary,
+            phase="review",
+            worker_id="builder-7",
+            session_id="build-session-12",
+            candidate_sha256="0" * 64,
+        )
+        review_sentinel = notes / ".phase-review.done"
+        self.write_sentinel(
+            summary,
+            review_sentinel,
+            "review",
+            worker_id="builder-7",
+            session_id="build-session-12",
+            candidate_artifact="slides/candidate.pptx",
+            candidate_sha256="0" * 64,
+        )
+
+        errors = self.workflow_contract.validate_summary(summary, self.contract)
+
+        self.assertTrue(any("worker_id" in error for error in errors), errors)
+        self.assertTrue(any("SHA256" in error for error in errors), errors)
 
 
 if __name__ == "__main__":

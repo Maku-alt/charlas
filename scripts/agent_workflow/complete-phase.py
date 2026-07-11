@@ -114,6 +114,7 @@ def main() -> int:
         return 1
     summary = workflow_contract.parse_summary(summary_path)
     errors = workflow_contract.validate_transition(summary, contract)
+    errors.extend(workflow_contract.validate_publication(summary, contract, summary_path))
     errors.extend(_identity_errors(summary, args))
     phase_contract = contract.get("phases", {}).get(args.phase)
     if phase_contract is None:
@@ -141,6 +142,13 @@ def main() -> int:
             "summary": f"{summary_path.parent.name}/{summary_path.name}",
             "completed_at": datetime.now(launched_at.tzinfo).isoformat(),
         }
+        if args.phase in workflow_contract.COMPACT_BOUNDARY_PHASES:
+            payload.update({
+                "worker_id": _scalar(summary, "worker id"),
+                "session_id": _scalar(summary, "session id"),
+                "candidate_artifact": _scalar(summary, "candidate artifact"),
+                "candidate_sha256": _scalar(summary, "candidate sha256"),
+            })
         _write_atomically(sentinel, payload)
     print(f"COMPLETED: {sentinel}")
     return 0

@@ -24,4 +24,3 @@ Usa este paquete exclusivamente para revisar, de manera independiente, una charl
 ## Constraints
 - Do not mutate the deck, source, candidate artifact, or build evidence.
 - Do not approve a different artifact or a candidate whose hash does not match the completed build handoff.
-
