@@ -41,13 +41,7 @@ Cada fase pesada debe ejecutarse con contexto acotado:
 El rol no es opcional. Por ejemplo, narrativa requiere `agents/narrative-charlas.md` ademas de `narrative-spec.md` y `run-narrative.md`.
 
 ## Mapeo rapido
-| Fase | Rol | Spec | Prompt |
-|---|---|---|---|
-| research | `researcher-charlas` | `research-spec.md` | `run-research.md` |
-| narrativa | `narrative-charlas` | `narrative-spec.md` | `run-narrative.md` |
-| build | `deck-builder-charlas` | `build-spec.md` | `run-build.md` |
-| imagen final | `image-closer-charlas` | cierre en `narrative-spec.md` o `build-spec.md` | `run-image-close.md` |
-| review | `review-charlas` | `review-spec.md` | `run-review.md` |
+`agents/workflow-contract.json` define el mapeo completo y vigente de fases, roles, specs, prompts, transiciones y sentinels. No copies esa tabla a documentos operativos.
 
 ## Dependencias
 - `narrative-charlas` depende de research o tesis convergida.
@@ -63,7 +57,7 @@ En hilos worker separados, el padre sigue `skills/worker-handoff` y las reglas c
 ## Artefactos obligatorios
 - Si hubo research externo, debe existir `notes/bibliografia.md`.
 - Si corrio cualquier fase pesada, debe existir `notes/phase-summary.md`.
-- `phase-summary.md` debe ser escueto y contener estado actual, pasa/no pasa, resumen, rutas de artefactos, hallazgos bloqueantes y siguiente accion.
+- `phase-summary.md` debe ser escueto y contener la version del contrato, identidad de corrida, fase, estado de ejecucion, decision, veredicto de review, artefactos, evidencia, bloqueos y siguiente accion.
 - El padre lee solo `phase-summary.md` para decidir transiciones. La evidencia pesada queda referenciada por rutas. No usar `agent-log.md` como handoff operativo.
 
 ## Gates de calidad

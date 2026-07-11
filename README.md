@@ -102,3 +102,19 @@ El flujo recomendado es:
 Si hay duda sobre en que fase esta una charla o que agente deberia correr primero, el entrypoint recomendado es `orchestrator-charlas`.
 
 Este repo no esta orientado a generar imagenes sueltas. La imagen final existe para cerrar una charla ya estructurada.
+
+## Inicio rapido del workflow v2
+
+Para una charla nueva o reabierta, opera en cinco pasos:
+
+1. Elige `templates/charlas-sdd/full/` para una charla normal o compleja, o `templates/charlas-sdd/compact/` cuando el framing ya sea claro.
+2. Copia los specs elegidos a `<talk>/specs/` y completa solo los requisitos concretos de esa charla.
+3. Copia `templates/charlas-sdd/execution-package.md` y registra `run_id`, intento, fase, rol, entradas permitidas, salidas, criterios de aceptacion y runtime real.
+4. Lanza el rol aislado con su prompt de `templates/charlas-sdd/prompts/`; el worker escribe primero `notes/phase-summary.md` y publica el sentinel mediante `scripts/agent_workflow/complete-phase.py`.
+5. Valida el handoff y, si pasa, aplica la transicion del contrato:
+
+   ```powershell
+   python scripts/agent_workflow/validate-workflow.py --contract agents/workflow-contract.json --summary "<talk>/notes/phase-summary.md" --sentinel "<talk>/notes/.phase-<phase>.done"
+   ```
+
+Consulta `agents/workflow-contract.json` para fases, transiciones y sentinels; `agents/runtime-defaults.json` contiene únicamente preferencias de runtime.
