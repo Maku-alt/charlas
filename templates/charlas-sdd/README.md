@@ -48,20 +48,12 @@ Si falta un spec obligatorio, no lances la fase. Corrige primero el contrato.
 
 Para pasar de narrativa a build, el handoff debe incluir `concepto visual` por slide, ademas de titulo, objeto visible y takeaway.
 
-Si hubo research externo, el handoff tambien debe incluir `notes/bibliografia.md`. Si corrio una fase pesada, debe quedar `notes/phase-summary.md` actualizado con fase, estado, pasa/no pasa, resumen, rutas, hallazgos bloqueantes y siguiente accion.
+Si hubo research externo, el handoff tambien debe incluir `notes/bibliografia.md`. Si corrio una fase pesada, debe quedar `notes/phase-summary.md` actualizado con el contrato v2 completo, incluyendo identidad de corrida, fase, estado de ejecucion, decision, veredicto de review, evidencia y siguiente accion.
 
 ## Phase summary
 `notes/phase-summary.md` reemplaza cualquier bitacora operativa. Debe representar el estado actual y ser lo unico que el hilo padre lee para avanzar.
 
-Formato minimo:
-
-- `Ultima fase`
-- `Estado`: `completado`, `requiere cambios` o `bloqueado`
-- `Pasa / no pasa`
-- `Resumen`: 1-3 frases
-- `Artefactos`: rutas
-- `Hallazgos bloqueantes`
-- `Siguiente accion`
+Formato minimo: usar exactamente `templates/charlas-sdd/phase-summary.md`. La combinacion de `Execution status`, `Decision` y `Review verdict` reemplaza campos ambiguos: una fase que termino pero requiere otra iteracion registra `completed`, `iterate` y el veredicto que corresponda.
 
 No pegues outputs de comandos, renders, transcripts ni reportes completos en el padre. Escribe evidencia larga a archivos y referencia rutas.
 
@@ -83,8 +75,11 @@ La skill `pptx` queda solo para emergencia o diagnostico avanzado. Los detalles 
 | review | `gpt-5.4` | `medium` | veredicto sobre artefacto exacto |
 
 ## Bloqueo y continuidad
-Una fase bloqueada debe devolver `Estado`, `Fase`, `Bloqueo concreto`, `Artefactos generados`, chequeos fallidos y exitosos, riesgos residuales y accion propuesta.
+Una fase bloqueada debe devolver `Execution status: blocked`, la fase, hallazgos bloqueantes concretos, artefactos generados, evidencia de chequeos, riesgos residuales y una accion propuesta.
 
 El padre decide `esperar`, `relanzar`, `volver a la fase anterior` o `escalar`. No completa la fase especializada desde fuera.
 
 Ninguna fase avanza automaticamente a la siguiente. Cada output debe cerrar con una decision: seguir, reformular, profundizar o descartar.
+
+## Compatibilidad v1
+Workflow v2 applies to new or explicitly reopened talks. Existing v1 summaries remain readable but are not valid inputs for a new v2 transition until upgraded. Closed legacy talks are not migrated in bulk.

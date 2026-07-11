@@ -2,23 +2,47 @@
 
 Sobrescribir este archivo con el estado operativo actual. No usarlo como log append-only ni pegar outputs de comandos, transcripts, renders o reportes completos.
 
-## Ultima fase
-<research | narrative | image-close | build | review | build-fix>
+## Contract version
+2
 
-## Estado
-<completado | requiere cambios | bloqueado>
+## Run ID
+<lowercase-slug-YYYYMMDD-HHMM>
 
-## Pasa / no pasa
-<pasa | no pasa>
+## Attempt
+<positive integer>
 
-## Resumen
-<1-3 frases maximo>
+## Phase
+<canonical phase name>
 
-## Artefactos
-- `<ruta>`
+## Execution status
+<completed | blocked>
 
-## Hallazgos bloqueantes
-- <Ninguno | P1/P2 concreto>
+## Decision
+<advance | iterate | return | stop>
 
-## Siguiente accion
-<una sola accion recomendada>
+## Review verdict
+<not_applicable | approved | requires_changes>
+
+## Summary
+<1-3 sentences>
+
+## Artifacts
+- `<path>`
+
+## Evidence
+- `<path>`
+
+## Candidate artifact
+<path | none>
+
+## Final artifact
+<path | none>
+
+## Blocking findings
+- <none | concrete finding>
+
+## Next phase
+<canonical phase name | none>
+
+## Next action
+<one concrete action>
