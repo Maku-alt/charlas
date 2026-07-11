@@ -13,6 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 MODULE_PATH = ROOT / "scripts" / "agent_workflow" / "workflow_contract.py"
 CLI_PATH = ROOT / "scripts" / "agent_workflow" / "validate-workflow.py"
+COMPLETE_PHASE_PATH = ROOT / "scripts" / "agent_workflow" / "complete-phase.py"
 FIXTURES = Path(__file__).parent / "fixtures"
 
 
@@ -53,6 +54,27 @@ class WorkflowContractTests(unittest.TestCase):
         sentinel.write_text(json.dumps(payload), encoding="utf-8")
         now = datetime.now().timestamp()
         os.utime(sentinel, (now, now))
+
+    def complete_phase(self, summary, **overrides):
+        arguments = {
+            "run_id": "review-contract-20260710-1200",
+            "phase": "review-final",
+            "attempt": "1",
+            "launched_at": "2026-07-10T12:00:00-05:00",
+        }
+        arguments.update(overrides)
+        return subprocess.run(
+            [
+                sys.executable, str(COMPLETE_PHASE_PATH),
+                "--contract", str(ROOT / "agents" / "workflow-contract.json"),
+                "--summary", str(summary),
+                "--run-id", arguments["run_id"],
+                "--phase", arguments["phase"],
+                "--attempt", arguments["attempt"],
+                "--launched-at", arguments["launched_at"],
+            ],
+            capture_output=True, text=True, check=False,
+        )
 
     def test_valid_summary_has_no_errors(self):
         summary, _ = self.copy_valid_summary()
@@ -148,6 +170,62 @@ class WorkflowContractTests(unittest.TestCase):
         )
         self.assertEqual(1, result.returncode)
         self.assertIn("ERROR:", result.stdout)
+
+    def test_complete_phase_writes_sentinel_after_valid_summary(self):
+        temp_dir = tempfile.TemporaryDirectory()
+        notes = Path(temp_dir.name) / "notes"
+        notes.mkdir()
+        summary = notes / "phase-summary.md"
+        shutil.copy(FIXTURES / "valid-phase-summary.md", summary)
+        self.addCleanup(temp_dir.cleanup)
+
+        result = self.complete_phase(summary)
+
+        sentinel = notes / ".phase-review-final.done"
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertTrue(sentinel.is_file())
+        payload = json.loads(sentinel.read_text(encoding="utf-8"))
+        self.assertEqual(2, payload["contract_version"])
+        self.assertEqual("review-contract-20260710-1200", payload["run_id"])
+        self.assertEqual("review-final", payload["phase"])
+        self.assertEqual(1, payload["attempt"])
+        self.assertEqual("completed", payload["execution_status"])
+        self.assertEqual("notes/phase-summary.md", payload["summary"])
+        self.assertIn("completed_at", payload)
+        self.assertEqual([], self.workflow_contract.validate_summary(summary, self.contract))
+
+    def test_complete_phase_does_not_write_sentinel_for_invalid_summary(self):
+        temp_dir = tempfile.TemporaryDirectory()
+        notes = Path(temp_dir.name) / "notes"
+        notes.mkdir()
+        summary = notes / "phase-summary.md"
+        invalid = (FIXTURES / "valid-phase-summary.md").read_text(encoding="utf-8").replace(
+            "## Attempt\n1", "## Attempt\n0"
+        )
+        summary.write_text(invalid, encoding="utf-8")
+        self.addCleanup(temp_dir.cleanup)
+
+        result = self.complete_phase(summary)
+
+        self.assertEqual(1, result.returncode)
+        self.assertIn("ERROR:", result.stdout)
+        self.assertFalse((notes / ".phase-review-final.done").exists())
+
+    def test_complete_phase_rejects_stale_sentinel_from_other_run(self):
+        temp_dir = tempfile.TemporaryDirectory()
+        notes = Path(temp_dir.name) / "notes"
+        notes.mkdir()
+        summary = notes / "phase-summary.md"
+        shutil.copy(FIXTURES / "valid-phase-summary.md", summary)
+        sentinel = notes / ".phase-review-final.done"
+        self.write_sentinel(summary, sentinel, "review-final", run_id="old-run-20260709-1200")
+        self.addCleanup(temp_dir.cleanup)
+
+        result = self.complete_phase(summary)
+
+        self.assertEqual(1, result.returncode)
+        self.assertIn("stale", result.stdout.lower())
+        self.assertEqual("old-run-20260709-1200", json.loads(sentinel.read_text(encoding="utf-8"))["run_id"])
 
 
 if __name__ == "__main__":

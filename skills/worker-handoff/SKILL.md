@@ -16,7 +16,7 @@ Use files as the interface:
 - The parent prepares a minimal execution package.
 - The worker reads only the package and required artifacts.
 - The worker writes a compact summary and a completion sentinel.
-- The parent waits for the sentinel and reads only the summary.
+- The parent validates sentinel identity and the summary before accepting completion.
 - Evidence, logs, renders, outputs, and reports stay in files referenced by the summary.
 
 This keeps the parent context small and prevents partial worker reasoning, logs, and exploratory noise from becoming orchestration state.
@@ -41,7 +41,7 @@ Do not use it for small direct edits, quick questions, or tasks where the parent
 
 The parent decides scope, prepares inputs, launches or instructs the worker, and decides the next transition after completion.
 
-The parent should avoid inspecting worker chat, logs, or partial reasoning. It checks for the sentinel and then reads the agreed summary file.
+The parent should avoid inspecting worker chat, logs, or partial reasoning. It checks the sentinel identity and validates the agreed summary file before accepting completion.
 
 ### Worker
 
@@ -75,13 +75,13 @@ The package should be enough for a fresh worker to execute without reading the p
 
 ## Sentinel Contract
 
-A sentinel is a small file that means the worker has finished writing the summary.
+A sentinel is a small, run-aware completion record written after the worker has finished writing and validating the summary.
 
 Rules:
 
 - The worker writes the summary first.
 - The worker writes the sentinel last.
-- The parent treats sentinel existence as the completion signal.
+- Completion requires a sentinel whose identity matches the expected contract version, run ID, phase, attempt, status, and summary path, plus a valid summary. Sentinel existence alone is not completion.
 - If relaunching the same phase, the parent deletes, renames, or explicitly ignores the old sentinel.
 - If the sentinel does not exist, the parent does not inspect worker chat to infer status.
 
@@ -146,10 +146,11 @@ Do not paste full logs, transcripts, renders, command output, or raw evidence in
 4. Remove or explicitly ignore stale sentinels.
 5. Launch or instruct the worker.
 6. Wait for the sentinel using a filesystem check.
-7. Read only the summary file.
-8. Decide the next transition from the summary.
-9. Read referenced reports only when the summary says they are needed for the transition.
-10. Do not inspect worker chat, logs, or reasoning to make orchestration decisions.
+7. Validate its identity and validate the summary file.
+8. Read only the validated summary file.
+9. Decide the next transition from the summary.
+10. Read referenced reports only when the summary says they are needed for the transition.
+11. Do not inspect worker chat, logs, or reasoning to make orchestration decisions.
 
 ## Worker Workflow
 
@@ -158,7 +159,7 @@ Do not paste full logs, transcripts, renders, command output, or raw evidence in
 3. Execute the task.
 4. Write outputs and evidence to agreed paths.
 5. Write the summary with current status.
-6. Write the sentinel last.
+6. Validate the summary, then write the sentinel last.
 7. Respond only with `DONE: summary written` or `BLOCKED: summary written`.
 
 ## Blocked State
