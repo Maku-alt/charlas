@@ -26,7 +26,7 @@ Esta carpeta contiene roles especializados. El chat principal usa `orchestrator-
 
 `advisor-charlas` solo se activa por un trigger complejo documentado. Su evidencia queda en `<talk>/notes/advice/`; no escribe ni reemplaza el handoff operacional `notes/phase-summary.md`.
 
-`agents/runtime-defaults.json` contiene preferencias de runtime, no reglas de validez del workflow. Si un modelo solicitado no esta disponible, solo puede usarse un fallback cuando el paquete de ejecucion registre el modelo solicitado y el modelo realmente usado. El orquestador hereda el modelo activo del thread; este archivo no cambia por si solo el thread padre. Con la configuracion root actual, el default es `gpt-5.6-terra` con razonamiento `medium`.
+`agents/runtime-defaults.json` contiene preferencias de runtime, no reglas de validez del workflow. Si un modelo solicitado no esta disponible, solo puede usarse un fallback cuando el paquete de ejecucion registre el modelo solicitado y el modelo realmente usado. El orquestador hereda el modelo activo del thread; este archivo no cambia por si solo el thread padre. Consulta ese archivo para los defaults vigentes.
 
 ## Paquete de fase
 Cada fase pesada debe ejecutarse con contexto acotado:

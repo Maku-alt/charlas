@@ -57,8 +57,3 @@ Usa este bloque por slide:
 ## Listo para build
 - si
 - no
-
-## Handoff worker separado
-- usar `templates/charlas-sdd/execution-package.md` y `agents/workflow-contract.json`
-- publicar el summary y el sentinel de `narrative` exclusivamente con `scripts/agent_workflow/complete-phase.py`
-- no escribir, reutilizar ni comunicar sentinels manualmente; el paquete define identidad y transporte

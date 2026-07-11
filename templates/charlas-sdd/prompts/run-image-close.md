@@ -6,11 +6,6 @@ Usa solo el `Image Close Spec`, el `Execution Package` y las referencias visuale
 
 No construyas el `pptx`. No hagas review final. No uses la imagen para explicar otra vez la parte tecnica.
 
-Modelo sugerido para esta fase:
-
-- `model`: `gpt-5.4`
-- `reasoning_effort`: `medium`
-
 Para una corrida aislada, usa el paquete de ejecución y `agents/workflow-contract.json`. Publica el summary y el sentinel canónico seleccionado para `image-close` exclusivamente con `scripts/agent_workflow/complete-phase.py`; nunca escribas, reutilices ni comuniques sentinels manualmente. El paquete define las salidas temporales permitidas si corre en paralelo con build.
 
 Devuelve:

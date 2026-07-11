@@ -31,16 +31,9 @@ Default: `standard`.
 - mini narrativa sugerida
 - cierre tentativo
 - bibliografia para `notes/bibliografia.md` si hubo fuentes externas
-- contenido para `notes/phase-summary.md`
-- publicación de `research` conforme al paquete de ejecución y contrato canónico
 
 ## Decision de continuidad
 - seguir a build package
 - reformular
 - profundizar con full research spec
 - descartar
-
-## Handoff worker separado
-- usar `templates/charlas-sdd/execution-package.md` y `agents/workflow-contract.json`
-- publicar el summary y el sentinel de `research` exclusivamente con `scripts/agent_workflow/complete-phase.py`
-- no escribir, reutilizar ni comunicar sentinels manualmente; el paquete define identidad y transporte

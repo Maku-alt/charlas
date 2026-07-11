@@ -590,6 +590,36 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertTrue(any("worker_id" in error for error in errors), errors)
         self.assertTrue(any("SHA256" in error for error in errors), errors)
 
+    def test_check_docs_rejects_model_literal_outside_runtime_defaults(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            document = Path(temp_dir) / "workflow.md"
+            document.write_text("- `model`: `gpt-5.4`\n", encoding="utf-8")
+
+            result = subprocess.run(
+                [sys.executable, str(CLI_PATH), "--check-docs", str(document)],
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+            )
+
+        self.assertEqual(1, result.returncode)
+        self.assertIn("model literal", result.stdout.lower())
+
+    def test_check_docs_rejects_legacy_pass_fail_field_outside_legacy_talks(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            document = Path(temp_dir) / "workflow.md"
+            document.write_text("## Pasa / no pasa\nno pasa\n", encoding="utf-8")
+
+            result = subprocess.run(
+                [sys.executable, str(CLI_PATH), "--check-docs", str(document)],
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+            )
+
+        self.assertEqual(1, result.returncode)
+        self.assertIn("pasa / no pasa", result.stdout.lower())
+
 
 if __name__ == "__main__":
     unittest.main()

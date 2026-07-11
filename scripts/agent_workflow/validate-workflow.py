@@ -7,6 +7,7 @@ import argparse
 import importlib.util
 import json
 from pathlib import Path
+import re
 import sys
 
 
@@ -24,6 +25,52 @@ ROLE_PATHS = {
     "review-charlas": "agents/review-charlas.md",
 }
 
+MODEL_LITERAL = re.compile(
+    r"\b(?:gpt|o[1-9]|claude|gemini|llama|mistral|qwen)-\d[\w.-]*\b",
+    re.IGNORECASE,
+)
+LEGACY_TALK_ROOTS = {
+    "agentes-modulares",
+    "Knowledge Repo 01 - Cuando Documentar Tablas se Vuelve Arquitectura de Conocimiento",
+}
+
+
+def iter_document_paths(targets: list[str]) -> list[Path]:
+    """Return supported documentation files from explicit files or directories."""
+    documents: list[Path] = []
+    for target in (Path(value) for value in targets):
+        if target.is_file():
+            documents.append(target)
+        elif target.is_dir():
+            documents.extend(
+                path for path in target.rglob("*")
+                if path.is_file() and "__pycache__" not in path.parts and path.suffix in {".md", ".json"}
+            )
+        else:
+            raise FileNotFoundError(target)
+    return documents
+
+
+def is_legacy_talk_path(path: Path, root: Path) -> bool:
+    try:
+        relative = path.resolve().relative_to(root.resolve())
+    except ValueError:
+        return False
+    return bool(relative.parts) and relative.parts[0] in LEGACY_TALK_ROOTS
+
+
+def validate_docs(targets: list[str], root: Path) -> list[str]:
+    """Reject obsolete workflow documentation outside its canonical locations."""
+    errors: list[str] = []
+    runtime_defaults = (root / "agents" / "runtime-defaults.json").resolve()
+    for path in iter_document_paths(targets):
+        text = path.read_text(encoding="utf-8")
+        if path.resolve() != runtime_defaults and MODEL_LITERAL.search(text):
+            errors.append(f"Model literal outside runtime defaults: {path}")
+        if not is_legacy_talk_path(path, root) and "Pasa / no pasa" in text:
+            errors.append(f"Obsolete Pasa / no pasa field outside legacy talks: {path}")
+    return errors
+
 
 def main() -> int:
     parser = argparse.ArgumentParser()
@@ -35,8 +82,22 @@ def main() -> int:
     parser.add_argument("--sentinel")
     parser.add_argument("--template")
     parser.add_argument("--check-phase-assets", action="store_true")
+    parser.add_argument("--check-docs", nargs="+", metavar="PATH")
     args = parser.parse_args()
     contract = json.loads(Path(args.contract).read_text(encoding="utf-8"))
+    if args.check_docs:
+        root = Path(args.contract).resolve().parent.parent
+        try:
+            errors = validate_docs(args.check_docs, root)
+        except (OSError, UnicodeDecodeError) as error:
+            print(f"ERROR: Cannot read documentation target: {error}")
+            return 1
+        if errors:
+            for error in errors:
+                print(f"ERROR: {error}")
+            return 1
+        print("VALID DOCS")
+        return 0
     if args.check_phase_assets:
         errors: list[str] = []
         root = Path(args.contract).resolve().parent.parent

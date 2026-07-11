@@ -32,10 +32,7 @@ Review no modifica el deck. Si devuelve `requiere cambios`, produce reporte acci
 - numero de slides correcto
 - contact sheet PowerPoint nativo
 - identidad del archivo revisado
-- sentinels previos requeridos presentes
 - `notes/bibliografia.md` presente si hubo fuentes externas
-- `notes/phase-summary.md` presente y actualizado
-- en modo aislado, publicación de `review` o `review-final` conforme al paquete de ejecución y contrato canónico
 
 ## Severidad
 - P1: bloquea presentacion
@@ -49,15 +46,9 @@ Review no modifica el deck. Si devuelve `requiere cambios`, produce reporte acci
 - slides mas debiles
 - slides sin concepto visual suficiente
 - riesgos residuales
-- estado de bibliografia y `notes/phase-summary.md`
+- estado de bibliografia
 - veredicto final
 
-## Handoff worker separado
-- usar `templates/charlas-sdd/execution-package.md` y `agents/workflow-contract.json`
-- publicar el summary y el sentinel de la fase declarada exclusivamente con `scripts/agent_workflow/complete-phase.py`
-- no escribir, reutilizar ni comunicar sentinels manualmente; el paquete define identidad y transporte
-- si la review inicial devuelve `requiere cambios`, `Siguiente accion` debe ser `orquestador decide build-fix o bloqueo`
-- si `review-final` no pasa, registrar bloqueo explicito; no abrir otro ciclo salvo autorizacion explicita del usuario
 
 ## QA visual PPTX
 - PowerPoint nativo es el gate visual primario.

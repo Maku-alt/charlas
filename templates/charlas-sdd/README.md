@@ -28,7 +28,7 @@ Cada fase pesada debe recibir:
 - prompt desde `templates/charlas-sdd/prompts/`
 - artefactos necesarios
 - `notes/phase-summary.md` como unico handoff operativo para el padre, salvo summaries temporales de `build` + `image-close` paralelos
-- `model`, `reasoning_effort` y `fork_context: false` explicitos cuando se use subagente
+- runtime solicitado y efectivo conforme a `agents/runtime-defaults.json`
 
 El spec define el encargo concreto. El rol define metodologia y criterio de calidad. El prompt consume el spec y el paquete de ejecucion de esa fase, sin duplicar un handoff generico, y evita que avance automaticamente a otra etapa.
 
@@ -70,13 +70,7 @@ Para decks `pptx` nuevos desde cero, usar por defecto el renderer local del repo
 La skill `pptx` queda solo para emergencia o diagnostico avanzado. Los detalles de build y QA viven en `scripts/deck_renderer/README.md`, `agents/deck-builder-charlas.md` y `agents/review-charlas.md`.
 
 ## Defaults
-| Fase | Model | Reasoning effort | Salida esperada |
-|---|---|---|---|
-| research | `gpt-5.5` | `medium` | research discutible |
-| narrativa | `gpt-5.5` | `medium` | narrativa aprobable |
-| build | `gpt-5.4` | `medium` | `pptx` editable y evidencia |
-| imagen final | `gpt-5.4` | `medium` | direccion visual o asset final |
-| review | `gpt-5.4` | `medium` | veredicto sobre artefacto exacto |
+Los defaults de runtime viven exclusivamente en `agents/runtime-defaults.json`.
 
 ## Bloqueo y continuidad
 Una fase bloqueada debe devolver `Execution status: blocked`, la fase, hallazgos bloqueantes concretos, artefactos generados, evidencia de chequeos, riesgos residuales y una accion propuesta.

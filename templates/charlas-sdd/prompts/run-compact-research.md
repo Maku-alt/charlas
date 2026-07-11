@@ -1,18 +1,7 @@
 # Prompt: Run Compact Research
 
-Estas ejecutando una fase compacta de research para charla pequena.
+Ejecuta únicamente la fase `research` en modo `compact` con el rol `agents/researcher-charlas.md`.
 
-Usa solo el `Research Package` recibido.
+El `Execution Package` debe identificar este prompt, el modo `compact` y el `Research Package` aplicable.
 
-Para una corrida aislada, usa el paquete de ejecución y `agents/workflow-contract.json`. Publica el summary y el sentinel de `research` exclusivamente con `scripts/agent_workflow/complete-phase.py`; nunca escribas, reutilices ni comuniques sentinels manualmente.
-
-Devuelve:
-
-- tesis refinada
-- 3-5 hallazgos que si merecen slide
-- riesgos o contradicciones
-- mini narrativa sugerida
-- cierre tentativo
-- contenido para `notes/bibliografia.md`, si hubo fuentes externas
-- publicación validada de `research` conforme al paquete de ejecución
-- decision: `seguir a build package`, `reformular`, `profundizar con full research spec` o `descartar`
+No construyas slides, no hagas build y no avances automáticamente a otra fase.

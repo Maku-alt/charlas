@@ -1,67 +1,7 @@
 # Prompt: Run Review
 
-Estas ejecutando solo la fase `review-charlas`.
+Ejecuta únicamente la fase `review` o `review-final` con el rol `agents/review-charlas.md`.
 
-Precondicion del launch:
+El `Execution Package` debe identificar este prompt y el `Review Spec` aplicable.
 
-- este prompt debe ejecutarse junto con `agents/review-charlas.md`
-- el archivo de rol especializado define el comportamiento; este prompt solo acota la fase
-
-Usa solo:
-
-- `Review Spec`
-- build report o evidencia de build
-- ruta del deck y renders indicados
-- `notes/phase-summary.md` y rutas de evidencia referenciadas
-- si es `review-final`: `review-report` inicial, evidencia de `build-fix` y PPTX/source candidato corregido
-
-Precheck obligatorio:
-
-- si falta `review-spec.md` o no es legible, aborta la fase con bloqueo de transicion
-- si faltan sentinels previos requeridos o summaries suficientes, aborta con bloqueo de transicion salvo review diagnostico pedido explicitamente
-- no improvises ni crees el `review-spec.md` dentro de esta fase
-
-No reescribas la charla. No reconstruyas ni modifiques el deck.
-No leas chats worker para completar contexto; usa `notes/phase-summary.md` y evidencia en disco.
-
-Modelo sugerido para esta fase:
-
-- `model`: `gpt-5.4`
-- `reasoning_effort`: `medium`
-
-Para una corrida aislada, usa el paquete de ejecución y `agents/workflow-contract.json`. Publica el summary y el sentinel de la fase declarada (`review` o `review-final`) exclusivamente con `scripts/agent_workflow/complete-phase.py`; nunca escribas, reutilices ni comuniques sentinels manualmente. El paquete define evidencia, identidad y transporte.
-
-Devuelve:
-
-- hallazgos priorizados con severidad P1/P2/P3
-- si el veredicto es `requiere cambios`, un `review-report` en `review/` con hallazgos accionables por slide: `slide`, `severidad`, `problema observado`, `criterio incumplido`, `cambio minimo sugerido` y `rutas de evidencia`
-- resumen de review
-- slides mas debiles
-- riesgos residuales
-- estado de `notes/bibliografia.md` y la evidencia de fase declarada
-- publicación validada de la fase declarada conforme al paquete de ejecución
-- veredicto final: `aprobado` o `requiere cambios`
-
-Si la review inicial devuelve `requiere cambios`, no cierres el flujo: deja `Siguiente accion: orquestador decide build-fix o bloqueo`. Si `review-final` devuelve `requiere cambios`, registra `Estado: bloqueado` o `Pasa / no pasa: no pasa` con bloqueo explicito; no propongas otro ciclo salvo autorizacion explicita del usuario.
-
-El review debe evaluar tambien fuerza conceptual y editorial. Una deck puede ser mecanicamente valida y aun asi requerir cambios si varias slides son demasiado cuadriculadas, repetitivas o no tienen concepto visual claro.
-
-QA visual PPTX:
-
-- PowerPoint nativo es el gate visual primario.
-- Primero inspecciona solo contact sheet PowerPoint nativo.
-- Abre slides individuales solo si el contact sheet muestra defecto.
-- No hagas fixes visuales ni modifiques el deck desde review.
-- Si PowerPoint nativo falla, registra bloqueo o continua solo como review diagnostico si el usuario lo pidio.
-- LibreOffice/Poppler son auxiliares, no gate de aprobacion.
-
-Si no puedes cerrar la review por falta de insumos o por bloqueo operativo, devuelve:
-
-- `Estado`: `bloqueado`
-- `Fase`: `review`
-- `Bloqueo concreto`
-- `Artefactos o evidencia disponible`
-- `Chequeos o comandos que fallaron`
-- `Chequeos o comandos que si funcionaron`
-- `Riesgos residuales`
-- `Accion siguiente propuesta`
+No modifiques el deck, el source, el candidato ni la evidencia de build; no avances automáticamente a otra fase.

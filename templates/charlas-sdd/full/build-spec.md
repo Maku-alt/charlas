@@ -45,8 +45,6 @@
 - cantidad de slides
 - concepto visual por slide
 - contact sheet PowerPoint nativo; renders auxiliares si existen
-- `notes/phase-summary.md` actualizado
-- publicación de la fase (`build` o `build-fix`) conforme al paquete de ejecución y contrato canónico
 - chequeo textual
 - chequeos mecanicos
 - estado de render nativo
@@ -70,16 +68,10 @@ Restricciones:
 - dejar el resultado como artefacto candidato corregido; la aprobacion corresponde a `review-final`
 - maximo 1 ciclo build-fix salvo autorizacion explicita del usuario
 
-## Handoff worker separado
-- usar `templates/charlas-sdd/execution-package.md` y `agents/workflow-contract.json`
-- publicar el summary y el sentinel de la fase declarada exclusivamente con `scripts/agent_workflow/complete-phase.py`
-- no escribir, reutilizar ni comunicar sentinels manualmente; el paquete define identidad, summary y salidas temporales permitidas
-- en paralelo con `image-close`, usar solo las salidas temporales declaradas en el paquete y publicar cada fase por separado
-
 ## QA visual PPTX
 - PowerPoint nativo es el gate final de apertura/export.
 - Primero inspeccionar solo contact sheet PowerPoint nativo.
 - Abrir slides individuales solo si el contact sheet muestra defecto; en build-fix, abrir solo slides afectadas y dependencias visuales directas.
 - Maximo 1 ciclo de fix visual y 1 revalidacion PowerPoint nativo, salvo permiso explicito.
-- Si PowerPoint nativo falla despues de un fix acotado, registrar bloqueo en `notes/phase-summary.md`.
+- Si PowerPoint nativo falla despues de un fix acotado, registrar un bloqueo explícito.
 - LibreOffice/Poppler son auxiliares, no gate de aprobacion; no aprueban build.
