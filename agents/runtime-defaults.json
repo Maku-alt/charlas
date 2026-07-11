@@ -1,0 +1,49 @@
+{
+  "runtime_defaults_version": 1,
+  "fork_context": false,
+  "orchestrator": {
+    "model_source": "thread_default",
+    "record_actual_model": true
+  },
+  "auxiliary_roles": {
+    "advisor-charlas": {
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "medium"
+    }
+  },
+  "phases": {
+    "thesis-review": {
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "medium"
+    },
+    "research": {
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "medium",
+      "research_effort": "standard"
+    },
+    "narrative": {
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "medium"
+    },
+    "image-close": {
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "medium"
+    },
+    "build": {
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "medium"
+    },
+    "build-fix": {
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "medium"
+    },
+    "review": {
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium"
+    },
+    "review-final": {
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "medium"
+    }
+  }
+}

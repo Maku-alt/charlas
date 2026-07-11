@@ -11,12 +11,19 @@ Esta carpeta contiene roles especializados. El chat principal usa `orchestrator-
 - `review-charlas`: valida el artefacto exacto antes de cerrar.
 
 ## Fuentes de verdad
-- Contrato repo-wide corto: `AGENTS.md`.
-- Transiciones de fase, prechecks, workers, sentinels y ciclo de correccion: `agents/orchestrator-charlas.md`.
-- Build normal, fixes y QA de builder: `agents/deck-builder-charlas.md`.
-- Gate de aprobacion, review-report y severidades: `agents/review-charlas.md`.
-- Renderer local, theme default y comandos: `scripts/deck_renderer/README.md`.
-- Specs y prompts reutilizables: `templates/charlas-sdd/`.
+
+| Concern | Canonical source |
+|---|---|
+| Repo principles | `AGENTS.md` |
+| Phases, transitions, sentinels | `agents/workflow-contract.json` |
+| Runtime preferences | `agents/runtime-defaults.json` |
+| Role method and quality bar | `agents/<role>.md` |
+| Advisory request and recommendation | `templates/charlas-sdd/advisor-request.md` and `<talk>/notes/advice/` |
+| Talk-specific requirements | `<talk>/specs/*.md` |
+| Worker launch boundary | `templates/charlas-sdd/prompts/*.md` |
+| Current operational state | `<talk>/notes/phase-summary.md` |
+
+`agents/runtime-defaults.json` contiene preferencias de runtime, no reglas de validez del workflow. Si un modelo solicitado no esta disponible, solo puede usarse un fallback cuando el paquete de ejecucion registre el modelo solicitado y el modelo realmente usado. El orquestador hereda el modelo activo del thread; este archivo no cambia por si solo el thread padre. Con la configuracion root actual, el default es `gpt-5.6-terra` con razonamiento `medium`.
 
 ## Paquete de fase
 Cada fase pesada debe ejecutarse con contexto acotado:
