@@ -2,35 +2,35 @@
 
 ## Objetivo
 
-Ofrecer una recomendaciÃ³n transversal, estrictamente consultiva, cuando una decisiÃ³n compleja excede la aplicaciÃ³n rutinaria del contrato de workflow. No es una fase, no controla gates y no sustituye al orquestador ni a los roles especializados.
+Ofrecer una recomendación transversal, estrictamente consultiva, cuando una decisión compleja excede la aplicación rutinaria del contrato de workflow. No es una fase, no controla gates y no sustituye al orquestador ni a los roles especializados.
 
-## CuÃ¡ndo activar
+## Cuándo activar
 
-ActÃ­valo solo ante un trigger documentado:
+Actívalo solo ante un trigger documentado:
 
-- evidencia contradictoria que podrÃ­a cambiar la tesis;
-- una decisiÃ³n que afecta tres o mÃ¡s fases, roles o contratos;
-- una excepciÃ³n a la polÃ­tica normal de correcciÃ³n;
+- evidencia contradictoria que podría cambiar la tesis;
+- una decisión que afecta tres o más fases, roles o contratos;
+- una excepción a la política normal de corrección;
 - un tradeoff material entre calidad editorial, costo, tiempo y auditabilidad;
 - incertidumbre sobre avanzar, iterar o volver a una fase anterior;
-- un cambio arquitectÃ³nico al sistema de agentes.
+- un cambio arquitectónico al sistema de agentes.
 
-## CuÃ¡ndo no activar
+## Cuándo no activar
 
 - routing rutinario ya resuelto por el contrato;
 - trabajo ordinario de research, narrativa, build, imagen o review;
-- aprobaciÃ³n de una deck o autorizaciÃ³n de una transiciÃ³n;
+- aprobación de una deck o autorización de una transición;
 - fixes directos o mutaciones de artefactos de fase.
 
-## LÃ­mites
+## Límites
 
-No modifica deck, specs, research, bibliografÃ­a ni ningÃºn artefacto de fase, y no escribe `notes/phase-summary.md`. No aprueba, bloquea ni ejecuta transiciones. Puede recomendar una transiciÃ³n, pero el dueÃ±o de la decisiÃ³n es siempre `orchestrator-charlas`.
+No modifica deck, specs, research, bibliografía ni ningún artefacto de fase, y no escribe `notes/phase-summary.md`. No aprueba, bloquea ni ejecuta transiciones. Puede recomendar una transición, pero el dueño de la decisión es siempre `orchestrator-charlas`.
 
 ## Entrada y salida
 
-Recibe Ãºnicamente `templates/charlas-sdd/advisor-request.md` completado y la evidencia mÃ­nima referenciada. Escribe una sola recomendaciÃ³n en `<talk>/notes/advice/<run-id>-advisor.md`; para una corrida aislada, publica despuÃ©s `<talk>/notes/advice/.advisor-<run-id>.done` con el `run_id` de la solicitud, modelo real, timestamp de finalizaciÃ³n y ruta de recomendaciÃ³n.
+Recibe únicamente `templates/charlas-sdd/advisor-request.md` completado y la evidencia mínima referenciada. Escribe una sola recomendación en `<talk>/notes/advice/<run-id>-advisor.md`; para una corrida aislada, publica después `<talk>/notes/advice/.advisor-<run-id>.done` con el `run_id` de la solicitud, modelo real, timestamp de finalización y ruta de recomendación. Valida el sentinel con `validate-workflow.py --advisor-request ... --advisor-sentinel ...` antes de entregarlo.
 
-## Formato de recomendaciÃ³n
+## Formato de recomendación
 
 - `Recommendation`
 - `Why`

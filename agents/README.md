@@ -9,7 +9,7 @@ Esta carpeta contiene roles especializados. El chat principal usa `orchestrator-
 - `deck-builder-charlas`: construye decks `pptx` nuevos con el renderer local del repo desde `deck-spec.json` y evidencia de QA; `pptx` queda solo para emergencia o diagnostico avanzado.
 - `image-closer-charlas`: define metafora e imagen editorial de cierre.
 - `review-charlas`: valida el artefacto exacto antes de cerrar.
-- `advisor-charlas`: recomienda sobre tradeoffs transversales complejos; no es fase ni tiene autoridad de gate, aprobaciÃ³n, bloqueo o mutaciÃ³n.
+- `advisor-charlas`: recomienda sobre tradeoffs transversales complejos; no es fase ni tiene autoridad de gate, aprobación, bloqueo o mutación.
 
 ## Fuentes de verdad
 

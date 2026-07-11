@@ -32,6 +32,12 @@ Sobrescribir este archivo con el estado operativo actual. No usarlo como log app
 ## Evidence
 - `<path>`
 
+## Worker ID
+<stable worker identifier | none; required for build, build-fix, review and review-final>
+
+## Session ID
+<isolated session identifier | none; required for build, build-fix, review and review-final>
+
 ## Candidate artifact
 <path | none>
 

@@ -38,11 +38,27 @@ class WorkflowContractTests(unittest.TestCase):
         notes = Path(temp_dir.name) / "notes"
         notes.mkdir()
         summary = notes / "phase-summary.md"
-        shutil.copy(FIXTURES / "valid-phase-summary.md", summary)
+        self.write_valid_review_final(summary)
         sentinel = notes / ".phase-review-final.done"
-        self.write_sentinel(summary, sentinel, "review-final")
+        self.write_sentinel(
+            summary,
+            sentinel,
+            "review-final",
+            worker_id="reviewer-8",
+            session_id="review-session-13",
+        )
         self.addCleanup(temp_dir.cleanup)
         return summary, sentinel
+
+    def write_valid_review_final(self, summary):
+        shutil.copy(FIXTURES / "valid-phase-summary.md", summary)
+        self.write_sentinel(
+            summary,
+            summary.parent / ".phase-build-fix.done",
+            "build-fix",
+            worker_id="builder-7",
+            session_id="build-session-12",
+        )
 
     def write_sentinel(self, summary_path, sentinel, phase_name, **overrides):
         payload = {
@@ -153,6 +169,21 @@ class WorkflowContractTests(unittest.TestCase):
         errors = self.workflow_contract.validate_summary(summary, self.contract)
         self.assertTrue(any("not_applicable" in error for error in errors))
 
+    def test_blocked_phase_cannot_advance_or_report_approved_review(self):
+        summary, _ = self.copy_valid_summary()
+        summary.write_text(
+            summary.read_text(encoding="utf-8").replace(
+                "## Execution status\ncompleted", "## Execution status\nblocked"
+            ),
+            encoding="utf-8",
+        )
+
+        errors = self.workflow_contract.validate_transition(
+            self.workflow_contract.parse_summary(summary), self.contract
+        )
+
+        self.assertTrue(any("Blocked phase" in error for error in errors), errors)
+
     def test_next_phase_must_be_allowed_transition(self):
         summary, _ = self.copy_valid_summary()
         summary.write_text(
@@ -228,7 +259,7 @@ class WorkflowContractTests(unittest.TestCase):
         notes = Path(temp_dir.name) / "notes"
         notes.mkdir()
         summary = notes / "phase-summary.md"
-        shutil.copy(FIXTURES / "valid-phase-summary.md", summary)
+        self.write_valid_review_final(summary)
         self.addCleanup(temp_dir.cleanup)
 
         result = self.complete_phase(summary)
@@ -268,7 +299,7 @@ class WorkflowContractTests(unittest.TestCase):
         notes = Path(temp_dir.name) / "notes"
         notes.mkdir()
         summary = notes / "phase-summary.md"
-        shutil.copy(FIXTURES / "valid-phase-summary.md", summary)
+        self.write_valid_review_final(summary)
         sentinel = notes / ".phase-review-final.done"
         self.write_sentinel(summary, sentinel, "review-final", run_id="old-run-20260709-1200")
         self.addCleanup(temp_dir.cleanup)
@@ -279,12 +310,35 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("stale", result.stdout.lower())
         self.assertEqual("old-run-20260709-1200", json.loads(sentinel.read_text(encoding="utf-8"))["run_id"])
 
+    def test_complete_phase_rejects_stale_sentinel_from_same_run_with_other_attempt(self):
+        temp_dir = tempfile.TemporaryDirectory()
+        notes = Path(temp_dir.name) / "notes"
+        notes.mkdir()
+        summary = notes / "phase-summary.md"
+        text = (FIXTURES / "valid-phase-summary.md").read_text(encoding="utf-8")
+        summary.write_text(
+            text.replace("## Phase\nreview-final", "## Phase\nresearch")
+            .replace("## Review verdict\napproved", "## Review verdict\nnot_applicable")
+            .replace("## Candidate artifact\nslides/candidate.pptx", "## Candidate artifact\nnone")
+            .replace("## Next phase\nrelease", "## Next phase\nnarrative"),
+            encoding="utf-8",
+        )
+        sentinel = notes / ".phase-research.done"
+        self.write_sentinel(summary, sentinel, "research", attempt=2)
+        self.addCleanup(temp_dir.cleanup)
+
+        result = self.complete_phase(summary, phase="research")
+
+        self.assertEqual(1, result.returncode)
+        self.assertIn("stale", result.stdout.lower())
+        self.assertEqual(2, json.loads(sentinel.read_text(encoding="utf-8"))["attempt"])
+
     def test_complete_phase_rejects_sentinel_claimed_by_other_run_during_publish(self):
         temp_dir = tempfile.TemporaryDirectory()
         notes = Path(temp_dir.name) / "notes"
         notes.mkdir()
         summary = notes / "phase-summary.md"
-        shutil.copy(FIXTURES / "valid-phase-summary.md", summary)
+        self.write_valid_review_final(summary)
         sentinel = notes / ".phase-review-final.done"
         self.addCleanup(temp_dir.cleanup)
         lock = self.hold_publish_lock(sentinel)
@@ -382,7 +436,43 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("completion timestamp", request)
         self.assertIn("agents/advisor-charlas.md", prompt)
         self.assertIn("Advisor Request", prompt)
-        self.assertNotIn("sentinel", prompt.lower())
+        self.assertIn("agents/runtime-defaults.json", prompt)
+        self.assertIn("requested and actual runtime", prompt)
+        self.assertIn("--advisor-request", prompt)
+
+    def test_cli_validates_advisor_sentinel_identity(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            request = Path(temp_dir) / "advisor-request.md"
+            request.write_text(
+                (ROOT / "templates" / "charlas-sdd" / "advisor-request.md")
+                .read_text(encoding="utf-8")
+                .replace("`<lowercase-slug-YYYYMMDD-HHMM>`", "advice-20260711-0900"),
+                encoding="utf-8",
+            )
+            sentinel = Path(temp_dir) / ".advisor-advice-20260711-0900.done"
+            sentinel.write_text(
+                json.dumps({
+                    "run_id": "advice-20260711-0900",
+                    "actual_model": "gpt-5.6-sol",
+                    "completed_at": "2026-07-11T09:05:00-05:00",
+                    "recommendation_path": "notes/advice/advice-20260711-0900-advisor.md",
+                }),
+                encoding="utf-8",
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable, str(CLI_PATH),
+                    "--advisor-request", str(request),
+                    "--advisor-sentinel", str(sentinel),
+                ],
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+            )
+
+        self.assertEqual(0, result.returncode, result.stdout)
+        self.assertIn("VALID ADVISOR SENTINEL", result.stdout)
 
     def test_phase_asset_check_requires_worker_role_spec_and_prompt_but_allows_embedded_release(self):
         contract_path = ROOT / "agents" / ".task-7-workflow-contract.json"
@@ -487,7 +577,11 @@ class WorkflowContractTests(unittest.TestCase):
         summary.write_text(
             text.replace("## Phase\nreview-final", "## Phase\nbuild")
             .replace("## Review verdict\napproved", "## Review verdict\nnot_applicable")
-            .replace("## Next phase\nrelease", "## Next phase\nreview"),
+            .replace("## Next phase\nrelease", "## Next phase\nreview")
+            .replace(
+                "## Final artifact\nnone",
+                "## Final artifact\nnone\n\n## Worker ID\nbuilder-7\n\n## Session ID\nbuild-session-12",
+            ),
             encoding="utf-8",
         )
         build = self.complete_phase(summary, phase="build")
@@ -495,7 +589,11 @@ class WorkflowContractTests(unittest.TestCase):
         summary.write_text(
             text.replace("## Phase\nreview-final", "## Phase\nreview")
             .replace("## Review verdict\napproved", "## Review verdict\nrequires_changes")
-            .replace("## Next phase\nrelease", "## Next phase\nbuild-fix"),
+            .replace("## Next phase\nrelease", "## Next phase\nbuild-fix")
+            .replace(
+                "## Final artifact\nnone",
+                "## Final artifact\nnone\n\n## Worker ID\nreviewer-8\n\n## Session ID\nreview-session-13",
+            ),
             encoding="utf-8",
         )
 
@@ -503,6 +601,71 @@ class WorkflowContractTests(unittest.TestCase):
 
         self.assertEqual(0, review.returncode, review.stdout)
         self.assertTrue((notes / ".phase-review.done").exists())
+
+    def test_full_review_publication_rejects_shared_build_identity(self):
+        temp_dir = tempfile.TemporaryDirectory()
+        notes = Path(temp_dir.name) / "notes"
+        notes.mkdir()
+        summary = notes / "phase-summary.md"
+        self.addCleanup(temp_dir.cleanup)
+        text = (FIXTURES / "valid-phase-summary.md").read_text(encoding="utf-8")
+        build_summary = (
+            text.replace("## Phase\nreview-final", "## Phase\nbuild")
+            .replace("## Review verdict\napproved", "## Review verdict\nnot_applicable")
+            .replace("## Next phase\nrelease", "## Next phase\nreview")
+            .replace(
+                "## Final artifact\nnone",
+                "## Final artifact\nnone\n\n## Worker ID\nbuilder-7\n\n## Session ID\nbuild-session-12",
+            )
+        )
+        summary.write_text(build_summary, encoding="utf-8")
+        build = self.complete_phase(summary, phase="build")
+        self.assertEqual(0, build.returncode, build.stdout)
+
+        review_summary = (
+            text.replace("## Phase\nreview-final", "## Phase\nreview")
+            .replace("## Review verdict\napproved", "## Review verdict\nrequires_changes")
+            .replace("## Next phase\nrelease", "## Next phase\nbuild-fix")
+            .replace(
+                "## Final artifact\nnone",
+                "## Final artifact\nnone\n\n## Worker ID\nbuilder-7\n\n## Session ID\nbuild-session-12",
+            )
+        )
+        summary.write_text(review_summary, encoding="utf-8")
+
+        review = self.complete_phase(summary, phase="review")
+
+        self.assertEqual(1, review.returncode)
+        self.assertIn("worker_id", review.stdout)
+        self.assertFalse((notes / ".phase-review.done").exists())
+
+    def test_full_sentinel_identity_must_match_summary(self):
+        temp_dir = tempfile.TemporaryDirectory()
+        notes = Path(temp_dir.name) / "notes"
+        notes.mkdir()
+        summary = notes / "phase-summary.md"
+        self.addCleanup(temp_dir.cleanup)
+        text = (FIXTURES / "valid-phase-summary.md").read_text(encoding="utf-8")
+        summary.write_text(
+            text.replace("## Phase\nreview-final", "## Phase\nbuild")
+            .replace("## Review verdict\napproved", "## Review verdict\nnot_applicable")
+            .replace("## Next phase\nrelease", "## Next phase\nreview")
+            .replace(
+                "## Final artifact\nnone",
+                "## Final artifact\nnone\n\n## Worker ID\nbuilder-7\n\n## Session ID\nbuild-session-12",
+            ),
+            encoding="utf-8",
+        )
+        result = self.complete_phase(summary, phase="build")
+        self.assertEqual(0, result.returncode, result.stdout)
+        summary.write_text(
+            summary.read_text(encoding="utf-8").replace("## Worker ID\nbuilder-7", "## Worker ID\nother-worker"),
+            encoding="utf-8",
+        )
+
+        errors = self.workflow_contract.validate_summary(summary, self.contract)
+
+        self.assertTrue(any("sentinel worker id" in error.lower() for error in errors), errors)
 
     def test_compact_build_rejects_review_that_omits_or_changes_compact_mode(self):
         for review_mode in ("", "full"):
@@ -639,7 +802,7 @@ class WorkflowContractTests(unittest.TestCase):
         )
 
         self.assertEqual(0, result.returncode, result.stdout)
-        self.assertIn("VALID DOCS", result.stdout)
+        self.assertIn("VALID DOC REFERENCES", result.stdout)
 
     def test_check_docs_rejects_legacy_pass_fail_field_outside_legacy_talks(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -655,6 +818,21 @@ class WorkflowContractTests(unittest.TestCase):
 
         self.assertEqual(1, result.returncode)
         self.assertIn("pasa / no pasa", result.stdout.lower())
+
+    def test_check_docs_rejects_mojibake(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            document = Path(temp_dir) / "workflow.md"
+            document.write_text("La recomendaciÃ³n debe ser clara.\n", encoding="utf-8")
+
+            result = subprocess.run(
+                [sys.executable, str(CLI_PATH), "--check-docs", str(document)],
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+            )
+
+        self.assertEqual(1, result.returncode)
+        self.assertIn("mojibake", result.stdout.lower())
 
     def test_worker_flow_audit_charlas_adapter_matches_renderer_and_run_aware_sentinels(self):
         skill = (ROOT / "skills" / "worker-flow-audit" / "SKILL.md").read_text(encoding="utf-8")

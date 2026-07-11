@@ -6,7 +6,7 @@ Solicitud acotada para una consulta transversal. No crea una fase, no autoriza c
 `<lowercase-slug-YYYYMMDD-HHMM>`
 
 ## decision question
-`<pregunta concreta que requiere recomendaciÃ³n>`
+`<pregunta concreta que requiere recomendación>`
 
 ## current phase
 `<canonical phase name>`

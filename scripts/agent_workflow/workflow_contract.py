@@ -18,6 +18,7 @@ REQUIRED_FIELDS = (
 )
 ARTIFACT_PHASES = {"build", "review", "review-final", "build-fix"}
 COMPACT_BOUNDARY_PHASES = {"build", "review"}
+IDENTITY_BOUNDARY_PHASES = {"build", "review", "build-fix", "review-final"}
 WORKFLOW_MODES = {"full", "compact"}
 COMPACT_WORKFLOW_MODE = "compact"
 
@@ -67,6 +68,11 @@ def is_compact_boundary(summary: dict[str, str]) -> bool:
         _scalar(summary, "phase") in COMPACT_BOUNDARY_PHASES
         and _scalar(summary, "workflow mode").lower() == COMPACT_WORKFLOW_MODE
     )
+
+
+def is_identity_boundary(summary: dict[str, str]) -> bool:
+    """Return whether this phase must publish an execution identity."""
+    return _scalar(summary, "phase") in IDENTITY_BOUNDARY_PHASES
 
 
 def _candidate_path(summary: dict[str, str], summary_path: Path) -> Path | None:
@@ -146,15 +152,54 @@ def _review_mode_errors(summary: dict[str, str], summary_path: Path) -> list[str
     return []
 
 
+def _identity_boundary_errors(summary: dict[str, str], summary_path: Path) -> list[str]:
+    """Require distinct build and review execution identities in every workflow mode."""
+    phase = _scalar(summary, "phase")
+    if phase not in IDENTITY_BOUNDARY_PHASES:
+        return []
+
+    errors = [
+        f"Missing execution identity field: {field}"
+        for field in ("worker id", "session id")
+        if not _scalar(summary, field)
+    ]
+    predecessor = {"review": "build", "review-final": "build-fix"}.get(phase)
+    if predecessor is None:
+        return errors
+
+    sentinel = summary_path.parent / f".phase-{predecessor}.done"
+    if not sentinel.is_file():
+        return [*errors, f"{phase} requires a completed {predecessor} sentinel"]
+    try:
+        previous = json.loads(sentinel.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return [*errors, f"{predecessor} sentinel must contain valid JSON"]
+    if not isinstance(previous, dict) or previous.get("phase") != predecessor:
+        return [*errors, f"{phase} requires a {predecessor} sentinel"]
+
+    review_identity = {
+        "worker_id": _scalar(summary, "worker id"),
+        "session_id": _scalar(summary, "session id"),
+    }
+    errors.extend(validate_compact_review_independence(
+        {
+            "worker_id": str(previous.get("worker_id", "")),
+            "session_id": str(previous.get("session_id", "")),
+        },
+        review_identity,
+        independence_required=True,
+    ))
+    return errors
+
+
 def validate_publication(summary: dict[str, str], contract: dict[str, Any], summary_path: Path) -> list[str]:
     """Validate runtime-bound build/review fields before a phase sentinel is published."""
     phase = _scalar(summary, "phase")
-    errors = _review_mode_errors(summary, summary_path)
-    if errors:
-        return errors
+    errors = _identity_boundary_errors(summary, summary_path)
+    errors.extend(_review_mode_errors(summary, summary_path))
     if not is_compact_boundary(summary):
-        return []
-    errors = _candidate_identity_errors(summary, summary_path)
+        return errors
+    errors.extend(_candidate_identity_errors(summary, summary_path))
     if phase == "review":
         errors.extend(validate_compact_review_boundary(summary, summary_path))
     return errors
@@ -175,9 +220,11 @@ def validate_transition(summary: dict[str, str], contract: dict[str, Any]) -> li
 
     if _scalar(summary, "contract version") != str(contract.get("contract_version")):
         errors.append("Contract version does not match workflow contract")
-    if _scalar(summary, "execution status") not in contract.get("execution_statuses", []):
+    execution_status = _scalar(summary, "execution status")
+    decision = _scalar(summary, "decision")
+    if execution_status not in contract.get("execution_statuses", []):
         errors.append("Invalid execution status")
-    if _scalar(summary, "decision") not in contract.get("decisions", []):
+    if decision not in contract.get("decisions", []):
         errors.append("Invalid decision")
     workflow_mode = _scalar(summary, "workflow mode").lower()
     if workflow_mode and workflow_mode not in WORKFLOW_MODES:
@@ -188,6 +235,11 @@ def validate_transition(summary: dict[str, str], contract: dict[str, Any]) -> li
         errors.append("Invalid review verdict")
     if not phase.startswith("review") and verdict != "not_applicable":
         errors.append("Non-review phases require review verdict not_applicable")
+    if execution_status == "blocked":
+        if decision not in {"return", "stop"}:
+            errors.append("Blocked phase must return or stop")
+        if verdict != "not_applicable":
+            errors.append("Blocked phase requires review verdict not_applicable")
 
     attempt = _scalar(summary, "attempt")
     if not attempt.isdigit() or int(attempt) <= 0:
@@ -245,11 +297,17 @@ def _validate_sentinel(
         if values.get(field) != expected_value:
             errors.append(f"Sentinel {field.replace('_', ' ')} does not match summary")
 
+    if is_identity_boundary(summary):
+        for sentinel_field, summary_field in (
+            ("worker_id", "worker id"),
+            ("session_id", "session id"),
+        ):
+            if values.get(sentinel_field) != _scalar(summary, summary_field):
+                errors.append(f"Sentinel {sentinel_field.replace('_', ' ')} does not match summary")
+
     if is_compact_boundary(summary):
         for sentinel_field, summary_field in (
             ("workflow_mode", "workflow mode"),
-            ("worker_id", "worker id"),
-            ("session_id", "session id"),
             ("candidate_artifact", "candidate artifact"),
             ("candidate_sha256", "candidate sha256"),
         ):

@@ -30,6 +30,12 @@ The candidate deck meets the review gate.
 ## Evidence
 - `review/review.md`
 
+## Worker ID
+reviewer-8
+
+## Session ID
+review-session-13
+
 ## Candidate artifact
 slides/candidate.pptx
 

@@ -37,16 +37,22 @@ def _identity_errors(summary: dict[str, str], args: argparse.Namespace) -> list[
     ]
 
 
-def _stale_sentinel_error(sentinel: Path, run_id: str) -> str | None:
+def _stale_sentinel_error(sentinel: Path, run_id: str, phase: str, attempt: int) -> str | None:
     if not sentinel.exists():
         return None
     try:
         payload = json.loads(sentinel.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return f"Stale sentinel cannot be safely replaced: {sentinel}"
-    if not isinstance(payload, dict) or payload.get("run_id") != run_id:
+    if not isinstance(payload, dict):
+        return f"Stale sentinel cannot be safely replaced: {sentinel}"
+    if (
+        payload.get("run_id") != run_id
+        or payload.get("phase") != phase
+        or payload.get("attempt") != attempt
+    ):
         return f"Stale sentinel belongs to a different run: {sentinel}"
-    return None
+    return f"Sentinel already exists for this run identity: {sentinel}"
 
 
 @contextmanager
@@ -128,7 +134,7 @@ def main() -> int:
 
     sentinel = summary_path.parent / phase_contract["sentinel"]
     with _sentinel_claim(sentinel):
-        stale_error = _stale_sentinel_error(sentinel, args.run_id)
+        stale_error = _stale_sentinel_error(sentinel, args.run_id, args.phase, args.attempt)
         if stale_error:
             print(f"ERROR: {stale_error}")
             return 1
@@ -142,11 +148,14 @@ def main() -> int:
             "summary": f"{summary_path.parent.name}/{summary_path.name}",
             "completed_at": datetime.now(launched_at.tzinfo).isoformat(),
         }
+        if workflow_contract.is_identity_boundary(summary):
+            payload.update({
+                "worker_id": _scalar(summary, "worker id"),
+                "session_id": _scalar(summary, "session id"),
+            })
         if workflow_contract.is_compact_boundary(summary):
             payload.update({
                 "workflow_mode": workflow_contract.COMPACT_WORKFLOW_MODE,
-                "worker_id": _scalar(summary, "worker id"),
-                "session_id": _scalar(summary, "session id"),
                 "candidate_artifact": _scalar(summary, "candidate artifact"),
                 "candidate_sha256": _scalar(summary, "candidate sha256"),
             })

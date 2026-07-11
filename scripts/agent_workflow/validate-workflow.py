@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+from datetime import datetime
 import importlib.util
 import json
 from pathlib import Path
@@ -29,6 +30,7 @@ MODEL_LITERAL = re.compile(
     r"\b(?:o\d+|(?:gpt|claude|gemini|llama|mistral|qwen)[ -]?\d[\w.-]*(?:\s+(?:sonnet|opus|haiku|turbo|mini|nano|pro))?)\b",
     re.IGNORECASE,
 )
+MOJIBAKE = re.compile(r"(?:Ã.|Â.|â€)")
 LEGACY_TALK_ROOTS = {
     "agentes-modulares",
     "Knowledge Repo 01 - Cuando Documentar Tablas se Vuelve Arquitectura de Conocimiento",
@@ -70,6 +72,35 @@ def validate_docs(targets: list[str], root: Path) -> list[str]:
             errors.append(f"Model literal outside runtime defaults: {path}")
         if not is_legacy_talk_path(path, root) and "Pasa / no pasa" in text:
             errors.append(f"Obsolete Pasa / no pasa field outside legacy talks: {path}")
+        if MOJIBAKE.search(text):
+            errors.append(f"Mojibake detected: {path}")
+    return errors
+
+
+def validate_advisor_sentinel(request_path: str, sentinel_path: str) -> list[str]:
+    """Validate the run-aware completion record for an auxiliary Advisor request."""
+    request = workflow_contract.parse_summary(request_path)
+    run_id = request.get("run_id", "").strip().strip("`")
+    if not run_id or run_id.startswith("<"):
+        return ["Advisor request requires a concrete run_id"]
+    try:
+        sentinel = json.loads(Path(sentinel_path).read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return ["Advisor sentinel must contain valid JSON"]
+    if not isinstance(sentinel, dict):
+        return ["Advisor sentinel must contain a JSON object"]
+
+    errors: list[str] = []
+    if sentinel.get("run_id") != run_id:
+        errors.append("Advisor sentinel run_id does not match request")
+    if not isinstance(sentinel.get("actual_model"), str) or not sentinel["actual_model"].strip():
+        errors.append("Advisor sentinel requires actual_model")
+    if not isinstance(sentinel.get("recommendation_path"), str) or not sentinel["recommendation_path"].strip():
+        errors.append("Advisor sentinel requires recommendation_path")
+    try:
+        datetime.fromisoformat(str(sentinel.get("completed_at", "")))
+    except ValueError:
+        errors.append("Advisor sentinel requires an ISO 8601 completed_at timestamp")
     return errors
 
 
@@ -85,8 +116,20 @@ def main() -> int:
     parser.add_argument("--check-phase-assets", action="store_true")
     parser.add_argument("--check-docs", nargs="+", metavar="PATH")
     parser.add_argument("--allow-migrated-summary-without-sentinel", action="store_true")
+    parser.add_argument("--advisor-request")
+    parser.add_argument("--advisor-sentinel")
     args = parser.parse_args()
     contract = json.loads(Path(args.contract).read_text(encoding="utf-8"))
+    if args.advisor_request or args.advisor_sentinel:
+        if not args.advisor_request or not args.advisor_sentinel:
+            parser.error("--advisor-request and --advisor-sentinel are required together")
+        errors = validate_advisor_sentinel(args.advisor_request, args.advisor_sentinel)
+        if errors:
+            for error in errors:
+                print(f"ERROR: {error}")
+            return 1
+        print("VALID ADVISOR SENTINEL")
+        return 0
     if args.check_docs:
         root = Path(args.contract).resolve().parent.parent
         try:
@@ -98,7 +141,7 @@ def main() -> int:
             for error in errors:
                 print(f"ERROR: {error}")
             return 1
-        print("VALID DOCS")
+        print("VALID DOC REFERENCES")
         return 0
     if args.check_phase_assets:
         errors: list[str] = []
