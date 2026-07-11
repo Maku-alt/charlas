@@ -1,17 +1,7 @@
 # Prompt: Run Image Close
 
-Estas ejecutando solo la fase `image-closer-charlas`.
+Ejecuta únicamente la fase `image-close` con el rol `agents/image-closer-charlas.md`.
 
-Usa solo el `Image Close Spec`, el `Execution Package` y las referencias visuales explicitamente incluidas.
+El `Execution Package` debe identificar este prompt y el `Image Close Spec` aplicable.
 
-No construyas el `pptx`. No hagas review final. No uses la imagen para explicar otra vez la parte tecnica.
-
-Para una corrida aislada, usa el paquete de ejecución y `agents/workflow-contract.json`. Publica el summary y el sentinel canónico seleccionado para `image-close` exclusivamente con `scripts/agent_workflow/complete-phase.py`; nunca escribas, reutilices ni comuniques sentinels manualmente. El paquete define las salidas temporales permitidas si corre en paralelo con build.
-
-Devuelve:
-
-- `Image Close Spec` completado: tesis, mensaje, cita/fallback, tono, restricciones, metaforas, direccion, asset, relacion de aspecto, espacio negativo y criterios de aceptacion
-- composicion de slide sugerida y prompt final de imagen
-- riesgos o cosas a evitar
-- publicación validada de `image-close` conforme al paquete de ejecución
-- decision: `listo para build`, `requiere ajuste editorial` o `descartar direccion`; no uses `listo para build` si la imagen funcionaria como accesorio, wallpaper generico o contenedor pequeno
+No construyas el `pptx`, no hagas review y no avances automáticamente a otra fase.

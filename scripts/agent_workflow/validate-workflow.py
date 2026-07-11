@@ -26,7 +26,7 @@ ROLE_PATHS = {
 }
 
 MODEL_LITERAL = re.compile(
-    r"\b(?:gpt|o[1-9]|claude|gemini|llama|mistral|qwen)-\d[\w.-]*\b",
+    r"\b(?:o\d+|(?:gpt|claude|gemini|llama|mistral|qwen)[ -]?\d[\w.-]*(?:\s+(?:sonnet|opus|haiku|turbo|mini|nano|pro))?)\b",
     re.IGNORECASE,
 )
 LEGACY_TALK_ROOTS = {
@@ -65,7 +65,8 @@ def validate_docs(targets: list[str], root: Path) -> list[str]:
     runtime_defaults = (root / "agents" / "runtime-defaults.json").resolve()
     for path in iter_document_paths(targets):
         text = path.read_text(encoding="utf-8")
-        if path.resolve() != runtime_defaults and MODEL_LITERAL.search(text):
+        is_allowed_model_context = path.resolve() == runtime_defaults or is_legacy_talk_path(path, root)
+        if not is_allowed_model_context and MODEL_LITERAL.search(text):
             errors.append(f"Model literal outside runtime defaults: {path}")
         if not is_legacy_talk_path(path, root) and "Pasa / no pasa" in text:
             errors.append(f"Obsolete Pasa / no pasa field outside legacy talks: {path}")

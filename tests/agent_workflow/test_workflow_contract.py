@@ -372,7 +372,7 @@ class WorkflowContractTests(unittest.TestCase):
             with self.subTest(field=field):
                 self.assertIn(field, role)
 
-    def test_advisor_sentinel_matches_request_run_id(self):
+    def test_advisor_request_carries_sentinel_contract_while_prompt_stays_scoped(self):
         request = (ROOT / "templates" / "charlas-sdd" / "advisor-request.md").read_text(encoding="utf-8")
         prompt = (ROOT / "templates" / "charlas-sdd" / "prompts" / "run-advisor.md").read_text(encoding="utf-8")
         self.assertIn("<talk>/notes/advice/<run-id>-advisor.md", request)
@@ -380,7 +380,9 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("request `run_id`", request)
         self.assertIn("actual model", request)
         self.assertIn("completion timestamp", request)
-        self.assertIn("run-aware advisory sentinel", prompt)
+        self.assertIn("agents/advisor-charlas.md", prompt)
+        self.assertIn("Advisor Request", prompt)
+        self.assertNotIn("sentinel", prompt.lower())
 
     def test_phase_asset_check_requires_worker_role_spec_and_prompt_but_allows_embedded_release(self):
         contract_path = ROOT / "agents" / ".task-7-workflow-contract.json"
@@ -604,6 +606,40 @@ class WorkflowContractTests(unittest.TestCase):
 
         self.assertEqual(1, result.returncode)
         self.assertIn("model literal", result.stdout.lower())
+
+    def test_check_docs_rejects_generic_model_names_outside_runtime_defaults(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            document = Path(temp_dir) / "workflow.md"
+            document.write_text("- model: o1\n- model: Claude 3.5 Sonnet\n", encoding="utf-8")
+
+            result = subprocess.run(
+                [sys.executable, str(CLI_PATH), "--check-docs", str(document)],
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+            )
+
+        self.assertEqual(1, result.returncode)
+        self.assertIn("model literal", result.stdout.lower())
+
+    def test_check_docs_allows_runtime_defaults_and_legacy_talk_contexts(self):
+        runtime_defaults = ROOT / "agents" / "runtime-defaults.json"
+        legacy_document = (
+            ROOT
+            / "Knowledge Repo 01 - Cuando Documentar Tablas se Vuelve Arquitectura de Conocimiento"
+            / "notes"
+            / "research-launch-package.md"
+        )
+
+        result = subprocess.run(
+            [sys.executable, str(CLI_PATH), "--check-docs", str(runtime_defaults), str(legacy_document)],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+
+        self.assertEqual(0, result.returncode, result.stdout)
+        self.assertIn("VALID DOCS", result.stdout)
 
     def test_check_docs_rejects_legacy_pass_fail_field_outside_legacy_talks(self):
         with tempfile.TemporaryDirectory() as temp_dir:
