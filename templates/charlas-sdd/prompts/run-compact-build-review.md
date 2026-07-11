@@ -17,14 +17,7 @@ Modelo sugerido para esta fase compacta:
 - `model`: `gpt-5.4`
 - `reasoning_effort`: `medium`
 
-Regla para `modo chat separado` o hilo worker separado:
-
-- el resultado operativo se comunica solo por archivos en disco
-- sobrescribe `notes/phase-summary.md` con el estado actual de build-review compacto
-- escribe `notes/.phase-build.done` y `notes/.phase-review.done` al terminar
-- responde en chat solo `DONE: summary written` o `BLOCKED: summary written`
-- no pegues el contenido del summary en chat
-- no uses `agent-log.md`
+Para una corrida aislada, usa paquetes de ejecución separados para cada fase canónica y `agents/workflow-contract.json`. Publica cada summary y su sentinel exclusivamente con `scripts/agent_workflow/complete-phase.py`; nunca combines ni escribas, reutilices o comuniques sentinels manualmente.
 
 QA visual PPTX:
 
@@ -41,7 +34,6 @@ Devuelve:
 - evidencia de build
 - hallazgos de review
 - riesgos residuales
-- estado de `notes/bibliografia.md` y `notes/phase-summary.md`
-- `notes/phase-summary.md` actualizado con fase, estado, pasa/no pasa, resumen, rutas, hallazgos bloqueantes y siguiente accion
-- `notes/.phase-build.done` y `notes/.phase-review.done` escritos al finalizar en modo chat separado o worker separado
+- estado de `notes/bibliografia.md` y evidencia de cada fase declarada
+- publicaciones validadas de las fases declaradas conforme a sus paquetes de ejecución
 - veredicto final: `aprobado` o `requiere cambios`

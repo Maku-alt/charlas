@@ -46,11 +46,9 @@ Usa este paquete para construir y revisar una charla pequena con narrativa ya cl
 - veredicto final
 
 ## Handoff worker separado
-- resultado operativo solo por archivos en disco
-- sobrescribir `notes/phase-summary.md`
-- escribir `notes/.phase-build.done` y `notes/.phase-review.done` al terminar build-review compacto
-- responder en chat solo `DONE: summary written` o `BLOCKED: summary written`
-- no usar `agent-log.md`
+- usar un paquete de ejecución separado por cada fase canónica y `agents/workflow-contract.json`
+- publicar cada summary y su sentinel exclusivamente con `scripts/agent_workflow/complete-phase.py`
+- no combinar ni escribir, reutilizar o comunicar sentinels manualmente; cada paquete define identidad y transporte
 
 ## QA visual PPTX
 - PowerPoint nativo es el gate final de apertura/export.

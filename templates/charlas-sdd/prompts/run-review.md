@@ -29,20 +29,7 @@ Modelo sugerido para esta fase:
 - `model`: `gpt-5.4`
 - `reasoning_effort`: `medium`
 
-Regla para `modo chat separado` o hilo worker separado:
-
-- el resultado operativo se comunica solo por archivos en disco
-- sobrescribe `notes/phase-summary.md` con el estado actual de review
-- escribe `notes/.phase-review.done` al terminar
-- responde en chat solo `DONE: summary written` o `BLOCKED: summary written`
-- no pegues el contenido del summary en chat
-- no uses `agent-log.md`
-- no escribas `phase-summary-review.md`
-- deja evidencia pesada en `review/`, `assets/` o `slides/` y referenciala desde `notes/phase-summary.md`
-
-Formato de `notes/phase-summary.md`: `Ultima fase`, `Estado` (`completado`, `requiere cambios` o `bloqueado`), `Pasa / no pasa`, `Resumen` de 1-3 frases, `Artefactos` con rutas, `Hallazgos bloqueantes` y `Siguiente accion`.
-
-En review debe indicar si el flujo esta en `review` o `review-final`, artefacto candidato actual, artefacto final si existe, hallazgos bloqueantes restantes y siguiente accion.
+Para una corrida aislada, usa el paquete de ejecución y `agents/workflow-contract.json`. Publica el summary y el sentinel de la fase declarada (`review` o `review-final`) exclusivamente con `scripts/agent_workflow/complete-phase.py`; nunca escribas, reutilices ni comuniques sentinels manualmente. El paquete define evidencia, identidad y transporte.
 
 Devuelve:
 
@@ -51,9 +38,8 @@ Devuelve:
 - resumen de review
 - slides mas debiles
 - riesgos residuales
-- estado de `notes/bibliografia.md` y `notes/phase-summary.md`
-- `notes/phase-summary.md` actualizado con fase, estado, pasa/no pasa, resumen, rutas, hallazgos bloqueantes y siguiente accion
-- `notes/.phase-review.done` escrito al finalizar en modo chat separado o worker separado
+- estado de `notes/bibliografia.md` y la evidencia de fase declarada
+- publicación validada de la fase declarada conforme al paquete de ejecución
 - veredicto final: `aprobado` o `requiere cambios`
 
 Si la review inicial devuelve `requiere cambios`, no cierres el flujo: deja `Siguiente accion: orquestador decide build-fix o bloqueo`. Si `review-final` devuelve `requiere cambios`, registra `Estado: bloqueado` o `Pasa / no pasa: no pasa` con bloqueo explicito; no propongas otro ciclo salvo autorizacion explicita del usuario.

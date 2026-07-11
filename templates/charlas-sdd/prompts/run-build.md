@@ -23,22 +23,7 @@ Modelo sugerido para esta fase:
 - `model`: `gpt-5.4`
 - `reasoning_effort`: `medium`
 
-Regla para `modo chat separado` o hilo worker separado:
-
-- el resultado operativo se comunica solo por archivos en disco
-- sobrescribe `notes/phase-summary.md` con el estado actual de build
-- escribe `notes/.phase-build.done` al terminar
-- responde en chat solo `DONE: summary written` o `BLOCKED: summary written`
-- no pegues el contenido del summary en chat
-- no uses `agent-log.md`
-- no escribas `phase-summary-build.md`
-- deja evidencia pesada en `review/`, `assets/` o `slides/` y referenciala desde `notes/phase-summary.md`
-
-Si este build corre en paralelo con `image-close`, escribe temporalmente `notes/.phase-build.summary.md` en vez de sobrescribir `notes/phase-summary.md`. Escribe igual `notes/.phase-build.done`; el padre consolidara cuando tambien exista `notes/.phase-image.done`.
-
-Formato de `notes/phase-summary.md`: `Ultima fase`, `Estado` (`completado`, `requiere cambios` o `bloqueado`), `Pasa / no pasa`, `Resumen` de 1-3 frases, `Artefactos` con rutas, `Hallazgos bloqueantes` y `Siguiente accion`.
-
-En build/review, `notes/phase-summary.md` debe indicar si el flujo esta en `build` o `build-fix`, artefacto candidato actual, artefacto final si existe, hallazgos bloqueantes restantes y siguiente accion.
+Para una corrida aislada, usa el paquete de ejecución y `agents/workflow-contract.json`. Publica el summary y el sentinel de la fase declarada (`build` o `build-fix`) exclusivamente con `scripts/agent_workflow/complete-phase.py`; nunca escribas, reutilices ni comuniques sentinels manualmente. El paquete define la evidencia, el summary y, si hay paralelo con `image-close`, las salidas temporales permitidas.
 
 Devuelve:
 
@@ -50,8 +35,7 @@ Devuelve:
 - chequeos mecanicos
 - estado de render nativo
 - riesgos residuales
-- `notes/phase-summary.md` actualizado con fase, estado, pasa/no pasa, resumen, rutas, hallazgos bloqueantes y siguiente accion
-- `notes/.phase-build.done` escrito al finalizar en modo chat separado o worker separado
+- publicación validada de la fase declarada conforme al paquete de ejecución
 
 Si este encargo es `build-fix`:
 

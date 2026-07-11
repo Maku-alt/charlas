@@ -15,3 +15,10 @@
 ## Commit
 
 `refactor: align charla roles with canonical workflow`
+
+## Review fix
+
+- Normalized the affected full and compact phase specs plus execution prompts that still directed manual sentinels or chat completion strings.
+- Each isolated phase now uses the execution package, `agents/workflow-contract.json`, and `scripts/agent_workflow/complete-phase.py`; compact build-review explicitly uses a separate package per canonical phase.
+- `run-image-close.md` now refers to the canonical contract-selected sentinel for `image-close`, not `.phase-image.done`.
+- Targeted obsolete-transport scan and `git diff --check` passed.

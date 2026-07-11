@@ -48,11 +48,9 @@ Default del repo: `standard`.
 - direccion de cierre
 - `notes/bibliografia.md` o contenido listo para crearlo
 - contenido para `notes/phase-summary.md`
-- `notes/.phase-research.done` escrito al terminar en modo chat separado o worker separado
+- publicación de `research` conforme al paquete de ejecución y contrato canónico
 
 ## Handoff worker separado
-- resultado operativo solo por archivos en disco
-- sobrescribir `notes/phase-summary.md`
-- escribir `notes/.phase-research.done` al terminar
-- responder en chat solo `DONE: summary written` o `BLOCKED: summary written`
-- no usar `agent-log.md`
+- usar `templates/charlas-sdd/execution-package.md` y `agents/workflow-contract.json`
+- publicar el summary y el sentinel de `research` exclusivamente con `scripts/agent_workflow/complete-phase.py`
+- no escribir, reutilizar ni comunicar sentinels manualmente; el paquete define identidad y transporte
