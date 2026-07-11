@@ -1,5 +1,8 @@
 # Thesis Spec
 
+## Run ID
+<lowercase-slug-YYYYMMDD-HHMM; debe coincidir con el Execution Package y el phase summary>
+
 ## Tema
 <tema bruto de la charla>
 
@@ -25,7 +28,14 @@
 <donde la tesis puede sonar exagerada, ambigua o debil>
 
 ## Decision de continuidad
-- seguir
-- reformular tesis
-- descartar
+- `advance`: la tesis esta lista para pasar a `research`
+- `stop`: no continuar esta charla
+
+## Transicion esperada
+`research` si la decision es `advance`; `stop` si la decision es `stop`.
+
+## Publicacion atomica
+- Actualizar `notes/phase-summary.md` con el mismo `run_id`, la decision y la transicion esperada.
+- Publicar `.phase-thesis-review.done` solo mediante `scripts/agent_workflow/complete-phase.py` despues de validar el summary.
+- No escribir, reutilizar ni comunicar el sentinel manualmente.
 

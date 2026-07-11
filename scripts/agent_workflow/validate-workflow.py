@@ -33,6 +33,22 @@ def main() -> int:
         root = Path(args.contract).resolve().parent.parent
         phases = contract.get("phases", {})
         for phase_name, phase in phases.items():
+            if phase_name == "release":
+                if (
+                    phase.get("role") != "orchestrator-charlas"
+                    or phase.get("spec") != "embedded release contract"
+                    or phase.get("prompt") != "not_applicable"
+                ):
+                    errors.append("Release must be an explicit orchestrator-owned embedded contract")
+                continue
+
+            if not isinstance(phase.get("role"), str) or not phase["role"].strip():
+                errors.append(f"Phase {phase_name} is missing a declared role")
+            spec = phase.get("spec")
+            if not isinstance(spec, str) or not spec.strip():
+                errors.append(f"Phase {phase_name} is missing a declared spec")
+            elif not (root / "templates" / "charlas-sdd" / "full" / spec).is_file():
+                errors.append(f"Phase {phase_name} references missing spec: {spec}")
             prompt = phase.get("prompt")
             if prompt != "not_applicable" and not (root / "templates" / "charlas-sdd" / "prompts" / prompt).is_file():
                 errors.append(f"Phase {phase_name} references missing prompt: {prompt}")
@@ -62,6 +78,7 @@ def main() -> int:
         for role_name in contract.get("auxiliary_roles", {}):
             print(f"VALID AUXILIARY ROLE {role_name}")
             print(f"AUXILIARY ROLE {role_name} absent from phase transition graph")
+        print("VALID ORCHESTRATOR RELEASE release")
         print("VALID PHASE ASSETS")
         return 0
     if args.template:

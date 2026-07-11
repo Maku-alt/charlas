@@ -8,8 +8,8 @@ Usa `full/` cuando la charla tenga tesis incierta, research externo, claims sens
 1. `thesis-spec.md`
 2. `research-spec.md`
 3. `narrative-spec.md`
-4. `build-spec.md`
-5. `run-image-close.md`, si necesita imagen editorial final
+4. `image-spec.md`, si necesita imagen editorial final
+5. `build-spec.md`
 6. `review-spec.md`
 
 Usa `compact/` cuando la charla sea pequena, tenga tesis clara o no tenga claims sensibles:
@@ -27,7 +27,7 @@ Cada fase pesada debe recibir:
 - `notes/phase-summary.md` como unico handoff operativo para el padre, salvo summaries temporales de `build` + `image-close` paralelos
 - `model`, `reasoning_effort` y `fork_context: false` explicitos cuando se use subagente
 
-El spec define el encargo concreto. El rol define metodologia y criterio de calidad. El prompt empaqueta la corrida y evita que avance automaticamente a otra etapa.
+El spec define el encargo concreto. El rol define metodologia y criterio de calidad. El prompt consume el spec y el paquete de ejecucion de esa fase, sin duplicar un handoff generico, y evita que avance automaticamente a otra etapa.
 
 La imagen final puede correr como fase separada con `image-closer-charlas`; su salida alimenta build y review.
 
@@ -38,10 +38,11 @@ El feedback humano tambien es entrada SDD: `orchestrator-charlas` lo clasifica, 
 ## Precondiciones
 | Fase | Spec minimo | Artefactos minimos |
 |---|---|---|
+| thesis-review | `thesis-spec.md` | brief o tesis abierta, `run_id` y decision hacia `research` o `stop` |
 | research | `research-spec.md` o package compacto | framing o tesis base |
 | narrativa | `narrative-spec.md` | research aprobado |
 | build | `build-spec.md` | `narrative-spec.md` aprobado, `notes/bibliografia.md` si hubo research |
-| imagen final | cierre en `narrative-spec.md` o `build-spec.md` | mensaje final, cita/fallback, tono |
+| imagen final | `image-spec.md` | tesis, mensaje final, cita/fallback, tono y restricciones visuales |
 | review | `review-spec.md` | deck exacto, sentinels previos requeridos, build report o evidencia de build, cierre visual cuando aplique, bibliografia y `notes/phase-summary.md` |
 
 Si falta un spec obligatorio, no lances la fase. Corrige primero el contrato.

@@ -50,7 +50,7 @@
       "sentinel": ".phase-image-close.done",
       "next": ["build", "review", "narrative"],
       "role": "image-closer-charlas",
-      "spec": "narrative-spec.md or build-spec.md",
+      "spec": "image-spec.md",
       "prompt": "run-image-close.md",
       "required_inputs": ["thesis", "final message", "real reference quote or justified fallback", "emotional tone", "closing direction"],
       "required_outputs": ["final closing asset or concrete visual direction", "phase summary"],

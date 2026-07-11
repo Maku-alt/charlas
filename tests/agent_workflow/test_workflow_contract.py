@@ -347,6 +347,28 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("completion timestamp", request)
         self.assertIn("run-aware advisory sentinel", prompt)
 
+    def test_phase_asset_check_requires_worker_role_spec_and_prompt_but_allows_embedded_release(self):
+        contract_path = ROOT / "agents" / ".task-7-workflow-contract.json"
+        contract = json.loads((ROOT / "agents" / "workflow-contract.json").read_text(encoding="utf-8"))
+        contract["phases"]["image-close"]["spec"] = "missing-image-spec.md"
+        contract_path.write_text(json.dumps(contract), encoding="utf-8")
+        self.addCleanup(contract_path.unlink, missing_ok=True)
+
+        result = subprocess.run(
+            [sys.executable, str(CLI_PATH), "--contract", str(contract_path), "--check-phase-assets"],
+            capture_output=True, text=True, check=False,
+        )
+
+        self.assertEqual(1, result.returncode)
+        self.assertIn("Phase image-close references missing spec", result.stdout)
+
+        result = subprocess.run(
+            [sys.executable, str(CLI_PATH), "--check-phase-assets"],
+            capture_output=True, text=True, check=False,
+        )
+        self.assertEqual(0, result.returncode, result.stdout)
+        self.assertIn("VALID ORCHESTRATOR RELEASE release", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

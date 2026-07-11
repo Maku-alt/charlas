@@ -2,14 +2,7 @@
 
 Estas ejecutando solo la fase `image-closer-charlas`.
 
-Usa solo:
-
-- tesis aprobada
-- mensaje final
-- cita real de referente con autor/fuente, o fallback justificado
-- tono emocional
-- restricciones visuales del `Narrative Spec` o `Build Spec`
-- referencias visuales explicitamente incluidas
+Usa solo el `Image Close Spec`, el `Execution Package` y las referencias visuales explicitamente incluidas.
 
 No construyas el `pptx`. No hagas review final. No uses la imagen para explicar otra vez la parte tecnica.
 
@@ -22,14 +15,8 @@ Para una corrida aislada, usa el paquete de ejecución y `agents/workflow-contra
 
 Devuelve:
 
-- tesis que debe amplificar
-- mensaje final
-- cita real de referente con autor/fuente o fallback propio justificado
-- tono emocional
-- metaforas visuales candidatas
-- direccion recomendada
-- composicion de slide sugerida: imagen protagonista, zona de texto, recorte y relacion con la cita
-- prompt final de imagen
+- `Image Close Spec` completado: tesis, mensaje, cita/fallback, tono, restricciones, metaforas, direccion, asset, relacion de aspecto, espacio negativo y criterios de aceptacion
+- composicion de slide sugerida y prompt final de imagen
 - riesgos o cosas a evitar
 - publicación validada de `image-close` conforme al paquete de ejecución
 - decision: `listo para build`, `requiere ajuste editorial` o `descartar direccion`; no uses `listo para build` si la imagen funcionaria como accesorio, wallpaper generico o contenedor pequeno
