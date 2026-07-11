@@ -14,6 +14,7 @@ Usa este paquete exclusivamente para revisar, de manera independiente, una charl
 - session_id: <isolated session identifier distinct from build session_id>
 
 ## Independence gate
+- `workflow mode` must match the completed build sentinel; a compact build requires `Workflow mode: compact` in review.
 - `worker_id` and `session_id` must differ from the completed build handoff when independence is required.
 - Validate with `validate_compact_review_independence`; reject a matching identifier.
 

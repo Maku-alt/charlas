@@ -502,6 +502,42 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertEqual(0, review.returncode, review.stdout)
         self.assertTrue((notes / ".phase-review.done").exists())
 
+    def test_compact_build_rejects_review_that_omits_or_changes_compact_mode(self):
+        for review_mode in ("", "full"):
+            with self.subTest(review_mode=review_mode):
+                temp_dir = tempfile.TemporaryDirectory()
+                notes = Path(temp_dir.name) / "notes"
+                notes.mkdir()
+                summary = notes / "phase-summary.md"
+                self.addCleanup(temp_dir.cleanup)
+                self.publish_compact_build(summary, Path(temp_dir.name) / "slides" / "candidate.pptx")
+                self.write_compact_phase_summary(
+                    summary,
+                    phase="review",
+                    worker_id="builder-7",
+                    session_id="build-session-12",
+                    candidate_sha256="0" * 64,
+                )
+                summary.write_text(
+                    summary.read_text(encoding="utf-8").replace(
+                        "## Workflow mode\ncompact", f"## Workflow mode\n{review_mode}"
+                    ),
+                    encoding="utf-8",
+                )
+
+                errors = self.workflow_contract.validate_publication(
+                    self.workflow_contract.parse_summary(summary),
+                    self.contract,
+                    summary,
+                )
+
+                result = self.complete_phase(summary, phase="review")
+
+                self.assertTrue(any("workflow mode" in error.lower() for error in errors), errors)
+                self.assertEqual(1, result.returncode)
+                self.assertIn("workflow mode", result.stdout.lower())
+                self.assertFalse((notes / ".phase-review.done").exists())
+
     def test_compact_review_publication_rejects_mismatched_candidate_hash(self):
         temp_dir = tempfile.TemporaryDirectory()
         notes = Path(temp_dir.name) / "notes"

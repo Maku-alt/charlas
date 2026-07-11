@@ -126,9 +126,32 @@ def validate_compact_review_boundary(summary: dict[str, str], summary_path: Path
     return errors
 
 
+def _review_mode_errors(summary: dict[str, str], summary_path: Path) -> list[str]:
+    """Reject a review whose mode differs from its completed build handoff."""
+    if _scalar(summary, "phase") != "review":
+        return []
+    build_sentinel = summary_path.parent / ".phase-build.done"
+    if not build_sentinel.is_file():
+        return []
+    try:
+        build = json.loads(build_sentinel.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return []
+    if not isinstance(build, dict) or build.get("phase") != "build":
+        return []
+    build_mode = str(build.get("workflow_mode", "full")).lower()
+    review_mode = _scalar(summary, "workflow mode").lower() or "full"
+    if build_mode != review_mode:
+        return ["Review workflow mode must match the completed build workflow mode"]
+    return []
+
+
 def validate_publication(summary: dict[str, str], contract: dict[str, Any], summary_path: Path) -> list[str]:
     """Validate runtime-bound build/review fields before a phase sentinel is published."""
     phase = _scalar(summary, "phase")
+    errors = _review_mode_errors(summary, summary_path)
+    if errors:
+        return errors
     if not is_compact_boundary(summary):
         return []
     errors = _candidate_identity_errors(summary, summary_path)
