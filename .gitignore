@@ -4,6 +4,7 @@ analysis/
 DeckLab/
 .codex/
 .agents/
+.worktrees/
 .ai/
 .venv/
 venv/
