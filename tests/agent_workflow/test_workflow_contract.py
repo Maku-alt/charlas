@@ -666,6 +666,35 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertNotIn("@oai/artifact-tool", skill)
         self.assertNotIn("`pptxgenjs` not used", skill)
 
+    def test_cli_validates_migrated_summary_without_a_completion_sentinel(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            notes = Path(temp_dir) / "notes"
+            notes.mkdir()
+            summary = notes / "phase-summary.md"
+            text = (FIXTURES / "valid-phase-summary.md").read_text(encoding="utf-8")
+            summary.write_text(
+                text.replace("## Phase\nreview-final", "## Phase\nresearch")
+                .replace("## Decision\nadvance", "## Decision\niterate")
+                .replace("## Review verdict\napproved", "## Review verdict\nnot_applicable")
+                .replace("## Candidate artifact\nslides/candidate.pptx", "## Candidate artifact\nnone")
+                .replace("## Next phase\nrelease", "## Next phase\nresearch"),
+                encoding="utf-8",
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable, str(CLI_PATH),
+                    "--summary", str(summary),
+                    "--allow-migrated-summary-without-sentinel",
+                ],
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+            )
+
+        self.assertEqual(0, result.returncode, result.stdout)
+        self.assertIn("VALID MIGRATED SUMMARY", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -84,6 +84,7 @@ def main() -> int:
     parser.add_argument("--template")
     parser.add_argument("--check-phase-assets", action="store_true")
     parser.add_argument("--check-docs", nargs="+", metavar="PATH")
+    parser.add_argument("--allow-migrated-summary-without-sentinel", action="store_true")
     args = parser.parse_args()
     contract = json.loads(Path(args.contract).read_text(encoding="utf-8"))
     if args.check_docs:
@@ -168,6 +169,16 @@ def main() -> int:
                 print(f"ERROR: Missing template field: {field}")
             return 1
         print("VALID TEMPLATE")
+        return 0
+    if args.allow_migrated_summary_without_sentinel:
+        if not args.summary:
+            parser.error("--summary is required with --allow-migrated-summary-without-sentinel")
+        errors = workflow_contract.validate_migrated_summary(args.summary, contract)
+        if errors:
+            for error in errors:
+                print(f"ERROR: {error}")
+            return 1
+        print("VALID MIGRATED SUMMARY")
         return 0
     if not args.summary or not args.sentinel:
         parser.error("--summary and --sentinel are required unless --template is used")

@@ -281,3 +281,15 @@ def _validate_summary(path: str | Path, contract: dict[str, Any], sentinel: Path
 def validate_summary(path: str | Path, contract: dict[str, Any]) -> list[str]:
     """Validate a phase summary and the phase sentinel beside it."""
     return _validate_summary(path, contract)
+
+
+def validate_migrated_summary(path: str | Path, contract: dict[str, Any]) -> list[str]:
+    """Validate v2 metadata migrated from a prior run without a new sentinel."""
+    summary_path = Path(path)
+    summary = parse_summary(summary_path)
+    errors = validate_transition(summary, contract)
+    phase = _scalar(summary, "phase")
+    if _scalar(summary, "decision") == "iterate" and _scalar(summary, "next phase") == phase:
+        errors = [error for error in errors if not error.startswith("Next phase ")]
+    errors.extend(validate_publication(summary, contract, summary_path))
+    return errors
