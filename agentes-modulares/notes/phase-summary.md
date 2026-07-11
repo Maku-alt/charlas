@@ -1,33 +1,49 @@
-# Phase summary
+# Phase Summary
 
-## Ultima fase
+## Contract version
+2
 
-registro de fuente inicial
+## Run ID
+agentes-modulares-20260711-0316
 
-## Estado
+## Attempt
+1
 
-completado
+## Phase
+research
 
-## Pasa / no pasa
+## Execution status
+completed
 
-pasa solo como insumo preliminar
+## Decision
+iterate
 
-## Resumen
+## Review verdict
+not_applicable
 
-Se extrajo la transcripcion original del video con el MCP `youtube_transcript` y se registro como una fuente mas para analisis posterior. No hay research profundo, narrativa aprobada ni claims validados; quedan puntos abiertos para contrastar el video con fuentes actuales y con las pruebas locales.
+## Summary
+Se extrajo y registró la transcripción original del video como insumo preliminar. No hay research profundo, narrativa aprobada ni claims validados; faltan contrastes con fuentes actuales y pruebas locales.
 
-## Artefactos
-
-- `agentes-modulares/notes/transcript-original.en-orig.vtt`
-- `agentes-modulares/notes/transcript-original.en-orig.txt`
+## Artifacts
 - `agentes-modulares/notes/transcripcion.md`
 - `agentes-modulares/notes/research-video.md`
 - `agentes-modulares/notes/bibliografia.md`
 
-## Hallazgos bloqueantes
+## Evidence
+- `agentes-modulares/notes/transcripcion.md`
+- `agentes-modulares/notes/research-video.md`
 
-No se debe avanzar a narrativa ni PPTX todavia. Falta terminar pruebas locales y habilitar research profundo.
+## Candidate artifact
+none
 
-## Siguiente accion
+## Final artifact
+none
 
-Esperar cierre de pruebas locales. Luego ejecutar research profundo, contrastar claims del video y recien despues converger tesis y narrativa.
+## Blocking findings
+- No se debe avanzar a narrativa ni PPTX: faltan pruebas locales y research profundo que contraste los claims del video.
+
+## Next phase
+research
+
+## Next action
+Cerrar las pruebas locales y ejecutar research profundo antes de converger tesis y narrativa.
