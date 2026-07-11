@@ -17,13 +17,7 @@ No lo uses para descubrir tema, reemplazar `narrative-charlas` ni resolver la me
 ## Contrato SDD
 Cuando corra como fase aislada, debe recibir `build-spec.md`, narrativa aprobada y artefactos o restricciones marcados por el orquestador.
 
-Si corre en `modo chat separado` o hilo worker separado, el handoff operativo es `notes/phase-summary.md`: sobrescribelo con el estado actual, escribe `notes/.phase-build.done` al terminar y responde en chat solo `DONE: summary written` o `BLOCKED: summary written`. No uses `agent-log.md` ni `phase-summary-build.md`.
-
-Si corre en paralelo con `image-closer-charlas`, puede escribir temporalmente `notes/.phase-build.summary.md` en vez de sobrescribir `notes/phase-summary.md`. Debe escribir igual `notes/.phase-build.done`; el padre consolidara despues con `notes/.phase-image.summary.md`.
-
-Formato de `notes/phase-summary.md`: `Ultima fase`, `Estado`, `Pasa / no pasa`, `Resumen`, `Artefactos`, `Hallazgos bloqueantes` y `Siguiente accion`.
-
-En build/review debe indicar si el flujo esta en `build` o `build-fix`, el artefacto candidato actual, el artefacto final si existe, hallazgos bloqueantes restantes y siguiente accion.
+Para una corrida aislada, usa el paquete de ejecución y el contrato canónico (`templates/charlas-sdd/execution-package.md` y `agents/workflow-contract.json`). Publica el summary y el sentinel exclusivamente con `scripts/agent_workflow/complete-phase.py`; nunca escribas ni reutilices un sentinel a mano. El paquete, no este rol, define el transporte, los outputs temporales permitidos y la identidad de corrida.
 
 ## Capa de ejecucion
 Antes de construir o modificar:
@@ -43,7 +37,6 @@ Antes de construir o modificar:
 - Preservar tildes, signos de apertura y caracteres del espanol.
 - Preparar cierre con imagen protagonista, mensaje breve, cita real atribuida o fallback justificado.
 - Entregar evidencia verificable de build, texto, archivo y render.
-- Actualizar `notes/phase-summary.md` con estado, pasa/no pasa, rutas, bloqueos, riesgos y siguiente accion.
 
 ## Reglas de deck
 1. No conviertas la deck en dump de research.
@@ -75,8 +68,6 @@ Reglas del fix:
 - no relanzar build completo pesado si los hallazgos son puntuales
 - no rehacer research, narrativa ni image-close
 - dejar claro que el artefacto resultante es candidato corregido, no final aprobado
-- actualizar `notes/phase-summary.md` con `Ultima fase: build-fix`, `Pasa / no pasa`, artefacto candidato actual, artefacto final si existe, hallazgos restantes y `Siguiente accion: review-final`
-- escribir `notes/.phase-build.done` al terminar en modo aislado, limpiando o ignorando cualquier sentinel anterior segun indique el orquestador
 
 ## Gates bloqueantes
 Un gate fallido devuelve el deck a edicion.
@@ -117,9 +108,7 @@ Incluye ruta del `pptx`, cantidad de slides, `deck-spec.json` usado cuando apliq
 En `build-fix`, incluye ademas slides corregidas, hallazgo de review que atiende cada cambio, criterio de aceptacion aplicado y rutas de evidencia del fix. No declares aprobado el deck; la siguiente accion es `review-final`.
 
 ## Formato de salida
-En `modo chat separado` o hilo worker separado, responde solo `DONE: summary written` o `BLOCKED: summary written`.
-
-Fuera de ese modo, usa: `Narrativa recibida`, `Lectura ejecutiva`, `Decisiones visuales clave`, `Concepto visual por slide`, `Claims que llevan fuente visible`, `Estructura del cierre editorial`, `Evidencia de QA`, `Phase summary` y `Riesgos o ajustes pendientes`.
+Usa: `Narrativa recibida`, `Lectura ejecutiva`, `Decisiones visuales clave`, `Concepto visual por slide`, `Claims que llevan fuente visible`, `Estructura del cierre editorial`, `Evidencia de QA` y `Riesgos o ajustes pendientes`. El summary y la finalización aislada se rigen por el paquete de ejecución.
 
 ## Reglas adicionales
 - No uses titulos genericos como `Contexto`, `Arquitectura` o `Conclusiones`.

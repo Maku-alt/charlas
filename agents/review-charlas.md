@@ -13,11 +13,7 @@ No lo uses sobre tema abierto, puro research o antes de una narrativa/deck concr
 ## Contrato SDD
 Cuando corra como fase aislada, debe recibir `review-spec.md`, artefacto exacto a revisar y evidencia de build.
 
-Si corre en `modo chat separado` o hilo worker separado, el handoff operativo es `notes/phase-summary.md`: sobrescribelo con el estado actual de review, escribe `notes/.phase-review.done` al terminar y responde en chat solo `DONE: summary written` o `BLOCKED: summary written`. No uses `agent-log.md` ni `phase-summary-review.md`.
-
-Formato de `notes/phase-summary.md`: `Ultima fase`, `Estado`, `Pasa / no pasa`, `Resumen`, `Artefactos`, `Hallazgos bloqueantes` y `Siguiente accion`.
-
-En review debe indicar si el flujo esta en `review` o `review-final`, el artefacto candidato actual, el artefacto final si existe, hallazgos bloqueantes restantes y siguiente accion. Si el estado es `requiere cambios`, debe referenciar un `review-report` accionable.
+Para una corrida aislada, usa el paquete de ejecución y el contrato canónico (`templates/charlas-sdd/execution-package.md` y `agents/workflow-contract.json`). Publica el summary y el sentinel exclusivamente con `scripts/agent_workflow/complete-phase.py`; nunca escribas ni reutilices un sentinel a mano. El paquete, no este rol, define el transporte y la identidad de corrida.
 
 ## Responsabilidad
 Revisar claridad de tesis, lectura ejecutiva, ritmo narrativo, titulos-conclusion, concepto visual por slide, densidad, legibilidad, jerarquia, consistencia con `STYLE-CHARLAS.md`, cierre editorial, claims con fuente visible, bibliografia cuando aplique, ortografia espanola, `UTF-8`, contact sheet PowerPoint nativo, `notes/phase-summary.md`, sentinels previos requeridos e identidad exacta del artefacto revisado.
@@ -70,14 +66,12 @@ No se puede aprobar una deck con hallazgos `P1` o `P2`.
 El proceso debe detectar al menos metricas con labels largos que se solapan, bullets de dos o mas lineas con altura insuficiente, caracteres especiales danados y diferencias visibles entre renderer de construccion y PowerPoint.
 
 ## Evidencia de revision
-Registrar archivo exacto revisado, hash o identidad cuando sea posible, numero de slides, contact sheet PowerPoint nativo, estado del render nativo, chequeo textual, bibliografia, `notes/phase-summary.md`, sentinel en modo aislado, hallazgos por severidad y decision final: `aprobado` o `requiere cambios`.
+Registrar archivo exacto revisado, hash o identidad, numero de slides, contact sheet PowerPoint nativo, estado del render nativo, chequeo textual, bibliografia, hallazgos por severidad y veredicto conforme al contrato.
 
 Si la decision final es `requiere cambios`, registrar ruta del `review-report` accionable y dejar `Siguiente accion` como `orquestador decide build-fix o bloqueo`. Si la fase es `review-final` y no pasa, registrar bloqueo explicito; no proponer otro ciclo salvo autorizacion explicita del usuario.
 
 ## Formato de salida
-En `modo chat separado` o hilo worker separado, responde solo `DONE: summary written` o `BLOCKED: summary written`.
-
-Fuera de ese modo, entrega primero hallazgos priorizados con severidad y razon. Luego incluye `Resumen de la review`, `Slides mas debiles`, `Problemas del cierre`, `Riesgos de evidencia o fuentes`, `Estado de bibliografia y phase-summary` y `Ajustes recomendados antes de cerrar`.
+Entrega primero hallazgos priorizados con severidad y razón. Luego incluye `Resumen de la review`, `Slides más débiles`, `Problemas del cierre`, `Riesgos de evidencia o fuentes`, `Estado de bibliografía` y `Ajustes recomendados antes de cerrar`.
 
 ## Reglas adicionales
 - No rehagas la charla completa salvo que el problema lo exija.

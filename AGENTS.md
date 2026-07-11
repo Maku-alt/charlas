@@ -19,7 +19,8 @@ Cada slide debe tener tesis, lectura ejecutiva, objeto visible y concepto visual
 ## Donde vive cada regla
 - Roles especializados: `agents/*.md`.
 - Mapa de roles, paquetes y dependencias: `agents/README.md`.
-- Orquestacion de fases, prechecks, workers, sentinels y ciclo de correccion: `agents/orchestrator-charlas.md`.
+- Contrato canónico de fases, transiciones y publicación: `agents/workflow-contract.json`.
+- Orquestación y decisiones de transición: `agents/orchestrator-charlas.md`.
 - Specs y prompts SDD reutilizables: `templates/charlas-sdd/`.
 - Renderer local, theme default y comandos de build/QA: `scripts/deck_renderer/README.md`.
 - Ejemplo de `deck-spec.json`: `templates/deck-renderer/deck-spec.example.json`.
@@ -65,17 +66,9 @@ El theme default es `scripts/deck_renderer/theme-charlas.json`. Los detalles de 
 La skill `pptx` queda solo para emergencia o diagnostico avanzado: inspeccion, extraccion, unpack/pack, reparacion puntual y diagnostico XML/estructura cuando los scripts del repo no expliquen el fallo.
 
 ## Workers y handoff
-No cambies la politica de workers desde este archivo. Para `modo chat separado` o hilos worker separados, sigue `skills/worker-handoff` y `agents/orchestrator-charlas.md`.
+Las reglas operativas de workers, paquetes de ejecución, sentinels, identidad de corrida, esperas, consolidación y release viven en `agents/workflow-contract.json`, `agents/orchestrator-charlas.md`, `templates/charlas-sdd/execution-package.md` y `skills/worker-handoff`.
 
-Reglas repo-wide minimas:
-
-- el padre observa archivos, no chats worker ni `read_thread`
-- `notes/phase-summary.md` es el handoff operativo oficial, salvo summaries temporales permitidos para `build` + `image-close` paralelos
-- la finalizacion se verifica con `Test-Path` sobre el sentinel esperado
-- el worker escribe el sentinel al terminar y responde solo `DONE: summary written` o `BLOCKED: summary written`
-- `fork_context: false` es el default para subagentes
-
-Los tiempos de espera, sentinels, limpieza de sentinels viejos, consolidacion de summaries temporales y bloqueo de workers viven en `agents/orchestrator-charlas.md` y el protocolo `skills/worker-handoff`.
+Los workers se comunican mediante artefactos validados, no por su chat. La publicación de una fase usa `scripts/agent_workflow/complete-phase.py`; los detalles del transporte pertenecen al contrato canónico, no a este archivo.
 
 ## Gates de cierre
 El entregable primario es un `pptx` editable compatible con PowerPoint nativo.

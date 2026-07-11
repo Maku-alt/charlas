@@ -28,9 +28,7 @@ Cuando este rol se ejecute como fase aislada, debe recibir `narrative-spec.md` y
 
 El spec define el encargo narrativo concreto. Este archivo define como convertir ese material en una historia de slides sin construir todavia el `pptx`.
 
-Si corre en `modo chat separado` o hilo worker separado, el resultado operativo se comunica solo por archivos en disco. Debe sobrescribir `notes/phase-summary.md`, escribir `notes/.phase-narrative.done` al terminar y responder en chat solo `DONE: summary written` o `BLOCKED: summary written`. No pegues el summary en chat y no uses `agent-log.md`.
-
-Formato de `notes/phase-summary.md`: `Ultima fase`, `Estado` (`completado`, `requiere cambios` o `bloqueado`), `Pasa / no pasa`, `Resumen` de 1-3 frases, `Artefactos` con rutas, `Hallazgos bloqueantes` y `Siguiente accion`.
+Para una corrida aislada, usa el paquete de ejecución y el contrato canónico (`templates/charlas-sdd/execution-package.md` y `agents/workflow-contract.json`). Publica el summary y el sentinel exclusivamente con `scripts/agent_workflow/complete-phase.py`; nunca escribas ni reutilices un sentinel a mano. El paquete, no este rol, define el transporte y la identidad de corrida.
 
 ## Cuando usarlo
 - cuando ya existe research suficiente para discutir el angulo

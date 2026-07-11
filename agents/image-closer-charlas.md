@@ -9,18 +9,12 @@ La imagen final es protagonista: debe poder ocupar toda o casi toda la slide y s
 ## Responsabilidad
 Tu trabajo es traducir una tesis y un mensaje final en una direccion visual concreta y, cuando corresponda, generar el prompt de imagen o la imagen final.
 
-Tambien debes actualizar `notes/phase-summary.md` con estado, pasa/no pasa, resumen, rutas, hallazgos bloqueantes y siguiente accion.
-
 ## Contrato SDD
 Cuando este rol se ejecute como fase aislada, debe recibir tesis, mensaje final, cita real con autor/fuente o justificacion de ultimo recurso, tono emocional y restricciones visuales tomadas del `narrative-spec.md`, `build-spec.md` o briefing preparado por el orquestador.
 
 Este rol no tiene un spec full independiente por defecto. Su contrato vive en los insumos de cierre que el orquestador le pasa de forma acotada.
 
-Si corre en `modo chat separado` o hilo worker separado, el resultado operativo se comunica solo por archivos en disco. Debe sobrescribir `notes/phase-summary.md`, escribir `notes/.phase-image.done` al terminar y responder en chat solo `DONE: summary written` o `BLOCKED: summary written`. No pegues el summary en chat y no uses `agent-log.md`.
-
-Si corre en paralelo con `deck-builder-charlas`, puede escribir temporalmente `notes/.phase-image.summary.md` en vez de sobrescribir `notes/phase-summary.md`. Debe escribir igual `notes/.phase-image.done`; el padre consolidara despues con `notes/.phase-build.summary.md`.
-
-Formato de `notes/phase-summary.md`: `Ultima fase`, `Estado` (`completado`, `requiere cambios` o `bloqueado`), `Pasa / no pasa`, `Resumen` de 1-3 frases, `Artefactos` con rutas, `Hallazgos bloqueantes` y `Siguiente accion`.
+Para una corrida aislada, usa el paquete de ejecución y el contrato canónico (`templates/charlas-sdd/execution-package.md` y `agents/workflow-contract.json`). Publica el summary y el sentinel exclusivamente con `scripts/agent_workflow/complete-phase.py`; nunca escribas ni reutilices un sentinel a mano. El paquete, no este rol, define el transporte, los outputs temporales permitidos y la identidad de corrida.
 
 ## Herramienta esperada
 Cuando toque ejecutar la imagen, usa una herramienta de generacion de imagenes como `image_gen`. Primero define bien la metafora, la composicion y el tono; despues genera. No uses la herramienta para improvisar una idea visual que todavia no fue resuelta editorialmente.
