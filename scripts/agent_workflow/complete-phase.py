@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from contextlib import contextmanager
 from datetime import datetime
 import importlib.util
 import json
@@ -48,6 +49,32 @@ def _stale_sentinel_error(sentinel: Path, run_id: str) -> str | None:
     return None
 
 
+@contextmanager
+def _sentinel_claim(sentinel: Path):
+    """Serialize stale-sentinel validation and publication for one phase."""
+    lock_path = sentinel.parent / f"{sentinel.name}.lock"
+    with lock_path.open("a+b") as lock:
+        lock.seek(0)
+        lock.write(b"0")
+        lock.flush()
+        lock.seek(0)
+        try:
+            import msvcrt
+
+            msvcrt.locking(lock.fileno(), msvcrt.LK_LOCK, 1)
+            unlock = lambda: msvcrt.locking(lock.fileno(), msvcrt.LK_UNLCK, 1)
+        except ImportError:
+            import fcntl
+
+            fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+            unlock = lambda: fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
+        try:
+            yield
+        finally:
+            lock.seek(0)
+            unlock()
+
+
 def _write_atomically(sentinel: Path, payload: dict[str, object]) -> None:
     with tempfile.NamedTemporaryFile(
         mode="w", encoding="utf-8", dir=sentinel.parent, prefix=f".{sentinel.name}.", suffix=".tmp", delete=False,
@@ -81,7 +108,10 @@ def main() -> int:
         return 1
 
     contract = json.loads(Path(args.contract).read_text(encoding="utf-8"))
-    summary_path = Path(args.summary)
+    summary_path = Path(args.summary).resolve()
+    if summary_path.parent.name != "notes" or summary_path.name != "phase-summary.md":
+        print("ERROR: --summary must resolve to <talk>/notes/phase-summary.md")
+        return 1
     summary = workflow_contract.parse_summary(summary_path)
     errors = workflow_contract.validate_transition(summary, contract)
     errors.extend(_identity_errors(summary, args))
@@ -96,21 +126,22 @@ def main() -> int:
         return 1
 
     sentinel = summary_path.parent / phase_contract["sentinel"]
-    stale_error = _stale_sentinel_error(sentinel, args.run_id)
-    if stale_error:
-        print(f"ERROR: {stale_error}")
-        return 1
+    with _sentinel_claim(sentinel):
+        stale_error = _stale_sentinel_error(sentinel, args.run_id)
+        if stale_error:
+            print(f"ERROR: {stale_error}")
+            return 1
 
-    payload = {
-        "contract_version": contract["contract_version"],
-        "run_id": args.run_id,
-        "phase": args.phase,
-        "attempt": args.attempt,
-        "execution_status": _scalar(summary, "execution status"),
-        "summary": f"{summary_path.parent.name}/{summary_path.name}",
-        "completed_at": datetime.now(launched_at.tzinfo).isoformat(),
-    }
-    _write_atomically(sentinel, payload)
+        payload = {
+            "contract_version": contract["contract_version"],
+            "run_id": args.run_id,
+            "phase": args.phase,
+            "attempt": args.attempt,
+            "execution_status": _scalar(summary, "execution status"),
+            "summary": f"{summary_path.parent.name}/{summary_path.name}",
+            "completed_at": datetime.now(launched_at.tzinfo).isoformat(),
+        }
+        _write_atomically(sentinel, payload)
     print(f"COMPLETED: {sentinel}")
     return 0
 

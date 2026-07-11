@@ -1,10 +1,12 @@
 import importlib.util
 import json
+import msvcrt
 import os
 import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from datetime import datetime
 from pathlib import Path
@@ -55,7 +57,7 @@ class WorkflowContractTests(unittest.TestCase):
         now = datetime.now().timestamp()
         os.utime(sentinel, (now, now))
 
-    def complete_phase(self, summary, **overrides):
+    def complete_phase_command(self, summary, **overrides):
         arguments = {
             "run_id": "review-contract-20260710-1200",
             "phase": "review-final",
@@ -63,18 +65,33 @@ class WorkflowContractTests(unittest.TestCase):
             "launched_at": "2026-07-10T12:00:00-05:00",
         }
         arguments.update(overrides)
+        return [
+            sys.executable, str(COMPLETE_PHASE_PATH),
+            "--contract", str(ROOT / "agents" / "workflow-contract.json"),
+            "--summary", str(summary),
+            "--run-id", arguments["run_id"],
+            "--phase", arguments["phase"],
+            "--attempt", arguments["attempt"],
+            "--launched-at", arguments["launched_at"],
+        ]
+
+    def complete_phase(self, summary, **overrides):
         return subprocess.run(
-            [
-                sys.executable, str(COMPLETE_PHASE_PATH),
-                "--contract", str(ROOT / "agents" / "workflow-contract.json"),
-                "--summary", str(summary),
-                "--run-id", arguments["run_id"],
-                "--phase", arguments["phase"],
-                "--attempt", arguments["attempt"],
-                "--launched-at", arguments["launched_at"],
-            ],
+            self.complete_phase_command(summary, **overrides),
             capture_output=True, text=True, check=False,
         )
+
+    def hold_publish_lock(self, sentinel):
+        lock_path = sentinel.parent / f"{sentinel.name}.lock"
+        lock = lock_path.open("a+b")
+        lock.seek(0)
+        lock.write(b"0")
+        lock.flush()
+        lock.seek(0)
+        msvcrt.locking(lock.fileno(), msvcrt.LK_LOCK, 1)
+        self.addCleanup(lambda: lock_path.unlink(missing_ok=True))
+        self.addCleanup(lock.close)
+        return lock
 
     def test_valid_summary_has_no_errors(self):
         summary, _ = self.copy_valid_summary()
@@ -226,6 +243,45 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertEqual(1, result.returncode)
         self.assertIn("stale", result.stdout.lower())
         self.assertEqual("old-run-20260709-1200", json.loads(sentinel.read_text(encoding="utf-8"))["run_id"])
+
+    def test_complete_phase_rejects_sentinel_claimed_by_other_run_during_publish(self):
+        temp_dir = tempfile.TemporaryDirectory()
+        notes = Path(temp_dir.name) / "notes"
+        notes.mkdir()
+        summary = notes / "phase-summary.md"
+        shutil.copy(FIXTURES / "valid-phase-summary.md", summary)
+        sentinel = notes / ".phase-review-final.done"
+        self.addCleanup(temp_dir.cleanup)
+        lock = self.hold_publish_lock(sentinel)
+
+        process = subprocess.Popen(self.complete_phase_command(summary), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        time.sleep(0.2)
+        waiting = process.poll() is None
+        try:
+            self.write_sentinel(summary, sentinel, "review-final", run_id="old-run-20260709-1200")
+        finally:
+            lock.seek(0)
+            msvcrt.locking(lock.fileno(), msvcrt.LK_UNLCK, 1)
+        stdout, stderr = process.communicate(timeout=5)
+
+        self.assertTrue(waiting, "publisher should wait for the sentinel claim")
+        self.assertEqual(1, process.returncode, stderr)
+        self.assertIn("stale", stdout.lower())
+        self.assertEqual("old-run-20260709-1200", json.loads(sentinel.read_text(encoding="utf-8"))["run_id"])
+
+    def test_complete_phase_rejects_noncanonical_summary_path(self):
+        temp_dir = tempfile.TemporaryDirectory()
+        notes = Path(temp_dir.name) / "notes"
+        notes.mkdir()
+        summary = notes / "review-summary.md"
+        shutil.copy(FIXTURES / "valid-phase-summary.md", summary)
+        self.addCleanup(temp_dir.cleanup)
+
+        result = self.complete_phase(summary)
+
+        self.assertEqual(1, result.returncode)
+        self.assertIn("notes/phase-summary.md", result.stdout)
+        self.assertFalse((notes / ".phase-review-final.done").exists())
 
 
 if __name__ == "__main__":
