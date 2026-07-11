@@ -35,7 +35,7 @@ Default: `standard`.
 - publicación de `research` conforme al paquete de ejecución y contrato canónico
 
 ## Decision de continuidad
-- seguir a build-review package
+- seguir a build package
 - reformular
 - profundizar con full research spec
 - descartar

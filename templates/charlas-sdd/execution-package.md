@@ -14,6 +14,10 @@ Paquete acotado para una sola corrida aislada. Completar todos los campos antes 
 ## role
 <agents/<role>.md>
 
+## worker identity
+- worker_id: `<stable worker identifier>`
+- session_id: `<isolated session identifier>`
+
 ## spec
 <talk-relative path to the applicable spec or package>
 

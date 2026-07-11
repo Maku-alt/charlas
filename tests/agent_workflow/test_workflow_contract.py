@@ -404,6 +404,21 @@ class WorkflowContractTests(unittest.TestCase):
                 self.assertEqual(1, result.returncode)
                 self.assertIn(f"Phase research {expected}", result.stdout)
 
+    def test_compact_review_must_use_a_distinct_worker_and_session_from_build(self):
+        build = {"worker_id": "builder-7", "session_id": "build-session-12"}
+
+        for review, expected in (
+            ({"worker_id": "builder-7", "session_id": "review-session-13"}, "worker_id"),
+            ({"worker_id": "reviewer-8", "session_id": "build-session-12"}, "session_id"),
+        ):
+            with self.subTest(review=review):
+                errors = self.workflow_contract.validate_compact_review_independence(
+                    build,
+                    review,
+                    independence_required=True,
+                )
+                self.assertTrue(any(expected in error for error in errors), errors)
+
 
 if __name__ == "__main__":
     unittest.main()

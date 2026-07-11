@@ -15,7 +15,8 @@ Usa `full/` cuando la charla tenga tesis incierta, research externo, claims sens
 Usa `compact/` cuando la charla sea pequena, tenga tesis clara o no tenga claims sensibles:
 
 1. `research-package.md`
-2. `build-review-package.md`
+2. `build-package.md`
+3. `review-package.md`
 
 ## Paquete de ejecucion
 Cada fase pesada debe recibir:

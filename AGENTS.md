@@ -53,7 +53,7 @@ Si hubo research externo, `notes/bibliografia.md` es obligatorio. Si corrio una 
 La metodologia vive en `templates/charlas-sdd/`.
 
 - Usa `full/` para charlas normales o complejas: `thesis-spec.md`, `research-spec.md`, `narrative-spec.md`, `build-spec.md` y `review-spec.md`.
-- Usa `compact/` para charlas pequenas o con framing claro: `research-package.md` y `build-review-package.md`.
+- Usa `compact/` para charlas pequenas o con framing claro: `research-package.md`, `build-package.md` y `review-package.md`.
 - Usa los prompts de `templates/charlas-sdd/prompts/` para acotar cada fase.
 
 ## Build PPTX

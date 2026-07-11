@@ -15,4 +15,4 @@ Devuelve:
 - cierre tentativo
 - contenido para `notes/bibliografia.md`, si hubo fuentes externas
 - publicación validada de `research` conforme al paquete de ejecución
-- decision: `seguir a build-review package`, `reformular`, `profundizar con full research spec` o `descartar`
+- decision: `seguir a build package`, `reformular`, `profundizar con full research spec` o `descartar`

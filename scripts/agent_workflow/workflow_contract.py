@@ -18,6 +18,27 @@ REQUIRED_FIELDS = (
 ARTIFACT_PHASES = {"build", "review", "review-final", "build-fix"}
 
 
+def validate_compact_review_independence(
+    build_identity: dict[str, str],
+    review_identity: dict[str, str],
+    *,
+    independence_required: bool,
+) -> list[str]:
+    """Reject compact review identity reuse when an independent review is required."""
+    if not independence_required:
+        return []
+
+    errors: list[str] = []
+    for field in ("worker_id", "session_id"):
+        build_value = build_identity.get(field, "").strip()
+        review_value = review_identity.get(field, "").strip()
+        if build_value and build_value == review_value:
+            errors.append(
+                f"Compact review {field} must differ from compact build when independence is required"
+            )
+    return errors
+
+
 def parse_summary(path: str | Path) -> dict[str, str]:
     """Return normalized H2 Markdown blocks from a phase summary."""
     text = Path(path).read_text(encoding="utf-8")

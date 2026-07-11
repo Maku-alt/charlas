@@ -68,6 +68,6 @@ Si no puedes cerrar el build, no quedes en loop silencioso. Devuelve un reporte 
 - `Riesgos residuales`
 - `Accion siguiente propuesta`
 
-No hagas la review final salvo que el encargo indique modo compacto. En `build-fix`, la review final siempre corresponde a `review-charlas`.
+No hagas la review final. Tanto en flujo full como compacto, la review corresponde a `review-charlas` y debe ser independiente del build. En `build-fix`, la review final siempre corresponde a `review-charlas`.
 
 No delegues implicitamente el cierre del build al padre. O entregas `completado con artefacto`, o entregas `bloqueado con evidencia`, o indicas `requiere volver a fase anterior`.
