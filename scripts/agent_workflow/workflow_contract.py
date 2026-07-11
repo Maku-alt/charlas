@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+import json
 from pathlib import Path
 import re
 from typing import Any
@@ -92,21 +93,32 @@ def _run_launch_timestamp(run_id: str) -> float | None:
     return datetime.strptime("".join(match.groups()), "%Y%m%d%H%M").timestamp()
 
 
-def _validate_sentinel(summary: dict[str, str], sentinel: Path) -> list[str]:
+def _validate_sentinel(
+    summary: dict[str, str], sentinel: Path, contract: dict[str, Any], summary_path: Path,
+) -> list[str]:
     errors: list[str] = []
     if not sentinel.is_file():
         return [f"Missing sentinel: {sentinel}"]
-    values: dict[str, str] = {}
-    for line in sentinel.read_text(encoding="utf-8").splitlines():
-        if ":" in line:
-            key, value = line.split(":", 1)
-            values[key.strip().lower().replace("_", " ")] = value.strip()
-    run_id = _scalar(summary, "run id")
-    attempt = _scalar(summary, "attempt")
-    if values.get("run id") != run_id:
-        errors.append("Sentinel run ID does not match summary")
-    if values.get("attempt") != attempt:
-        errors.append("Sentinel attempt does not match summary")
+    try:
+        values = json.loads(sentinel.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return ["Sentinel must contain valid JSON"]
+    if not isinstance(values, dict):
+        return ["Sentinel must contain a JSON object"]
+
+    expected = {
+        "contract_version": contract.get("contract_version"),
+        "run_id": _scalar(summary, "run id"),
+        "phase": _scalar(summary, "phase"),
+        "attempt": int(_scalar(summary, "attempt")) if _scalar(summary, "attempt").isdigit() else None,
+        "execution_status": _scalar(summary, "execution status"),
+        "summary": f"{summary_path.parent.name}/{summary_path.name}",
+    }
+    for field, expected_value in expected.items():
+        if values.get(field) != expected_value:
+            errors.append(f"Sentinel {field.replace('_', ' ')} does not match summary")
+
+    run_id = expected["run_id"]
     launch = _run_launch_timestamp(run_id)
     if launch is None:
         errors.append("Run ID must end in -YYYYMMDD-HHMM")
@@ -116,13 +128,14 @@ def _validate_sentinel(summary: dict[str, str], sentinel: Path) -> list[str]:
 
 
 def _validate_summary(path: str | Path, contract: dict[str, Any], sentinel: Path | None = None) -> list[str]:
-    summary = parse_summary(path)
+    summary_path = Path(path)
+    summary = parse_summary(summary_path)
     errors = validate_transition(summary, contract)
     phase = _scalar(summary, "phase")
     phase_contract = contract.get("phases", {}).get(phase)
     if phase_contract:
-        expected = Path(path).parent / phase_contract["sentinel"]
-        errors.extend(_validate_sentinel(summary, sentinel or expected))
+        expected = summary_path.parent / phase_contract["sentinel"]
+        errors.extend(_validate_sentinel(summary, sentinel or expected, contract, summary_path))
     return errors
 
 
