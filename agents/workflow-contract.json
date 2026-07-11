@@ -3,6 +3,18 @@
   "execution_statuses": ["completed", "blocked"],
   "decisions": ["advance", "iterate", "return", "stop"],
   "review_verdicts": ["not_applicable", "approved", "requires_changes"],
+  "auxiliary_roles": {
+    "advisor-charlas": {
+      "role": "agents/advisor-charlas.md",
+      "request_template": "templates/charlas-sdd/advisor-request.md",
+      "prompt": "templates/charlas-sdd/prompts/run-advisor.md",
+      "owns_phase": false,
+      "may_modify_artifacts": false,
+      "may_write_phase_summary": false,
+      "may_approve": false,
+      "may_block": false
+    }
+  },
   "phases": {
     "thesis-review": {
       "sentinel": ".phase-thesis-review.done",

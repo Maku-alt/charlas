@@ -18,12 +18,52 @@ SPEC.loader.exec_module(workflow_contract)
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--contract", required=True)
+    parser.add_argument(
+        "--contract",
+        default=str(Path(__file__).resolve().parents[2] / "agents" / "workflow-contract.json"),
+    )
     parser.add_argument("--summary")
     parser.add_argument("--sentinel")
     parser.add_argument("--template")
+    parser.add_argument("--check-phase-assets", action="store_true")
     args = parser.parse_args()
     contract = json.loads(Path(args.contract).read_text(encoding="utf-8"))
+    if args.check_phase_assets:
+        errors: list[str] = []
+        root = Path(args.contract).resolve().parent.parent
+        phases = contract.get("phases", {})
+        for phase_name, phase in phases.items():
+            prompt = phase.get("prompt")
+            if prompt != "not_applicable" and not (root / "templates" / "charlas-sdd" / "prompts" / prompt).is_file():
+                errors.append(f"Phase {phase_name} references missing prompt: {prompt}")
+
+        for role_name, role in contract.get("auxiliary_roles", {}).items():
+            required_flags = {
+                "owns_phase": False,
+                "may_modify_artifacts": False,
+                "may_write_phase_summary": False,
+                "may_approve": False,
+                "may_block": False,
+            }
+            for field, expected in required_flags.items():
+                if role.get(field) is not expected:
+                    errors.append(f"Auxiliary role {role_name} must set {field} to {expected}")
+            for field in ("role", "request_template", "prompt"):
+                asset = role.get(field)
+                if not isinstance(asset, str) or not (root / asset).is_file():
+                    errors.append(f"Auxiliary role {role_name} references missing {field}: {asset}")
+            if role_name in phases or any(role_name in phase.get("next", []) for phase in phases.values()):
+                errors.append(f"Auxiliary role {role_name} must be absent from the phase transition graph")
+
+        if errors:
+            for error in errors:
+                print(f"ERROR: {error}")
+            return 1
+        for role_name in contract.get("auxiliary_roles", {}):
+            print(f"VALID AUXILIARY ROLE {role_name}")
+            print(f"AUXILIARY ROLE {role_name} absent from phase transition graph")
+        print("VALID PHASE ASSETS")
+        return 0
     if args.template:
         fields = workflow_contract.parse_summary(args.template)
         missing = [field for field in workflow_contract.REQUIRED_FIELDS if field not in fields]

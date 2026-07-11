@@ -9,6 +9,7 @@ Esta carpeta contiene roles especializados. El chat principal usa `orchestrator-
 - `deck-builder-charlas`: construye decks `pptx` nuevos con el renderer local del repo desde `deck-spec.json` y evidencia de QA; `pptx` queda solo para emergencia o diagnostico avanzado.
 - `image-closer-charlas`: define metafora e imagen editorial de cierre.
 - `review-charlas`: valida el artefacto exacto antes de cerrar.
+- `advisor-charlas`: recomienda sobre tradeoffs transversales complejos; no es fase ni tiene autoridad de gate, aprobaciÃ³n, bloqueo o mutaciÃ³n.
 
 ## Fuentes de verdad
 
@@ -22,6 +23,8 @@ Esta carpeta contiene roles especializados. El chat principal usa `orchestrator-
 | Talk-specific requirements | `<talk>/specs/*.md` |
 | Worker launch boundary | `templates/charlas-sdd/prompts/*.md` |
 | Current operational state | `<talk>/notes/phase-summary.md` |
+
+`advisor-charlas` solo se activa por un trigger complejo documentado. Su evidencia queda en `<talk>/notes/advice/`; no escribe ni reemplaza el handoff operacional `notes/phase-summary.md`.
 
 `agents/runtime-defaults.json` contiene preferencias de runtime, no reglas de validez del workflow. Si un modelo solicitado no esta disponible, solo puede usarse un fallback cuando el paquete de ejecucion registre el modelo solicitado y el modelo realmente usado. El orquestador hereda el modelo activo del thread; este archivo no cambia por si solo el thread padre. Con la configuracion root actual, el default es `gpt-5.6-terra` con razonamiento `medium`.
 

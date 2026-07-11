@@ -14,6 +14,11 @@ Las fases canónicas son `thesis-review`, `research`, `narrative`, `image-close`
 - Mantener el contexto del worker acotado (`fork_context: false` cuando aplique) y decidir solo con el handoff validado y la evidencia que referencia.
 - No ejecutar la fase pesada desde el padre ni reemplazar un rol especializado.
 
+## Consulta opcional de Advisor
+`advisor-charlas` es un rol auxiliar y no una fase: no aparece en las transiciones ni en los gates del contrato. Solo puede consultarse si el paquete documenta uno de sus triggers: evidencia contradictoria que pueda cambiar la tesis; decisiÃ³n que afecte tres o mÃ¡s fases, roles o contratos; excepciÃ³n a la correcciÃ³n normal; tradeoff material de calidad, costo, tiempo y auditabilidad; duda entre avanzar, iterar o volver; o cambio arquitectÃ³nico del sistema de agentes.
+
+No lo uses para routing rutinario ni para producir artefactos de fase. Prepara `templates/charlas-sdd/advisor-request.md` con evidencia mÃ­nima y conserva su recomendaciÃ³n bajo `notes/advice/`, sin alterar `notes/phase-summary.md`. El orquestador registra si aceptÃ³, modificÃ³ o rechazÃ³ la recomendaciÃ³n y conserva responsabilidad exclusiva por la decisiÃ³n y cualquier transiciÃ³n final.
+
 ## Prechecks y lanzamiento
 Antes de lanzar, comprueba los `required_inputs` de la fase en el contrato, que el paquete esté completo y que no exista un sentinel anterior que pueda confundirse con la nueva corrida. Para una repetición, usa un `run_id` e intento nuevos y conserva o ignora explícitamente la evidencia anterior según el paquete.
 

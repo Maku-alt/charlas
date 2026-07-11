@@ -283,6 +283,70 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("notes/phase-summary.md", result.stdout)
         self.assertFalse((notes / ".phase-review-final.done").exists())
 
+    def test_advisor_is_auxiliary_and_not_a_phase(self):
+        advisor = self.contract["auxiliary_roles"]["advisor-charlas"]
+        self.assertNotIn("advisor-charlas", self.contract["phases"])
+        self.assertEqual("agents/advisor-charlas.md", advisor["role"])
+        self.assertEqual(
+            "templates/charlas-sdd/advisor-request.md",
+            advisor["request_template"],
+        )
+        self.assertEqual("templates/charlas-sdd/prompts/run-advisor.md", advisor["prompt"])
+
+    def test_advisor_has_no_transition_or_gate_authority(self):
+        advisor = self.contract["auxiliary_roles"]["advisor-charlas"]
+        self.assertFalse(advisor["owns_phase"])
+        self.assertFalse(advisor["may_approve"])
+        self.assertFalse(advisor["may_block"])
+        self.assertNotIn("next", advisor)
+        self.assertNotIn("advisor-charlas", {
+            next_phase
+            for phase in self.contract["phases"].values()
+            for next_phase in phase["next"]
+        })
+
+    def test_advisor_cannot_write_phase_summary_or_mutate_artifacts(self):
+        advisor = self.contract["auxiliary_roles"]["advisor-charlas"]
+        role = (ROOT / advisor["role"]).read_text(encoding="utf-8")
+        self.assertFalse(advisor["may_modify_artifacts"])
+        self.assertFalse(advisor["may_write_phase_summary"])
+        self.assertIn("No modifica", role)
+        self.assertIn("no escribe `notes/phase-summary.md`", role)
+
+    def test_advisor_request_requires_a_concrete_decision(self):
+        request = (ROOT / "templates" / "charlas-sdd" / "advisor-request.md").read_text(encoding="utf-8")
+        self.assertIn("## decision question", request)
+        self.assertIn("concreta", request)
+        self.assertIn("## current phase", request)
+        self.assertIn("## affected phases", request)
+        self.assertIn("## alternatives already considered", request)
+
+    def test_advisor_output_records_assumptions_options_tradeoffs_and_recommendation(self):
+        role = (ROOT / "agents" / "advisor-charlas.md").read_text(encoding="utf-8")
+        for field in (
+            "Recommendation",
+            "Why",
+            "Alternatives considered",
+            "Tradeoffs",
+            "Assumptions",
+            "Risks",
+            "Evidence paths",
+            "Confidence",
+            "Decision owner: orchestrator",
+        ):
+            with self.subTest(field=field):
+                self.assertIn(field, role)
+
+    def test_advisor_sentinel_matches_request_run_id(self):
+        request = (ROOT / "templates" / "charlas-sdd" / "advisor-request.md").read_text(encoding="utf-8")
+        prompt = (ROOT / "templates" / "charlas-sdd" / "prompts" / "run-advisor.md").read_text(encoding="utf-8")
+        self.assertIn("<talk>/notes/advice/<run-id>-advisor.md", request)
+        self.assertIn("<talk>/notes/advice/.advisor-<run-id>.done", request)
+        self.assertIn("request `run_id`", request)
+        self.assertIn("actual model", request)
+        self.assertIn("completion timestamp", request)
+        self.assertIn("run-aware advisory sentinel", prompt)
+
 
 if __name__ == "__main__":
     unittest.main()
