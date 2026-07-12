@@ -65,23 +65,26 @@ def test_minimal_sentinel_contains_only_required_completion_metadata(self):
         notes = Path(temp_dir) / "notes"
         notes.mkdir()
         summary = notes / "phase-summary.md"
-        self.write_valid_review_final(summary)
+        shutil.copy(self.fixture, summary)
 
-        result = self.complete_phase(summary)
+        result = self.complete_phase(
+            summary,
+            run_id="research-contract-20260710-1200",
+            phase="research",
+        )
 
         self.assertEqual(0, result.returncode, result.stdout)
-        payload = json.loads((notes / ".phase-review-final.done").read_text(encoding="utf-8"))
+        payload = json.loads((notes / ".phase-research.done").read_text(encoding="utf-8"))
         self.assertEqual(
             {
                 "contract_version", "run_id", "phase", "attempt",
                 "execution_status", "summary", "completed_at",
-                "worker_id", "session_id",
             },
             set(payload),
         )
 ```
 
-Mantener tests de candidato/hash en `build` y `review`; eliminar los tests cuya unica conducta sea crear, preservar o validar `phase-summary.<run_id>.md`.
+Mantener tests de candidato/hash en `build`, `review` y release; eliminar los tests cuya unica conducta sea crear, preservar o validar `phase-summary.<run_id>.md`.
 
 - [ ] **Step 2: Ejecutar las pruebas y confirmar RED**
 
@@ -446,4 +449,3 @@ Expected: los cambios implementados estan comprometidos; cualquier residuo preex
 - [ ] **Step 5: Solicitar code review**
 
 Invocar la skill `requesting-code-review`. Si CodeRabbit esta disponible y autenticado, ejecutar su review sobre `develop...HEAD`; si no, informar la limitacion exacta sin atribuirle una revision manual.
-
