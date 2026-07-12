@@ -967,6 +967,24 @@ class WorkflowContractTests(unittest.TestCase):
             self.contract["required_sentinel_fields"],
         )
 
+    def test_agent_workflow_learning_note_teaches_the_minimal_handoff(self):
+        note = (
+            ROOT / "agentes-modulares" / "notes" / "aprendizaje-workflow-agentes.md"
+        ).read_text(encoding="utf-8")
+
+        for heading in (
+            "## Antes",
+            "## Cambio central",
+            "## Flujo",
+            "## Controles minimos",
+            "## Por que importa",
+        ):
+            with self.subTest(heading=heading):
+                self.assertIn(heading, note)
+        self.assertLessEqual(len(note.splitlines()), 120)
+        self.assertNotIn("phase-summary.<run_id>.md", note)
+        self.assertNotIn("summary_sha256", note)
+
     def test_operational_docs_use_only_the_current_phase_summary(self):
         targets = [
             "README.md",

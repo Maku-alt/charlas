@@ -33,8 +33,20 @@ Se extrajo y registró la transcripción original del video como insumo prelimin
 - `agentes-modulares/notes/transcripcion.md`
 - `agentes-modulares/notes/research-video.md`
 
+## Worker ID
+none
+
+## Session ID
+none
+
 ## Candidate artifact
 none
+
+## Candidate SHA256
+none
+
+## Workflow mode
+full
 
 ## Final artifact
 none
