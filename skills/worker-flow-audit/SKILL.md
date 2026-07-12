@@ -204,6 +204,7 @@ Expected repo conventions:
 
 ```text
 notes/phase-summary.md
+notes/phase-summary.<run_id>.md (immutable snapshot named by the sentinel)
 notes/.phase-<phase>.done (JSON, validated against the execution package)
 review/<run-id>/
 slides/<run-id>/
@@ -211,7 +212,9 @@ slides/<run-id>/
 
 Expected phases and sentinel names come from `agents/workflow-contract.json`. Expected charla phases include `thesis-review`, `research`, `narrative`, `image-close`, `build`, `review`, `build-fix`, `review-final`, and `release`.
 
-For every completed phase, use `scripts/agent_workflow/validate-workflow.py` to validate the summary and sentinel. A sentinel confirms completion only when its run ID, phase, attempt and summary path match the execution package; existence or timestamp alone is insufficient.
+For every completed phase, use `scripts/agent_workflow/validate-workflow.py` to validate the summary and sentinel. A sentinel confirms completion only when its run ID, phase, attempt and summary path match the execution package; existence or timestamp alone is insufficient. The sentinel must carry `contract_version`, `run_id`, `phase`, `attempt`, `execution_status`, `summary`, `summary_sha256`, and `completed_at`.
+
+For transitions, the parent reads only `notes/phase-summary.md`, the mutable current summary. For historical validation and audits, read only `notes/phase-summary.<run_id>.md` named by the sentinel and verify `summary_sha256`; the mutable current summary is not historical evidence.
 
 For PPTX flows, validate:
 

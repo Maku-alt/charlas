@@ -103,6 +103,10 @@ Si hay duda sobre en que fase esta una charla o que agente deberia correr primer
 
 Este repo no esta orientado a generar imagenes sueltas. La imagen final existe para cerrar una charla ya estructurada.
 
+## Historial inmutable del workflow v2
+
+Para transiciones, el padre lee solo `notes/phase-summary.md`, el mutable current summary. Al completar una fase, `scripts/agent_workflow/complete-phase.py` toma un snapshot del contenido validado exacto en `notes/phase-summary.<run_id>.md`; el sentinel incluye `contract_version`, `run_id`, `phase`, `attempt`, `execution_status`, la ruta del snapshot, `summary_sha256` y `completed_at`. La validación histórica y las auditorías leen exclusivamente el snapshot inmutable nombrado por el sentinel y verifican `summary_sha256`; el mutable current summary no es evidencia histórica.
+
 ## Inicio rapido del workflow v2
 
 Para una charla nueva o reabierta, opera en cinco pasos:
@@ -110,7 +114,7 @@ Para una charla nueva o reabierta, opera en cinco pasos:
 1. Elige `templates/charlas-sdd/full/` para una charla normal o compleja, o `templates/charlas-sdd/compact/` cuando el framing ya sea claro.
 2. Copia los specs elegidos a `<talk>/specs/` y completa solo los requisitos concretos de esa charla.
 3. Copia `templates/charlas-sdd/execution-package.md` y registra `run_id`, intento, fase, rol, entradas permitidas, salidas, criterios de aceptacion y runtime real.
-4. Lanza el rol aislado con su prompt de `templates/charlas-sdd/prompts/`; el worker escribe primero `notes/phase-summary.md` y publica el sentinel mediante `scripts/agent_workflow/complete-phase.py`.
+4. Lanza el rol aislado con su prompt de `templates/charlas-sdd/prompts/`; el worker escribe primero `notes/phase-summary.md`, luego `scripts/agent_workflow/complete-phase.py` snapshot el contenido validado exacto en `notes/phase-summary.<run_id>.md` y finalmente publica el sentinel.
 5. Valida el handoff y, si pasa, aplica la transicion del contrato:
 
    ```powershell

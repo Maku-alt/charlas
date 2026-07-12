@@ -57,6 +57,8 @@ Si hubo research externo, el handoff tambien debe incluir `notes/bibliografia.md
 ## Phase summary
 `notes/phase-summary.md` reemplaza cualquier bitacora operativa. Debe representar el estado actual y ser lo unico que el hilo padre lee para avanzar.
 
+Para transiciones, el padre lee solo `notes/phase-summary.md`, el mutable current summary. Al completar una fase, `scripts/agent_workflow/complete-phase.py` toma un snapshot del contenido validado exacto en `notes/phase-summary.<run_id>.md`; el sentinel registra esa ruta y `summary_sha256`, junto con `contract_version`, `run_id`, `phase`, `attempt`, `execution_status` y `completed_at`. La validacion historica y las auditorias usan exclusivamente el snapshot inmutable nombrado por el sentinel; el mutable current summary no es evidencia historica.
+
 Formato minimo: usar exactamente `templates/charlas-sdd/phase-summary.md`. La combinacion de `Execution status`, `Decision` y `Review verdict` reemplaza campos ambiguos: una fase que termino pero requiere otra iteracion registra `completed`, `iterate` y el veredicto que corresponda.
 
 No pegues outputs de comandos, renders, transcripts ni reportes completos en el padre. Escribe evidencia larga a archivos y referencia rutas.

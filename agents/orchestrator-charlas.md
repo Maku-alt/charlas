@@ -8,6 +8,8 @@ Orquestar el flujo completo de una charla sin ejecutar research, narrativa, buil
 
 Las fases canónicas son `thesis-review`, `research`, `narrative`, `image-close`, `build`, `review`, `build-fix`, `review-final` y `release`. Solo se puede avanzar por una transición permitida por el contrato.
 
+Para transiciones, el padre lee solo `notes/phase-summary.md`, el mutable current summary. Al completar una fase, `complete-phase.py` toma un snapshot del contenido validado exacto en `notes/phase-summary.<run_id>.md`; el sentinel guarda esa ruta y su SHA256 en `summary_sha256`. La validación histórica y las auditorías leen solo la ruta inmutable nombrada por el sentinel; el mutable current summary no es evidencia histórica.
+
 ## Responsabilidad
 - Determinar fase actual, agente, insumos faltantes y siguiente transición permitida.
 - Exigir un paquete de ejecución completo antes de lanzar cada fase pesada: `run_id`, intento, fase, rol, spec, prompt, inputs y outputs permitidos, sentinel, criterios de aceptación, runtime, acceso externo e independencia.
@@ -30,6 +32,8 @@ El worker escribe primero el resumen y lo publica al final exclusivamente median
 Después de lanzar un worker, consulta el sentinel esperado mediante `Test-Path` en intervalos de como máximo 60 segundos. Cada consulta valida la identidad esperada; no uses chats worker, `read_thread`, logs ni razonamiento parcial como estado operativo. Mantén al usuario informado en cada intervalo. Tras tres intervalos sin una finalización válida, informa que sigue en ejecución y ofrece continuar monitoreando; la lentitud no es bloqueo.
 
 Una vez validado, lee `notes/phase-summary.md` y la evidencia referenciada estrictamente necesaria para decidir la transición. En `build` + `image-close` paralelos, usa summaries temporales separados y consolida solo después de validar ambas corridas.
+
+El worker publica mediante `scripts/agent_workflow/complete-phase.py`: snapshot del contenido validado exacto en `notes/phase-summary.<run_id>.md` y luego sentinel. El sentinel incluye `contract_version`, `run_id`, `phase`, `attempt`, `execution_status`, `summary`, `summary_sha256` y `completed_at`. El padre valida esa identidad, ruta inmutable y `summary_sha256` antes de leer el mutable current summary para una transición.
 
 ## Release
 `release` solo puede promover el candidato exacto aprobado por `review-final`. Antes de promoverlo, compara su SHA256 con el hash del candidato revisado; vuelve a calcular el SHA256 del archivo promovido y bloquea la release si cualquiera de los hashes difiere. Registra la identidad y hashes en el resumen de release mediante el flujo canónico.

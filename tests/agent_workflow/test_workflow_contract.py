@@ -964,8 +964,47 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("`qa-deck.py` and `validate-powerpoint.ps1`", skill)
         self.assertIn("PowerPoint native remains the final gate", skill)
         self.assertIn("run ID, phase, attempt and summary path", skill)
+        self.assertIn("notes/phase-summary.<run_id>.md", skill)
+        self.assertIn("summary_sha256", skill)
+        self.assertNotIn("mutable current summary as historical evidence", skill)
         self.assertNotIn("@oai/artifact-tool", skill)
         self.assertNotIn("`pptxgenjs` not used", skill)
+
+    def test_operational_docs_distinguish_current_handoff_from_immutable_history(self):
+        self.assertEqual("notes/phase-summary.md", self.contract["current_summary"])
+        self.assertEqual(
+            "notes/phase-summary.<run_id>.md",
+            self.contract["historical_summary_pattern"],
+        )
+        self.assertEqual(
+            [
+                "contract_version",
+                "run_id",
+                "phase",
+                "attempt",
+                "execution_status",
+                "summary",
+                "summary_sha256",
+                "completed_at",
+            ],
+            self.contract["required_sentinel_fields"],
+        )
+
+        operational_docs = [
+            ROOT / "agents" / "orchestrator-charlas.md",
+            ROOT / "templates" / "charlas-sdd" / "execution-package.md",
+            ROOT / "templates" / "charlas-sdd" / "README.md",
+            ROOT / "skills" / "worker-handoff" / "SKILL.md",
+            ROOT / "skills" / "worker-flow-audit" / "SKILL.md",
+            ROOT / "README.md",
+        ]
+        for document in operational_docs:
+            with self.subTest(document=document):
+                text = document.read_text(encoding="utf-8")
+                self.assertIn("notes/phase-summary.<run_id>.md", text)
+                self.assertIn("summary_sha256", text)
+                self.assertIn("mutable current summary", text)
+                self.assertNotIn("mutable current summary as historical evidence", text)
 
     def test_cli_validates_migrated_summary_without_a_completion_sentinel(self):
         with tempfile.TemporaryDirectory() as temp_dir:

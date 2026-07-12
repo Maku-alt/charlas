@@ -81,9 +81,12 @@ Rules:
 
 - The worker writes the summary first.
 - The worker writes the sentinel last.
-- Completion requires a sentinel whose identity matches the expected contract version, run ID, phase, attempt, status, and summary path, plus a valid summary. Sentinel existence alone is not completion.
+- `complete-phase.py` snapshots the exact validated content to `notes/phase-summary.<run_id>.md` before writing the sentinel. The sentinel stores that immutable path and its SHA256 as `summary_sha256`.
+- Completion requires a sentinel with `contract_version`, `run_id`, `phase`, `attempt`, `execution_status`, `summary`, `summary_sha256`, and `completed_at`, whose identity and immutable snapshot validate. Sentinel existence alone is not completion.
 - If relaunching the same phase, the parent deletes, renames, or explicitly ignores the old sentinel.
 - If the sentinel does not exist, the parent does not inspect worker chat to infer status.
+
+For transitions, the parent reads only `notes/phase-summary.md`, the mutable current summary. Historical validation and audits read only `notes/phase-summary.<run_id>.md` named by the sentinel and verify `summary_sha256`; the mutable current summary is not historical evidence.
 
 Suggested generic sentinel names:
 
@@ -147,7 +150,7 @@ Do not paste full logs, transcripts, renders, command output, or raw evidence in
 5. Launch or instruct the worker.
 6. Wait for the sentinel using a filesystem check.
 7. Validate its identity and validate the summary file.
-8. Read only the validated summary file.
+8. Read only the validated mutable current summary file for the transition.
 9. Decide the next transition from the summary.
 10. Read referenced reports only when the summary says they are needed for the transition.
 11. Do not inspect worker chat, logs, or reasoning to make orchestration decisions.
@@ -159,7 +162,7 @@ Do not paste full logs, transcripts, renders, command output, or raw evidence in
 3. Execute the task.
 4. Write outputs and evidence to agreed paths.
 5. Write the summary with current status.
-6. Validate the summary, then write the sentinel last.
+6. Validate the summary, snapshot it to `notes/phase-summary.<run_id>.md`, then write the sentinel last with `summary_sha256`.
 7. Respond only with `DONE: summary written` or `BLOCKED: summary written`.
 
 ## Blocked State
