@@ -984,6 +984,13 @@ class WorkflowContractTests(unittest.TestCase):
                 self.assertNotIn("phase-summary.<run_id>.md", text)
                 self.assertNotIn("summary_sha256", text)
 
+    def test_worker_handoff_does_not_teach_legacy_summary_fields(self):
+        handoff = (ROOT / "skills" / "worker-handoff" / "SKILL.md").read_text(encoding="utf-8")
+
+        self.assertNotIn("## Last phase", handoff)
+        self.assertNotIn("Pass / No Pass", handoff)
+        self.assertIn("templates/charlas-sdd/phase-summary.md", handoff)
+
     def test_cli_validates_migrated_summary_without_a_completion_sentinel(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             notes = Path(temp_dir) / "notes"

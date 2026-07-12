@@ -110,33 +110,7 @@ Repo rules may override exact paths.
 
 The summary must be compact and current. It is not a log.
 
-Use this minimum structure:
-
-```markdown
-# Phase Summary
-
-## Last phase
-[phase name]
-
-## Status
-completed | requires changes | blocked
-
-## Pass / No Pass
-pass | no pass
-
-## Summary
-[1-3 sentences]
-
-## Artifacts
-- [path]
-- [path]
-
-## Blocking findings
-- [finding or "None"]
-
-## Next action
-[one concrete next step]
-```
+Use `templates/charlas-sdd/phase-summary.md` directly; do not maintain another summary template here. It covers the canonical categories for run identity and execution, decision and review, artifacts and evidence, and blockers and next action.
 
 For audits or reviews, include a referenced report path when findings are too detailed for the summary.
 
@@ -189,7 +163,7 @@ For audit-style tasks, the worker should produce:
 - Evidence paths for each finding.
 - Severity or priority.
 - Minimal suggested fix or next action.
-- Pass / no pass decision.
+- Review verdict.
 
 The parent should read the detailed report only after the summary references it and only if it is needed to decide the next transition.
 
@@ -204,7 +178,7 @@ notes/.phase-build.summary.md
 notes/.phase-image.summary.md
 ```
 
-Then the parent waits for both sentinels, reads both summaries, and writes or requests a consolidated summary.
+The parent validates each temporary handoff against its own sentinel, then consolidates both into `notes/phase-summary.md` and validates that consolidated summary. A transition may be decided only from the validated consolidated summary.
 
 ## Repository Adaptation
 
