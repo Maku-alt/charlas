@@ -21,6 +21,7 @@ COMPACT_BOUNDARY_PHASES = {"build", "review"}
 IDENTITY_BOUNDARY_PHASES = {"build", "review", "build-fix", "review-final"}
 WORKFLOW_MODES = {"full", "compact"}
 COMPACT_WORKFLOW_MODE = "compact"
+RUN_ID_PATTERN = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*-\d{8}-\d{4}$")
 
 
 def validate_compact_review_independence(
@@ -273,7 +274,25 @@ def _run_launch_timestamp(run_id: str) -> float | None:
     match = re.search(r"-(\d{8})-(\d{4})$", run_id)
     if not match:
         return None
-    return datetime.strptime("".join(match.groups()), "%Y%m%d%H%M").timestamp()
+    try:
+        return datetime.strptime("".join(match.groups()), "%Y%m%d%H%M").timestamp()
+    except ValueError:
+        return None
+
+
+def is_valid_run_id(run_id: str) -> bool:
+    """Return whether a run ID is a safe lowercase slug with a valid launch timestamp."""
+    return bool(RUN_ID_PATTERN.fullmatch(run_id)) and _run_launch_timestamp(run_id) is not None
+
+
+def _is_timezone_aware_iso8601(value: object) -> bool:
+    if not isinstance(value, str):
+        return False
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError:
+        return False
+    return parsed.tzinfo is not None
 
 
 def _validate_sentinel(
@@ -288,6 +307,12 @@ def _validate_sentinel(
         return ["Sentinel must contain valid JSON"]
     if not isinstance(values, dict):
         return ["Sentinel must contain a JSON object"]
+
+    for field in contract.get("required_sentinel_fields", []):
+        if not values.get(field):
+            errors.append(f"Missing required sentinel field: {field}")
+    if not _is_timezone_aware_iso8601(values.get("completed_at")):
+        errors.append("Sentinel completed at must be a timezone-aware ISO 8601 timestamp")
 
     expected = {
         "contract_version": contract.get("contract_version"),

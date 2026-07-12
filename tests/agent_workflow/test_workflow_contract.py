@@ -72,6 +72,7 @@ class WorkflowContractTests(unittest.TestCase):
             "execution_status": "completed",
             "summary": "notes/phase-summary.md",
             "summary_sha256": hashlib.sha256(summary_path.read_bytes()).hexdigest(),
+            "completed_at": "2026-07-10T12:05:00-05:00",
         }
         payload.update(overrides)
         sentinel.write_text(json.dumps(payload), encoding="utf-8")
@@ -236,6 +237,59 @@ class WorkflowContractTests(unittest.TestCase):
                 self.write_sentinel(summary, sentinel, "review-final", **{field: value})
                 errors = self.workflow_contract.validate_summary(summary, self.contract)
                 self.assertTrue(any(field.replace("_", " ") in error.lower() for error in errors))
+
+    def test_published_sentinel_requires_every_contract_field_and_valid_completion_timestamp(self):
+        for mutation, expected_error in (
+            (
+                lambda payload: payload.pop("completed_at"),
+                "Missing required sentinel field: completed_at",
+            ),
+            (
+                lambda payload: payload.update(completed_at="not-a-timestamp"),
+                "Sentinel completed at must be a timezone-aware ISO 8601 timestamp",
+            ),
+        ):
+            with self.subTest(expected_error=expected_error):
+                with tempfile.TemporaryDirectory() as temp_dir:
+                    notes = Path(temp_dir) / "notes"
+                    notes.mkdir()
+                    summary = notes / "phase-summary.md"
+                    self.write_valid_review_final(summary)
+
+                    result = self.complete_phase(summary)
+
+                    self.assertEqual(0, result.returncode, result.stdout)
+                    sentinel = notes / ".phase-review-final.done"
+                    payload = json.loads(sentinel.read_text(encoding="utf-8"))
+                    mutation(payload)
+                    sentinel.write_text(json.dumps(payload), encoding="utf-8")
+                    snapshot = self.immutable_summary_path(summary, payload["run_id"])
+
+                    errors = self.workflow_contract.validate_summary(snapshot, self.contract)
+
+                    self.assertIn(expected_error, errors)
+
+    def test_complete_phase_rejects_nonconforming_or_unsafe_run_ids_before_publication(self):
+        for run_id in ("review-contract", "review/contract-20260710-1200"):
+            with self.subTest(run_id=run_id):
+                with tempfile.TemporaryDirectory() as temp_dir:
+                    notes = Path(temp_dir) / "notes"
+                    notes.mkdir()
+                    summary = notes / "phase-summary.md"
+                    self.write_valid_review_final(summary)
+                    summary.write_text(
+                        summary.read_text(encoding="utf-8").replace(
+                            "review-contract-20260710-1200", run_id,
+                        ),
+                        encoding="utf-8",
+                    )
+
+                    result = self.complete_phase(summary, run_id=run_id)
+
+                    self.assertEqual(1, result.returncode, result.stdout)
+                    self.assertIn("Run ID", result.stdout)
+                    self.assertFalse((notes / ".phase-review-final.done").exists())
+                    self.assertFalse(list(notes.glob("phase-summary.*.md")))
 
     def test_cli_prints_valid_and_exits_zero_for_valid_summary(self):
         summary, sentinel = self.copy_valid_summary()

@@ -133,6 +133,10 @@ def main() -> int:
         print("ERROR: --launched-at must be an ISO 8601 timestamp with timezone")
         return 1
 
+    if not workflow_contract.is_valid_run_id(args.run_id):
+        print("ERROR: Run ID must be a lowercase slug ending in -YYYYMMDD-HHMM")
+        return 1
+
     contract = json.loads(Path(args.contract).read_text(encoding="utf-8"))
     summary_path = Path(args.summary).resolve()
     if summary_path.parent.name != "notes" or summary_path.name != "phase-summary.md":
