@@ -137,7 +137,42 @@ def validate_compact_review_boundary(summary: dict[str, str], summary_path: Path
     return errors
 
 
-def _artifact_predecessor_errors(summary: dict[str, str], summary_path: Path) -> list[str]:
+def _trusted_sentinel_errors(
+    payload: object, expected_phase: str, contract: dict[str, Any],
+) -> list[str]:
+    if not isinstance(payload, dict):
+        return [f"{expected_phase} sentinel must contain trusted metadata"]
+    required = {
+        "contract_version": contract.get("contract_version"),
+        "phase": expected_phase,
+        "execution_status": "completed",
+        "summary": "notes/phase-summary.md",
+    }
+    errors = [
+        f"{expected_phase} sentinel trusted metadata {field} is invalid"
+        for field, expected in required.items()
+        if payload.get(field) != expected
+    ]
+    if not is_valid_run_id(str(payload.get("run_id", ""))):
+        errors.append(f"{expected_phase} sentinel trusted metadata run_id is invalid")
+    attempt = payload.get("attempt")
+    if not isinstance(attempt, int) or isinstance(attempt, bool) or attempt <= 0:
+        errors.append(f"{expected_phase} sentinel trusted metadata attempt is invalid")
+    if not _is_timezone_aware_iso8601(payload.get("completed_at")):
+        errors.append(f"{expected_phase} sentinel trusted metadata completed_at is invalid")
+    if payload.get("review_verdict") not in contract.get("review_verdicts", []):
+        errors.append(f"{expected_phase} sentinel trusted metadata review_verdict is invalid")
+    if not isinstance(payload.get("candidate_artifact"), str) or not payload.get("candidate_artifact"):
+        errors.append(f"{expected_phase} sentinel trusted metadata candidate_artifact is invalid")
+    candidate_sha256 = payload.get("candidate_sha256")
+    if not isinstance(candidate_sha256, str) or not re.fullmatch(r"[0-9a-f]{64}", candidate_sha256):
+        errors.append(f"{expected_phase} sentinel trusted metadata candidate_sha256 is invalid")
+    return errors
+
+
+def _artifact_predecessor_errors(
+    summary: dict[str, str], summary_path: Path, contract: dict[str, Any],
+) -> list[str]:
     phase = _scalar(summary, "phase")
     predecessor = {"review": "build", "review-final": "build-fix"}.get(phase)
     if predecessor is None:
@@ -149,9 +184,9 @@ def _artifact_predecessor_errors(summary: dict[str, str], summary_path: Path) ->
         previous = json.loads(sentinel.read_text(encoding="utf-8"))
     except json.JSONDecodeError:
         return [f"{predecessor} sentinel must contain valid JSON"]
-    if not isinstance(previous, dict) or previous.get("phase") != predecessor:
-        return [f"{phase} requires a {predecessor} sentinel"]
-    errors: list[str] = []
+    errors = _trusted_sentinel_errors(previous, predecessor, contract)
+    if errors:
+        return errors
     if previous.get("candidate_artifact") != _scalar(summary, "candidate artifact"):
         errors.append(f"{phase} candidate artifact does not match completed {predecessor}")
     if previous.get("candidate_sha256") != _scalar(summary, "candidate sha256"):
@@ -172,30 +207,37 @@ def _in_talk_file(summary: dict[str, str], summary_path: Path, field: str) -> Pa
     return path if path.is_file() else None
 
 
-def _release_errors(summary: dict[str, str], summary_path: Path) -> list[str]:
+def _release_errors(
+    summary: dict[str, str], summary_path: Path, contract: dict[str, Any],
+) -> list[str]:
     if _scalar(summary, "phase") != "release":
         return []
     candidate_artifact = _scalar(summary, "candidate artifact")
     candidate_sha256 = _scalar(summary, "candidate sha256")
-    approved = None
-    for phase in ("review-final", "review"):
-        sentinel = summary_path.parent / f".phase-{phase}.done"
-        if not sentinel.is_file():
-            continue
-        try:
-            payload = json.loads(sentinel.read_text(encoding="utf-8"))
-        except json.JSONDecodeError:
-            continue
-        if (
-            isinstance(payload, dict)
-            and payload.get("phase") == phase
-            and payload.get("review_verdict") == "approved"
-            and payload.get("candidate_artifact") == candidate_artifact
-            and payload.get("candidate_sha256") == candidate_sha256
-        ):
-            approved = payload
-            break
-    if approved is None:
+    correction_path = any(
+        (summary_path.parent / f".phase-{phase}.done").exists()
+        for phase in ("build-fix", "review-final")
+    )
+    phase = "review-final" if correction_path else "review"
+    sentinel = summary_path.parent / f".phase-{phase}.done"
+    if not sentinel.is_file():
+        if correction_path:
+            return ["Release requires an authoritative review-final sentinel after correction"]
+        return ["Release requires an approved review sentinel for the exact candidate"]
+    try:
+        payload = json.loads(sentinel.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return [f"Release {phase} sentinel must contain trusted metadata"]
+    trusted_errors = _trusted_sentinel_errors(payload, phase, contract)
+    if trusted_errors:
+        return trusted_errors
+    if (
+        payload.get("review_verdict") != "approved"
+        or payload.get("candidate_artifact") != candidate_artifact
+        or payload.get("candidate_sha256") != candidate_sha256
+    ):
+        if correction_path:
+            return ["Release requires an approved authoritative review-final for the exact candidate"]
         return ["Release requires an approved review sentinel for the exact candidate"]
     final = _in_talk_file(summary, summary_path, "final artifact")
     if final is None:
@@ -272,8 +314,8 @@ def validate_publication(summary: dict[str, str], contract: dict[str, Any], summ
     errors.extend(_review_mode_errors(summary, summary_path))
     if phase in ARTIFACT_PHASES:
         errors.extend(_candidate_identity_errors(summary, summary_path))
-        errors.extend(_artifact_predecessor_errors(summary, summary_path))
-    errors.extend(_release_errors(summary, summary_path))
+        errors.extend(_artifact_predecessor_errors(summary, summary_path, contract))
+    errors.extend(_release_errors(summary, summary_path, contract))
     return errors
 
 

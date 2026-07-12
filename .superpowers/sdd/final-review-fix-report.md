@@ -44,3 +44,22 @@ No final SHA field was added to the summary template because completion recomput
 ## Concerns
 
 None known. Operationally, promotion remains an orchestrator action performed before completion; completion is deliberately a rejecting publication gate, not a file-copy mechanism.
+
+## Remaining-review fix wave
+
+### Findings addressed
+
+- Correction-path `review-final` is authoritative. The presence of `build-fix` or `review-final` disables fallback to an older initial approval; missing, malformed, mismatched, or non-approved final review blocks release.
+- The release contract input now names an approved `review` or `review-final` verdict for the exact candidate.
+- Trusted predecessor sentinels now require contract version, valid run ID, expected phase, positive attempt, completed execution status, canonical summary path, timezone-aware completion time, valid review verdict, candidate path, and lowercase SHA256.
+- Every artifact sentinel now publishes `review_verdict`, including `not_applicable` for build phases, so later trust checks use publisher-owned metadata.
+
+### TDD and negative-control evidence
+
+RED command targeted three regressions: initial approval followed by same-byte build-fix and `review-final: requires_changes`; a build sentinel missing `completed_at`; and a handcrafted approved review containing only phase/verdict/candidate. Result: 3 tests ran and all 3 failed because release/review incorrectly accepted them.
+
+After the implementation, the identical focused command ran 3 tests and passed all 3. The full `tests/agent_workflow` suite then ran 64 tests and passed all 64.
+
+### Concerns
+
+None known. Initial review remains a valid release authority only when neither correction sentinel exists.

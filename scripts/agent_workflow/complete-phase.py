@@ -166,9 +166,8 @@ def main() -> int:
             payload.update({
                 "candidate_artifact": _scalar(summary, "candidate artifact"),
                 "candidate_sha256": _scalar(summary, "candidate sha256"),
+                "review_verdict": _scalar(summary, "review verdict"),
             })
-        if args.phase.startswith("review"):
-            payload["review_verdict"] = _scalar(summary, "review verdict")
         if workflow_contract.is_compact_boundary(summary):
             payload["workflow_mode"] = workflow_contract.COMPACT_WORKFLOW_MODE
         if args.phase == "release":

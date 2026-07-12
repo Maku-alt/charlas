@@ -86,8 +86,9 @@ class WorkflowContractTests(unittest.TestCase):
             payload.update({
                 "candidate_artifact": scalar("candidate artifact"),
                 "candidate_sha256": scalar("candidate sha256"),
+                "review_verdict": scalar("review verdict") or "not_applicable",
             })
-        if phase_name.startswith("review"):
+        elif phase_name.startswith("review"):
             payload["review_verdict"] = scalar("review verdict")
         payload.update(overrides)
         sentinel.write_text(json.dumps(payload), encoding="utf-8")
@@ -902,6 +903,91 @@ class WorkflowContractTests(unittest.TestCase):
 
             self.assertEqual(1, result.returncode)
             self.assertIn("exact candidate", result.stdout)
+
+    def test_release_does_not_fall_back_after_failed_final_review(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            notes = root / "notes"
+            notes.mkdir()
+            summary = notes / "phase-summary.md"
+            candidate, candidate_sha = self.make_candidate(root)
+            final = root / "slides" / "final.pptx"
+            shutil.copyfile(candidate, final)
+            common = {
+                "candidate_artifact": "slides/candidate.pptx",
+                "candidate_sha256": candidate_sha,
+            }
+            self.write_sentinel(
+                summary, notes / ".phase-review.done", "review",
+                review_verdict="approved", **common,
+            )
+            self.write_sentinel(
+                summary, notes / ".phase-build-fix.done", "build-fix",
+                review_verdict="not_applicable", **common,
+            )
+            self.write_sentinel(
+                summary, notes / ".phase-review-final.done", "review-final",
+                review_verdict="requires_changes", **common,
+            )
+            self.write_artifact_summary(
+                summary, phase="release", candidate_sha256=candidate_sha,
+                final_artifact="slides/final.pptx",
+            )
+
+            result = self.complete_phase(summary, phase="release")
+
+            self.assertEqual(1, result.returncode)
+            self.assertIn("authoritative review-final", result.stdout)
+
+    def test_review_rejects_predecessor_missing_trusted_metadata(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            notes = root / "notes"
+            notes.mkdir()
+            summary = notes / "phase-summary.md"
+            _, candidate_sha = self.make_candidate(root)
+            sentinel = notes / ".phase-build.done"
+            self.write_sentinel(
+                summary, sentinel, "build", review_verdict="not_applicable",
+                candidate_artifact="slides/candidate.pptx", candidate_sha256=candidate_sha,
+            )
+            payload = json.loads(sentinel.read_text(encoding="utf-8"))
+            payload.pop("completed_at")
+            sentinel.write_text(json.dumps(payload), encoding="utf-8")
+            self.write_artifact_summary(
+                summary, phase="review", candidate_sha256=candidate_sha,
+                verdict="approved", next_phase="release", worker_id="reviewer-8",
+                session_id="review-session-13",
+            )
+
+            result = self.complete_phase(summary, phase="review")
+
+            self.assertEqual(1, result.returncode)
+            self.assertIn("completed_at", result.stdout)
+
+    def test_release_rejects_handcrafted_approved_review_sentinel(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            notes = root / "notes"
+            notes.mkdir()
+            summary = notes / "phase-summary.md"
+            candidate, candidate_sha = self.make_candidate(root)
+            final = root / "slides" / "final.pptx"
+            shutil.copyfile(candidate, final)
+            (notes / ".phase-review.done").write_text(json.dumps({
+                "phase": "review", "review_verdict": "approved",
+                "candidate_artifact": "slides/candidate.pptx",
+                "candidate_sha256": candidate_sha,
+            }), encoding="utf-8")
+            self.write_artifact_summary(
+                summary, phase="release", candidate_sha256=candidate_sha,
+                final_artifact="slides/final.pptx",
+            )
+
+            result = self.complete_phase(summary, phase="release")
+
+            self.assertEqual(1, result.returncode)
+            self.assertIn("trusted metadata", result.stdout)
 
     def test_compact_review_publication_rejects_shared_build_identity(self):
         temp_dir = tempfile.TemporaryDirectory()

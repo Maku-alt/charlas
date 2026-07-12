@@ -114,7 +114,7 @@
       "role": "orchestrator-charlas",
       "spec": "embedded release contract",
       "prompt": "not_applicable",
-      "required_inputs": ["approved final review verdict", "approved editable PPTX candidate hash", "current phase summary"],
+      "required_inputs": ["approved review or review-final verdict for the exact candidate", "approved editable PPTX candidate hash", "current phase summary"],
       "required_outputs": ["promoted final PPTX with recomputed SHA256", "release phase summary"],
       "allows_parallel_with": []
     }
