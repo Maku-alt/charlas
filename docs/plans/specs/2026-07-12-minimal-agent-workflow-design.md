@@ -54,6 +54,8 @@ Se conserva `agents/workflow-contract.json` como unica fuente de verdad para fas
 - hallazgos bloqueantes;
 - siguiente fase y accion.
 
+En `build`, `build-fix`, `review` y `review-final` agrega `worker_id` y `session_id` para verificar que la revision sea independiente. Fuera de esas fronteras no se incluyen.
+
 No es un log, una transcripcion ni evidencia historica inmutable.
 
 El sentinel contiene solamente la identidad necesaria para no confundir corridas:
@@ -64,6 +66,8 @@ El sentinel contiene solamente la identidad necesaria para no confundir corridas
 - intento;
 - estado de ejecucion;
 - fecha de finalizacion.
+
+En las fronteras de identidad agrega `worker_id` y `session_id`. En review/release conserva tambien la identidad y el SHA256 del PPTX candidato aprobado.
 
 La publicacion sigue siendo atomica. No se conservan snapshots `phase-summary.<run_id>.md` ni `summary_sha256`.
 
