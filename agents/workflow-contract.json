@@ -1,7 +1,6 @@
 {
   "contract_version": 2,
   "current_summary": "notes/phase-summary.md",
-  "historical_summary_pattern": "notes/phase-summary.<run_id>.md",
   "required_sentinel_fields": [
     "contract_version",
     "run_id",
@@ -9,7 +8,6 @@
     "attempt",
     "execution_status",
     "summary",
-    "summary_sha256",
     "completed_at"
   ],
   "execution_statuses": ["completed", "blocked"],

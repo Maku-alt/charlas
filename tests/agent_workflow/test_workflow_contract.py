@@ -50,9 +50,6 @@ class WorkflowContractTests(unittest.TestCase):
         self.addCleanup(temp_dir.cleanup)
         return summary, sentinel
 
-    def immutable_summary_path(self, summary: Path, run_id: str) -> Path:
-        return summary.with_name(f"phase-summary.{run_id}.md")
-
     def write_valid_review_final(self, summary):
         shutil.copy(FIXTURES / "valid-phase-summary.md", summary)
         self.write_sentinel(
@@ -71,7 +68,6 @@ class WorkflowContractTests(unittest.TestCase):
             "attempt": 1,
             "execution_status": "completed",
             "summary": "notes/phase-summary.md",
-            "summary_sha256": hashlib.sha256(summary_path.read_bytes()).hexdigest(),
             "completed_at": "2026-07-10T12:05:00-05:00",
         }
         payload.update(overrides)
@@ -263,9 +259,7 @@ class WorkflowContractTests(unittest.TestCase):
                     payload = json.loads(sentinel.read_text(encoding="utf-8"))
                     mutation(payload)
                     sentinel.write_text(json.dumps(payload), encoding="utf-8")
-                    snapshot = self.immutable_summary_path(summary, payload["run_id"])
-
-                    errors = self.workflow_contract.validate_summary(snapshot, self.contract)
+                    errors = self.workflow_contract.validate_summary(summary, self.contract)
 
                     self.assertIn(expected_error, errors)
 
@@ -331,127 +325,44 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertEqual("review-final", payload["phase"])
         self.assertEqual(1, payload["attempt"])
         self.assertEqual("completed", payload["execution_status"])
-        self.assertEqual("notes/phase-summary.review-contract-20260710-1200.md", payload["summary"])
-        self.assertEqual(hashlib.sha256(summary.read_bytes()).hexdigest(), payload["summary_sha256"])
+        self.assertEqual("notes/phase-summary.md", payload["summary"])
+        self.assertNotIn("summary_sha256", payload)
         self.assertIn("completed_at", payload)
-        snapshot = self.immutable_summary_path(summary, "review-contract-20260710-1200")
-        self.assertEqual([], self.workflow_contract.validate_summary(snapshot, self.contract))
+        self.assertEqual([], self.workflow_contract.validate_summary(summary, self.contract))
 
-    def test_complete_phase_snapshots_exact_summary_and_hashes_it(self):
-        temp_dir = tempfile.TemporaryDirectory()
-        notes = Path(temp_dir.name) / "notes"
-        notes.mkdir()
-        summary = notes / "phase-summary.md"
-        self.write_valid_review_final(summary)
-        self.addCleanup(temp_dir.cleanup)
+    def test_research_completion_publishes_only_current_summary_metadata(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            notes = Path(temp_dir) / "notes"
+            notes.mkdir()
+            summary = notes / "phase-summary.md"
+            text = (FIXTURES / "valid-phase-summary.md").read_text(encoding="utf-8")
+            text = (
+                text.replace("## Run ID\nreview-contract-20260710-1200", "## Run ID\nresearch-contract-20260710-1200")
+                .replace("## Phase\nreview-final", "## Phase\nresearch")
+                .replace("## Review verdict\napproved", "## Review verdict\nnot_applicable")
+                .replace("## Next phase\nrelease", "## Next phase\nnarrative")
+            )
+            summary.write_text(text, encoding="utf-8")
 
-        result = self.complete_phase(summary)
+            result = self.complete_phase(
+                summary,
+                run_id="research-contract-20260710-1200",
+                phase="research",
+                launched_at="2026-07-10T12:00:00-05:00",
+            )
 
-        self.assertEqual(0, result.returncode, result.stdout)
-        snapshot = self.immutable_summary_path(summary, "review-contract-20260710-1200")
-        sentinel = notes / ".phase-review-final.done"
-        payload = json.loads(sentinel.read_text(encoding="utf-8"))
-        self.assertTrue(snapshot.is_file())
-        self.assertEqual(summary.read_bytes(), snapshot.read_bytes())
-        self.assertEqual(f"notes/{snapshot.name}", payload["summary"])
-        self.assertEqual(
-            hashlib.sha256(snapshot.read_bytes()).hexdigest(),
-            payload["summary_sha256"],
-        )
-
-    def test_historical_summary_remains_valid_after_current_summary_changes(self):
-        temp_dir = tempfile.TemporaryDirectory()
-        notes = Path(temp_dir.name) / "notes"
-        notes.mkdir()
-        summary = notes / "phase-summary.md"
-        self.addCleanup(temp_dir.cleanup)
-
-        candidate_sha256 = self.publish_compact_build(
-            summary, Path(temp_dir.name) / "slides" / "candidate.pptx"
-        )
-        build_sentinel = notes / ".phase-build.done"
-        snapshot = self.immutable_summary_path(summary, "review-contract-20260710-1200")
-        self.write_compact_phase_summary(
-            summary,
-            phase="review",
-            worker_id="reviewer-8",
-            session_id="review-session-13",
-            candidate_sha256=candidate_sha256,
-        )
-        self.assertTrue(snapshot.is_file())
-
-        errors = self.workflow_contract._validate_summary(
-            snapshot, self.contract, build_sentinel
-        )
-
-        self.assertEqual([], errors, errors)
-
-    def test_complete_phase_rejects_existing_historical_snapshot(self):
-        temp_dir = tempfile.TemporaryDirectory()
-        notes = Path(temp_dir.name) / "notes"
-        notes.mkdir()
-        summary = notes / "phase-summary.md"
-        self.write_valid_review_final(summary)
-        self.addCleanup(temp_dir.cleanup)
-        snapshot = self.immutable_summary_path(summary, "review-contract-20260710-1200")
-        snapshot.write_bytes(b"do not replace")
-
-        result = self.complete_phase(summary)
-
-        self.assertEqual(1, result.returncode, result.stdout)
-        self.assertEqual(b"do not replace", snapshot.read_bytes())
-        self.assertFalse((notes / ".phase-review-final.done").exists())
-
-    def test_historical_validation_rejects_summary_hash_mismatch(self):
-        temp_dir = tempfile.TemporaryDirectory()
-        notes = Path(temp_dir.name) / "notes"
-        notes.mkdir()
-        summary = notes / "phase-summary.md"
-        self.addCleanup(temp_dir.cleanup)
-
-        self.publish_compact_build(
-            summary, Path(temp_dir.name) / "slides" / "candidate.pptx"
-        )
-        snapshot = self.immutable_summary_path(summary, "review-contract-20260710-1200")
-        build_sentinel = notes / ".phase-build.done"
-        self.assertTrue(snapshot.is_file())
-        snapshot.write_bytes(snapshot.read_bytes() + b"\nTampered\n")
-
-        errors = self.workflow_contract._validate_summary(
-            snapshot, self.contract, build_sentinel
-        )
-
-        self.assertTrue(
-            any("Sentinel summary SHA256 does not match summary" in error for error in errors),
-            errors,
-        )
-
-    def test_current_summary_cannot_validate_against_historical_sentinel(self):
-        temp_dir = tempfile.TemporaryDirectory()
-        notes = Path(temp_dir.name) / "notes"
-        notes.mkdir()
-        summary = notes / "phase-summary.md"
-        self.addCleanup(temp_dir.cleanup)
-
-        candidate_sha256 = self.publish_compact_build(
-            summary, Path(temp_dir.name) / "slides" / "candidate.pptx"
-        )
-        self.write_compact_phase_summary(
-            summary,
-            phase="review",
-            worker_id="reviewer-8",
-            session_id="review-session-13",
-            candidate_sha256=candidate_sha256,
-        )
-
-        errors = self.workflow_contract._validate_summary(
-            summary, self.contract, notes / ".phase-build.done"
-        )
-
-        self.assertTrue(
-            any("Sentinel summary does not match summary" in error for error in errors),
-            errors,
-        )
+            self.assertEqual(0, result.returncode, result.stdout)
+            payload = json.loads((notes / ".phase-research.done").read_text(encoding="utf-8"))
+            self.assertEqual("notes/phase-summary.md", payload["summary"])
+            self.assertNotIn("summary_sha256", payload)
+            self.assertFalse(list(notes.glob("phase-summary.*.md")))
+            self.assertEqual(
+                {
+                    "contract_version", "run_id", "phase", "attempt",
+                    "execution_status", "summary", "completed_at",
+                },
+                set(payload),
+            )
 
     def test_complete_phase_does_not_write_sentinel_for_invalid_summary(self):
         temp_dir = tempfile.TemporaryDirectory()
@@ -1018,18 +929,13 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("`qa-deck.py` and `validate-powerpoint.ps1`", skill)
         self.assertIn("PowerPoint native remains the final gate", skill)
         self.assertIn("run ID, phase, attempt and summary path", skill)
-        self.assertIn("notes/phase-summary.<run_id>.md", skill)
-        self.assertIn("summary_sha256", skill)
         self.assertNotIn("mutable current summary as historical evidence", skill)
         self.assertNotIn("@oai/artifact-tool", skill)
         self.assertNotIn("`pptxgenjs` not used", skill)
 
-    def test_operational_docs_distinguish_current_handoff_from_immutable_history(self):
+    def test_contract_uses_current_handoff_and_minimal_sentinel_fields(self):
         self.assertEqual("notes/phase-summary.md", self.contract["current_summary"])
-        self.assertEqual(
-            "notes/phase-summary.<run_id>.md",
-            self.contract["historical_summary_pattern"],
-        )
+        self.assertNotIn("historical_summary_pattern", self.contract)
         self.assertEqual(
             [
                 "contract_version",
@@ -1038,27 +944,10 @@ class WorkflowContractTests(unittest.TestCase):
                 "attempt",
                 "execution_status",
                 "summary",
-                "summary_sha256",
                 "completed_at",
             ],
             self.contract["required_sentinel_fields"],
         )
-
-        operational_docs = [
-            ROOT / "agents" / "orchestrator-charlas.md",
-            ROOT / "templates" / "charlas-sdd" / "execution-package.md",
-            ROOT / "templates" / "charlas-sdd" / "README.md",
-            ROOT / "skills" / "worker-handoff" / "SKILL.md",
-            ROOT / "skills" / "worker-flow-audit" / "SKILL.md",
-            ROOT / "README.md",
-        ]
-        for document in operational_docs:
-            with self.subTest(document=document):
-                text = document.read_text(encoding="utf-8")
-                self.assertIn("notes/phase-summary.<run_id>.md", text)
-                self.assertIn("summary_sha256", text)
-                self.assertIn("mutable current summary", text)
-                self.assertNotIn("mutable current summary as historical evidence", text)
 
     def test_cli_validates_migrated_summary_without_a_completion_sentinel(self):
         with tempfile.TemporaryDirectory() as temp_dir:

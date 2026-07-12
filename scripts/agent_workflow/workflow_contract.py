@@ -325,9 +325,6 @@ def _validate_sentinel(
     for field, expected_value in expected.items():
         if values.get(field) != expected_value:
             errors.append(f"Sentinel {field.replace('_', ' ')} does not match summary")
-    if values.get("summary_sha256") != hashlib.sha256(summary_path.read_bytes()).hexdigest():
-        errors.append("Sentinel summary SHA256 does not match summary")
-
     if is_identity_boundary(summary):
         for sentinel_field, summary_field in (
             ("worker_id", "worker id"),
