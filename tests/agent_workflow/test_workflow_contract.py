@@ -310,7 +310,7 @@ class WorkflowContractTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             template = Path(temp_dir) / "phase-summary.md"
             template.write_text(
-                "# Phase Summary\n\n## Worker ID\na\n\n## Worker ID\nb\n",
+                "# Phase Summary\n\n## Worker ID\na\n\n## worker id\nb\n",
                 encoding="utf-8",
             )
 
