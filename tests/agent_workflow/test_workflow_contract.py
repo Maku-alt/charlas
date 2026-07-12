@@ -983,6 +983,11 @@ class WorkflowContractTests(unittest.TestCase):
                 self.assertIn("notes/phase-summary.md", text)
                 self.assertNotIn("phase-summary.<run_id>.md", text)
                 self.assertNotIn("summary_sha256", text)
+                self.assertNotIn(".phase-build.summary.md", text)
+                self.assertNotIn(".phase-image.summary.md", text)
+                self.assertNotIn("pueden correr en paralelo", text)
+                self.assertNotIn("`build` + `image-close` paralelos", text)
+                self.assertNotIn("summaries temporales", text)
 
     def test_worker_handoff_does_not_teach_legacy_summary_fields(self):
         handoff = (ROOT / "skills" / "worker-handoff" / "SKILL.md").read_text(encoding="utf-8")

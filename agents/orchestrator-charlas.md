@@ -1,7 +1,7 @@
 # orchestrator-charlas
 
 ## Objetivo
-Orquestar el flujo completo de una charla sin ejecutar research, narrativa, build, imagen final ni review detallado. Decide la fase, dependencias, precondiciones, paralelización, lanzamiento y bloqueo; el chat principal coordina y no sustituye a los roles especializados.
+Orquestar el flujo completo de una charla sin ejecutar research, narrativa, build, imagen final ni review detallado. Decide la fase, dependencias, precondiciones, secuenciación, lanzamiento y bloqueo; el chat principal coordina y no sustituye a los roles especializados.
 
 ## Fuente de verdad
 `agents/workflow-contract.json` es la fuente canónica de las nueve fases, transiciones permitidas, roles, specs, prompts, inputs, outputs, sentinels y restricciones de independencia. No reproduzcas ni sustituyas esas reglas en este archivo. Usa `templates/charlas-sdd/execution-package.md` para cada corrida aislada y valida que sus valores coincidan con el contrato.
@@ -29,7 +29,7 @@ El worker escribe primero el resumen y lo publica al final exclusivamente median
 
 Después de lanzar un worker, consulta el sentinel esperado mediante `Test-Path` en intervalos de como máximo 60 segundos. Cada consulta valida la identidad esperada; no uses chats worker, `read_thread`, logs ni razonamiento parcial como estado operativo. Mantén al usuario informado en cada intervalo. Tras tres intervalos sin una finalización válida, informa que sigue en ejecución y ofrece continuar monitoreando; la lentitud no es bloqueo.
 
-Una vez validado, lee `notes/phase-summary.md` y la evidencia referenciada estrictamente necesaria para decidir la transición. En `build` + `image-close` paralelos, usa summaries temporales separados y consolida solo después de validar ambas corridas.
+Una vez validado, lee `notes/phase-summary.md` y la evidencia referenciada estrictamente necesaria para decidir la transición. Las fases con el unico summary canonico corren secuencialmente por defecto. `allows_parallel_with` permanece como metadato de capacidad inactivo hasta que exista publicacion soportada con handoffs distintos; el padre transiciona solo desde `notes/phase-summary.md` validado.
 
 El worker sobrescribe `notes/phase-summary.md` y publica el sentinel al final mediante `scripts/agent_workflow/complete-phase.py`. El padre valida `run_id`, fase, intento y estado de ejecución antes de leer el resumen. La mera existencia del sentinel no implica finalización.
 
@@ -42,4 +42,4 @@ Si `review` requiere cambios, decide entre la transición permitida (`build-fix`
 Un worker bloqueado debe dejar evidencia y siguiente acción en su summary. Si no hay finalización válida, conserva el estado como en ejecución; no lo declares bloqueado solo por tardar.
 
 ## Formato de salida
-Incluye: `Fase actual`, `Agente que corresponde ahora`, `Por qué corresponde`, `Insumos requeridos`, `Salida esperada`, `Riesgos o bloqueos`, `Siguiente transición posible` y `Paralelización sugerida` cuando aplique.
+Incluye: `Fase actual`, `Agente que corresponde ahora`, `Por qué corresponde`, `Insumos requeridos`, `Salida esperada`, `Riesgos o bloqueos` y `Siguiente transición posible`.

@@ -97,7 +97,7 @@ El flujo recomendado es:
 6. `image-closer-charlas` para resolver la imagen editorial final
 7. `review-charlas` para revisar narrativa, visuales y cierre antes de cerrar la charla
 
-`deck-builder-charlas` e `image-closer-charlas` pueden correr en paralelo si la narrativa ya esta fija y ya existen, o se fijan antes, el mensaje final y la cita real de referente o fallback justificado.
+Las fases de charla que usan el unico `notes/phase-summary.md` canonico corren secuencialmente por defecto. `allows_parallel_with` es metadato de capacidad del contrato y permanece inactivo hasta que exista un mecanismo soportado de publicacion con handoffs distintos. El padre transiciona solo desde `notes/phase-summary.md` validado.
 
 Si hay duda sobre en que fase esta una charla o que agente deberia correr primero, el entrypoint recomendado es `orchestrator-charlas`.
 

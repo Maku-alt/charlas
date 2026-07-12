@@ -27,7 +27,7 @@ Cada fase pesada debe recibir:
 - spec o package de fase
 - prompt desde `templates/charlas-sdd/prompts/`
 - artefactos necesarios
-- `notes/phase-summary.md` como unico handoff operativo para el padre, salvo summaries temporales de `build` + `image-close` paralelos
+- `notes/phase-summary.md` como unico handoff operativo para el padre
 - runtime solicitado y efectivo conforme a `agents/runtime-defaults.json`
 
 El spec define el encargo concreto. El rol define metodologia y criterio de calidad. El prompt consume el spec y el paquete de ejecucion de esa fase, sin duplicar un handoff generico, y evita que avance automaticamente a otra etapa.
@@ -57,7 +57,7 @@ Formato minimo: usar exactamente `templates/charlas-sdd/phase-summary.md`. La co
 No pegues outputs de comandos, renders, transcripts ni reportes completos en el padre. Escribe evidencia larga a archivos y referencia rutas.
 
 ## Worker separado
-Usa `skills/worker-handoff` y `agents/orchestrator-charlas.md` para workers con `fork_context: false`, inputs minimos, sentinels, summaries temporales, esperas y reglas de monitoreo. El padre no lee chat, logs ni razonamiento del worker. Estos templates solo definen insumos y salidas esperadas por fase.
+Usa `skills/worker-handoff` y `agents/orchestrator-charlas.md` para workers con `fork_context: false`, inputs minimos, sentinels, esperas y reglas de monitoreo. Las fases con el unico summary canonico corren secuencialmente por defecto. `allows_parallel_with` es metadato de capacidad inactivo hasta que exista publicacion soportada con handoffs distintos. El padre no lee chat, logs ni razonamiento del worker y transiciona solo desde `notes/phase-summary.md` validado. Estos templates solo definen insumos y salidas esperadas por fase.
 
 ## Build PPTX
 Para decks `pptx` nuevos desde cero, usar por defecto el renderer local del repo en `scripts/deck_renderer/` desde `deck-spec.json`. El theme default es `scripts/deck_renderer/theme-charlas.json`.
