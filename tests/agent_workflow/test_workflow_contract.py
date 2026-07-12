@@ -306,6 +306,24 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertEqual(1, result.returncode)
         self.assertIn("ERROR:", result.stdout)
 
+    def test_cli_rejects_duplicate_template_fields_case_insensitively(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            template = Path(temp_dir) / "phase-summary.md"
+            template.write_text(
+                "# Phase Summary\n\n## Worker ID\na\n\n## Worker ID\nb\n",
+                encoding="utf-8",
+            )
+
+            result = subprocess.run(
+                [sys.executable, str(CLI_PATH), "--template", str(template)],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+
+        self.assertEqual(1, result.returncode)
+        self.assertIn("Duplicate template field: worker id", result.stdout)
+
     def test_complete_phase_writes_sentinel_after_valid_summary(self):
         temp_dir = tempfile.TemporaryDirectory()
         notes = Path(temp_dir.name) / "notes"

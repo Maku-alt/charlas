@@ -205,6 +205,16 @@ def main() -> int:
         print("VALID PHASE ASSETS")
         return 0
     if args.template:
+        template_text = Path(args.template).read_text(encoding="utf-8")
+        headings = [
+            match.group(1).strip().lower()
+            for match in re.finditer(r"^##\s+(.+?)\s*$", template_text, re.MULTILINE)
+        ]
+        duplicates = sorted({field for field in headings if headings.count(field) > 1})
+        if duplicates:
+            for field in duplicates:
+                print(f"ERROR: Duplicate template field: {field}")
+            return 1
         fields = workflow_contract.parse_summary(args.template)
         missing = [field for field in workflow_contract.REQUIRED_FIELDS if field not in fields]
         if missing:

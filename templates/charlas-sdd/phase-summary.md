@@ -44,12 +44,6 @@ Sobrescribir este archivo con el estado operativo actual. No usarlo como log app
 ## Candidate SHA256
 <lowercase SHA256 | none when no candidate applies>
 
-## Worker ID
-<stable worker identifier | none when no compact boundary applies>
-
-## Session ID
-<isolated session identifier | none when no compact boundary applies>
-
 ## Workflow mode
 <full | compact; omit only for legacy full summaries>
 
