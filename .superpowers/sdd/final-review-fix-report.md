@@ -63,3 +63,20 @@ After the implementation, the identical focused command ran 3 tests and passed a
 ### Concerns
 
 None known. Initial review remains a valid release authority only when neither correction sentinel exists.
+
+## Trusted execution identity fix wave
+
+### Findings addressed
+
+- Trusted `build`, `build-fix`, `review`, and `review-final` sentinels must contain non-empty `worker_id` and `session_id` before they can authorize a successor or release.
+- Phase-specific verdict semantics are enforced at trust boundaries: build phases require exactly `not_applicable`; review phases require `approved` or `requires_changes`; release still requires `approved` from its authoritative review.
+
+### TDD evidence
+
+The focused negative command ran two test methods with three cases. Before implementation, both missing-identity cases and the build-with-approved-verdict case failed because review was incorrectly authorized. After implementation, the identical focused command passed both methods and all three cases.
+
+The full `tests/agent_workflow` suite then ran 66 tests and passed all 66.
+
+### Concerns
+
+None known. The publisher already emits execution identity for all four artifact phases; this wave makes consumers refuse incomplete or phase-incoherent handcrafted metadata.

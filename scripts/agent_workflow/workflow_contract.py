@@ -160,8 +160,16 @@ def _trusted_sentinel_errors(
         errors.append(f"{expected_phase} sentinel trusted metadata attempt is invalid")
     if not _is_timezone_aware_iso8601(payload.get("completed_at")):
         errors.append(f"{expected_phase} sentinel trusted metadata completed_at is invalid")
-    if payload.get("review_verdict") not in contract.get("review_verdicts", []):
+    expected_verdicts = (
+        {"not_applicable"}
+        if expected_phase in {"build", "build-fix"}
+        else {"approved", "requires_changes"}
+    )
+    if payload.get("review_verdict") not in expected_verdicts:
         errors.append(f"{expected_phase} sentinel trusted metadata review_verdict is invalid")
+    for field in ("worker_id", "session_id"):
+        if not isinstance(payload.get(field), str) or not payload.get(field, "").strip():
+            errors.append(f"{expected_phase} sentinel trusted metadata {field} is invalid")
     if not isinstance(payload.get("candidate_artifact"), str) or not payload.get("candidate_artifact"):
         errors.append(f"{expected_phase} sentinel trusted metadata candidate_artifact is invalid")
     candidate_sha256 = payload.get("candidate_sha256")

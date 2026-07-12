@@ -86,7 +86,13 @@ class WorkflowContractTests(unittest.TestCase):
             payload.update({
                 "candidate_artifact": scalar("candidate artifact"),
                 "candidate_sha256": scalar("candidate sha256"),
-                "review_verdict": scalar("review verdict") or "not_applicable",
+                "review_verdict": (
+                    scalar("review verdict")
+                    if phase_name.startswith("review")
+                    else "not_applicable"
+                ),
+                "worker_id": "reviewer-8" if phase_name.startswith("review") else "builder-7",
+                "session_id": "review-session-13" if phase_name.startswith("review") else "build-session-12",
             })
         elif phase_name.startswith("review"):
             payload["review_verdict"] = scalar("review verdict")
@@ -964,6 +970,57 @@ class WorkflowContractTests(unittest.TestCase):
 
             self.assertEqual(1, result.returncode)
             self.assertIn("completed_at", result.stdout)
+
+    def test_review_rejects_build_sentinel_missing_execution_identity(self):
+        for missing_field in ("worker_id", "session_id"):
+            with self.subTest(missing_field=missing_field), tempfile.TemporaryDirectory() as temp_dir:
+                root = Path(temp_dir)
+                notes = root / "notes"
+                notes.mkdir()
+                summary = notes / "phase-summary.md"
+                _, candidate_sha = self.make_candidate(root)
+                sentinel = notes / ".phase-build.done"
+                self.write_sentinel(
+                    summary, sentinel, "build", worker_id="builder-7",
+                    session_id="build-session-12", review_verdict="not_applicable",
+                    candidate_artifact="slides/candidate.pptx", candidate_sha256=candidate_sha,
+                )
+                payload = json.loads(sentinel.read_text(encoding="utf-8"))
+                payload.pop(missing_field)
+                sentinel.write_text(json.dumps(payload), encoding="utf-8")
+                self.write_artifact_summary(
+                    summary, phase="review", candidate_sha256=candidate_sha,
+                    verdict="approved", next_phase="release", worker_id="reviewer-8",
+                    session_id="review-session-13",
+                )
+
+                result = self.complete_phase(summary, phase="review")
+
+                self.assertEqual(1, result.returncode)
+                self.assertIn(missing_field, result.stdout)
+
+    def test_review_rejects_build_sentinel_with_approved_verdict(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            notes = root / "notes"
+            notes.mkdir()
+            summary = notes / "phase-summary.md"
+            _, candidate_sha = self.make_candidate(root)
+            self.write_sentinel(
+                summary, notes / ".phase-build.done", "build", worker_id="builder-7",
+                session_id="build-session-12", review_verdict="approved",
+                candidate_artifact="slides/candidate.pptx", candidate_sha256=candidate_sha,
+            )
+            self.write_artifact_summary(
+                summary, phase="review", candidate_sha256=candidate_sha,
+                verdict="approved", next_phase="release", worker_id="reviewer-8",
+                session_id="review-session-13",
+            )
+
+            result = self.complete_phase(summary, phase="review")
+
+            self.assertEqual(1, result.returncode)
+            self.assertIn("review_verdict", result.stdout)
 
     def test_release_rejects_handcrafted_approved_review_sentinel(self):
         with tempfile.TemporaryDirectory() as temp_dir:
