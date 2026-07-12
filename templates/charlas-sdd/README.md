@@ -39,14 +39,7 @@ El feedback humano tambien es entrada SDD: `orchestrator-charlas` lo clasifica, 
 `modo chat separado` sigue el protocolo `skills/worker-handoff` y las reglas de `agents/orchestrator-charlas.md`: paquete acotado, summary en disco y sentinel escrito al final.
 
 ## Precondiciones
-| Fase | Spec minimo | Artefactos minimos |
-|---|---|---|
-| thesis-review | `thesis-spec.md` | brief o tesis abierta, `run_id` y decision hacia `research` o `stop` |
-| research | `research-spec.md` o package compacto | framing o tesis base |
-| narrativa | `narrative-spec.md` | research aprobado |
-| build | `build-spec.md` | `narrative-spec.md` aprobado, `notes/bibliografia.md` si hubo research |
-| imagen final | `image-spec.md` | tesis, mensaje final, cita/fallback, tono y restricciones visuales |
-| review | `review-spec.md` | deck exacto, sentinels previos requeridos, build report o evidencia de build, cierre visual cuando aplique, bibliografia y `notes/phase-summary.md` |
+Consulta en `agents/workflow-contract.json` los inputs, outputs, roles, specs, prompts y transiciones de cada fase; no mantengas una tabla paralela en estos templates.
 
 Si falta un spec obligatorio, no lances la fase. Corrige primero el contrato.
 
@@ -57,14 +50,14 @@ Si hubo research externo, el handoff tambien debe incluir `notes/bibliografia.md
 ## Phase summary
 `notes/phase-summary.md` reemplaza cualquier bitacora operativa. Debe representar el estado actual y ser lo unico que el hilo padre lee para avanzar.
 
-Para transiciones, el padre lee solo `notes/phase-summary.md`, el mutable current summary. Al completar una fase, `scripts/agent_workflow/complete-phase.py` toma un snapshot del contenido validado exacto en `notes/phase-summary.<run_id>.md`; el sentinel registra esa ruta y `summary_sha256`, junto con `contract_version`, `run_id`, `phase`, `attempt`, `execution_status` y `completed_at`. La validacion historica y las auditorias usan exclusivamente el snapshot inmutable nombrado por el sentinel; el mutable current summary no es evidencia historica.
+El worker sobrescribe `notes/phase-summary.md` y publica el sentinel al final mediante `scripts/agent_workflow/complete-phase.py`. El padre valida `run_id`, fase, intento y estado de ejecucion antes de leer el resumen. La mera existencia del sentinel no implica finalizacion.
 
 Formato minimo: usar exactamente `templates/charlas-sdd/phase-summary.md`. La combinacion de `Execution status`, `Decision` y `Review verdict` reemplaza campos ambiguos: una fase que termino pero requiere otra iteracion registra `completed`, `iterate` y el veredicto que corresponda.
 
 No pegues outputs de comandos, renders, transcripts ni reportes completos en el padre. Escribe evidencia larga a archivos y referencia rutas.
 
 ## Worker separado
-Usa `skills/worker-handoff` y `agents/orchestrator-charlas.md` para sentinels, summaries temporales, esperas y reglas de monitoreo. Estos templates solo definen insumos y salidas esperadas por fase.
+Usa `skills/worker-handoff` y `agents/orchestrator-charlas.md` para workers con `fork_context: false`, inputs minimos, sentinels, summaries temporales, esperas y reglas de monitoreo. El padre no lee chat, logs ni razonamiento del worker. Estos templates solo definen insumos y salidas esperadas por fase.
 
 ## Build PPTX
 Para decks `pptx` nuevos desde cero, usar por defecto el renderer local del repo en `scripts/deck_renderer/` desde `deck-spec.json`. El theme default es `scripts/deck_renderer/theme-charlas.json`.

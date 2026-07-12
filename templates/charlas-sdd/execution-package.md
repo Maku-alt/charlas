@@ -44,7 +44,10 @@ At completion, the worker overwrites `<talk>/notes/phase-summary.md`, then publi
 
 The parent validates the sentinel run ID, phase, attempt and execution status before reading `<talk>/notes/phase-summary.md`.
 
+Sentinel existence alone is not completion. The parent does not read worker chat, logs or reasoning.
+
 ## actual runtime
+- Fork context: `false`
 - Requested model: `<model | thread_default>`
 - Actual model: `<model>`
 - Requested reasoning effort: `<level | none>`

@@ -1,288 +1,63 @@
 ---
 name: worker-flow-audit
-description: Audit Codex workflows by phase, including parent-run phases, worker threads, sentinels, file handoffs, and token/function-call accounting. Use this whenever the user asks to validate token consumption, map a run to the right events/sessions, check whether workers actually ran, whether read_thread/subagents were avoided, whether a parent did heavy work, or whether an audit may have counted the wrong events. Includes guidance for the charlas repo workflow.
+description: Audit a charla worker run against its canonical identity, transition, artifacts and referenced evidence without reading worker chats or modifying the run.
 ---
 
 # Worker Flow Audit
 
-Use this skill to audit Codex workflows phase by phase. A phase may run in the parent conversation, in a separate worker thread, or in a mixed/iterative path. The audit maps each phase to the right local events/sessions and then determines whether product validity, execution mode, and token/function-call consumption are measurable.
+Audit a bounded charla run from repository artifacts. The audit answers whether the declared phase ran under the expected identity, produced the expected artifact and supports the requested transition.
 
-The audit must separate three questions:
+## Boundaries
 
-1. Did the final product pass?
-2. Which phases ran, where did they run, and are they tied to the right events/sessions?
-3. Is token/function-call usage measurable from reliable local evidence?
+- Treat `agents/workflow-contract.json` as canonical for phases, transitions, roles, inputs, outputs, sentinels and independence constraints. Do not reproduce its phase table.
+- Never use `read_thread` or inspect worker chats, logs or reasoning.
+- Do not rerun or modify the audited phase or its artifacts.
+- Do not infer completion from sentinel existence alone.
+- Keep Advisor exceptional and consultative; it is not a workflow phase or a source of transition authority.
 
-Do not collapse these into one verdict. A run can pass as product and fail as auditable token design.
+## Evidence
 
-## Core Rules
+Use the execution package, sentinel, `notes/phase-summary.md`, expected artifacts and evidence paths referenced by the summary. For each claim, cite a concrete path, field, hash or check result. Missing evidence remains missing; do not reconstruct it from conversation history.
 
-Never use `read_thread` to inspect worker chats.
+## Audit Procedure
 
-Do not read worker chat transcripts.
+1. Read the execution package and canonical contract.
+2. Validate that the sentinel matches `run_id`, phase, attempt and execution status.
+3. Only after that validation, read `notes/phase-summary.md`.
+4. Check that the summary and artifact match the declared phase and output contract.
+5. Check that the proposed transition is allowed by the canonical contract.
+6. Inspect only the referenced evidence needed for the verdict.
+7. Write a concise report with findings and a pass, changes-required or blocked verdict.
 
-Do not use subagents for the audit unless the user explicitly asks for a separate meta-audit.
+The worker overwrites `notes/phase-summary.md` and publishes the sentinel last through `complete-phase.py`. The parent validates run identity, phase, attempt and execution status before reading the summary. Sentinel existence alone is not completion.
 
-Do not rerun build, review, fix, or final review phases during audit.
+Validation ties the run ID, phase, attempt and summary path to the execution package.
 
-Do not modify audited artifacts. Only write the audit report.
+## Independent Review And PPTX Gates
 
-Do not count text mentions as tool calls. Strings such as `create_thread`, `send_message_to_thread`, `read_thread`, worker ids, or run ids inside prompts, markdown, CSVs, command output, or assistant messages are not function calls.
+For review phases, confirm the reviewer is independent from build or build-fix as required by the contract. Review reports findings; it does not silently repair the candidate.
 
-A JSONL can only be classified as a real parent/orchestrator session if it has structured evidence of launching workers, such as real function calls to `create_thread` or `send_message_to_thread`, or local metadata that proves it created child threads.
+For a PPTX candidate, preserve these gates:
 
-If phase or worker JSONL files are missing, say so. Do not infer token totals.
-
-Do not treat `phase-summary.md`, hand-written JSON, or worker-authored summaries as proof of token usage. They can identify phases, artifacts, sentinels, and declared status, but token consumption must come from runtime events, JSONL usage checkpoints, or another verifiable system source.
-
-## Evidence Sources
-
-Prefer local evidence in this order:
-
-1. Current repo artifacts.
-2. Sentinels and handoff files.
-3. Local Codex JSONL session files under `C:\Users\Victor\.codex\sessions\`.
-4. `C:\Users\Victor\.codex\process_manager\chat_processes.json`.
-5. `C:\Users\Victor\.codex\logs_2.sqlite` in read-only mode.
-6. Generated asset folders, temp folders, and filesystem timestamps.
-7. Prior audit reports, only as secondary evidence.
-
-Use previous audit reports to compare or detect mistakes, not as primary truth.
-
-## Session Identification
-
-Start every audit by identifying the run/event boundary. Determine which local sessions or event records are related to the requested test, which are actual execution, and which are later audit or coordination discussion.
-
-For every candidate JSONL, classify it as one of:
-
-- `accepted_parent`
-- `accepted_worker`
-- `accepted_phase_session`
-- `related_conversation`
-- `audit_session`
-- `rejected_candidate`
-
-For each candidate record:
-
-- file path
-- session/conversation id
-- timestamp range
-- why it was considered
-- run id hits
-- worker id hits
-- structured function calls
-- textual mentions only
-- associated phase, if any
-- final decision
-
-Reject a JSONL as parent if it only contains prompts, summaries, or audit discussion about the run.
-
-If a JSONL spans multiple user tasks, only count the window relevant to the audited run. If the window cannot be bounded reliably, mark token measurement as partial or invalid.
-
-## Function Call Accounting
-
-Count only structured function-call events.
-
-Report at least:
-
-- `create_thread`
-- `send_message_to_thread`
-- `read_thread`
-- `spawn_agent`
-- `wait_agent`
-- `close_agent`
-- `exec_command`
-- `apply_patch`
-- `view_image`
-- `load_workspace_dependencies`
-- `image_generation_call`
-
-If a tool name appears only in text, do not count it.
-
-## Token Accounting
-
-Use token checkpoints only from accepted sessions.
-
-Report separately:
-
-- `parent_tokens_confirmed`
-- `worker_tokens_confirmed`
-- `phase_tokens_confirmed`
-- `observed_tokens_lower_bound`
-- `end_to_end_tokens`
-
-Set `end_to_end_tokens` to `unknown` if any required phase token usage is missing or cannot be bounded.
-
-Never compare a partial token total against baselines as if it were end-to-end consumption.
-
-For iterative phases such as research or narrative, measure only if the conversation window is clearly bounded. If the phase is mixed with unrelated discussion, report it as partially measurable or unknown rather than guessing.
-
-If a mini or functional test passes operationally but lacks accepted token events, report it as `flow passes / token usage unknown`. Do not turn successful sentinels or artifacts into token evidence.
-
-## Phase Execution Validation
-
-Create a table per expected or observed phase:
-
-- phase
-- execution mode: `parent`, `worker`, `subagent`, `manual/external`, `unknown`
-- accepted session/event id
-- expected worker/thread id, if any
-- sentinel path
-- sentinel timestamp
-- expected artifact
-- artifact exists
-- process_manager evidence
-- SQLite evidence
-- JSONL found
-- tokens measurable
-- verdict: `confirmed`, `partially confirmed`, or `not confirmed`
-
-Use `confirmed` only when there is strong execution evidence, preferably JSONL or equivalent local metadata.
-
-Use `partially confirmed` when sentinels/artifacts/timestamps support the workflow but tool-call or token evidence is missing. For parent-run phases, use `partially confirmed` when the artifact exists but the token window cannot be cleanly bounded.
-
-## Report Structure
-
-Create an audit output directory named for the experiment, for example:
-
-```text
-analysis/token-finalflow-workers-presentations-experiment-YYYY-MM-DD
-analysis/token-finalflow-workers-presentations-experiment-YYYY-MM-DD-corrected
-```
-
-Generate these files when applicable:
-
-```text
-verdict.md
-correction-notes.md
-session-identification.md
-worker-execution-validation.md
-phase-execution-validation.md
-final-product-validation.md
-token-measurement-validation.md
-function-calls-summary.csv
-usage-sessions-summary.csv
-sentinel-validation.md
-visual-qa-validation.md
-build-engine-validation.md
-comparison-vs-previous-experiments.md
-run-metadata.md
-```
-
-Keep reports concise. Use tables, timestamps, paths, hashes, and counts. Do not paste long logs or transcripts.
-
-## Verdict Format
-
-In `verdict.md`, declare separately:
-
-- passes/fails as final product
-- passes/fails as phase/event identification
-- passes/fails as probable worker execution
-- passes/fails as fully auditable worker contract
-- passes/fails as end-to-end token measurement
-- main cause of failure, if any
-- concrete recommendation for the next run
-
-Use language like:
-
-```text
-Producto final: pasa.
-Ejecucion probable con workers: pasa parcialmente.
-Contrato workers auditable completo: no pasa.
-Medicion consumo end-to-end: no medible.
-```
-
-## Charlas Repo Adapter
-
-Use this adapter when auditing:
-
-```text
-C:\Users\Victor\Proyectos\2026\charlas
-```
-
-Expected repo conventions:
-
-```text
-notes/phase-summary.md
-notes/phase-summary.<run_id>.md (immutable snapshot named by the sentinel)
-notes/.phase-<phase>.done (JSON, validated against the execution package)
-review/<run-id>/
-slides/<run-id>/
-```
-
-Expected phases and sentinel names come from `agents/workflow-contract.json`. Expected charla phases include `thesis-review`, `research`, `narrative`, `image-close`, `build`, `review`, `build-fix`, `review-final`, and `release`.
-
-For every completed phase, use `scripts/agent_workflow/validate-workflow.py` to validate the summary and sentinel. A sentinel confirms completion only when its run ID, phase, attempt and summary path match the execution package; existence or timestamp alone is insufficient. The sentinel must carry `contract_version`, `run_id`, `phase`, `attempt`, `execution_status`, `summary`, `summary_sha256`, and `completed_at`.
-
-For transitions, the parent reads only `notes/phase-summary.md`, the mutable current summary. For historical validation and audits, read only `notes/phase-summary.<run_id>.md` named by the sentinel and verify `summary_sha256`; the mutable current summary is not historical evidence.
-
-For PPTX flows, validate:
-
-- final PPTX exists
-- final PPTX SHA256
-- filename has no experimental suffix when promoted
-- `phase-summary.md` declares the current phase, execution status, decision and review verdict
-- PowerPoint native opened/exported final PPTX
-- exported slide count
-- contact sheet evidence
-- review report and review-final report
-- maximum one `review -> build-fix -> review-final` cycle unless explicitly authorized
-- New decks use `deck-spec.json` -> `scripts/deck_renderer/render-deck.js`.
-- `qa-deck.py` and `validate-powerpoint.ps1` provide mechanical and native evidence.
+- Validate the exact candidate artifact and its integrity hash.
+- Confirm review and review-final refer to that same candidate.
+- Confirm new decks use `deck-spec.json` -> `scripts/deck_renderer/render-deck.js`.
+- Confirm `qa-deck.py` and `validate-powerpoint.ps1` evidence exists.
+- Require the editable PPTX to open and export in native PowerPoint.
 - PowerPoint native remains the final gate.
-- LibreOffice/Poppler only auxiliary, not final gate
+- Treat LibreOffice and Poppler as auxiliary checks only.
+- Allow release to promote only the candidate approved by review-final.
 
-Known baselines for this repo:
+## Report
 
-```text
-subagentes: 9,661,763
-hilos polling: 11,382,147
-hilos sentinel: 7,028,838
-Presentations sentinel: 4,134,978
-finalflow single-session invalido: 6,548,836
-```
+Keep the report compact:
 
-Do not compare against these using partial token totals. If only parent tokens are known, compare only as `parent_orchestration_tokens`.
+- Run identity and phase.
+- Sentinel validation result.
+- Canonical transition result.
+- Expected artifact and integrity result.
+- Referenced evidence checked.
+- Independence and native PowerPoint gate when applicable.
+- Findings, verdict and one next action.
 
-## Common Failure Modes
-
-Watch for these audit errors:
-
-- Treating a prompt that says "use create_thread" as evidence that `create_thread` ran.
-- Treating a JSONL with run-id mentions as the parent session.
-- Counting the audit session itself as part of the run.
-- Counting post-run conversation in the same JSONL.
-- Declaring worker token savings when worker token logs are missing.
-- Declaring no worker evidence while ignoring `process_manager` or filesystem artifacts.
-- Approving a PPTX by LibreOffice/Poppler when the repo requires PowerPoint native as gate.
-
-## Recommendation for Future Runs
-
-If worker token measurement is required, ask each worker to write a small local telemetry file at completion, for example:
-
-```text
-review/<run-id>/telemetry/<phase>-usage-summary.json
-```
-
-Suggested fields:
-
-```json
-{
-  "run_id": "",
-  "phase": "",
-  "thread_id": "",
-  "session_jsonl": "",
-  "started_at": "",
-  "completed_at": "",
-  "total_tokens": null,
-  "input_tokens": null,
-  "cached_input_tokens": null,
-  "output_tokens": null,
-  "function_calls": {},
-  "artifacts": [],
-  "sentinel": "",
-  "status": "done|blocked"
-}
-```
-
-If this file is missing, mark worker token measurement as unavailable.
+Do not paste transcripts or command logs. Reference their paths when they are legitimate evidence.

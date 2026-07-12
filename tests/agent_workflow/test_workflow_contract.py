@@ -967,6 +967,23 @@ class WorkflowContractTests(unittest.TestCase):
             self.contract["required_sentinel_fields"],
         )
 
+    def test_operational_docs_use_only_the_current_phase_summary(self):
+        targets = [
+            "README.md",
+            "agents/orchestrator-charlas.md",
+            "templates/charlas-sdd/README.md",
+            "templates/charlas-sdd/execution-package.md",
+            "skills/worker-handoff/SKILL.md",
+            "skills/worker-flow-audit/SKILL.md",
+        ]
+
+        for target in targets:
+            with self.subTest(target=target):
+                text = (ROOT / target).read_text(encoding="utf-8")
+                self.assertIn("notes/phase-summary.md", text)
+                self.assertNotIn("phase-summary.<run_id>.md", text)
+                self.assertNotIn("summary_sha256", text)
+
     def test_cli_validates_migrated_summary_without_a_completion_sentinel(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             notes = Path(temp_dir) / "notes"
