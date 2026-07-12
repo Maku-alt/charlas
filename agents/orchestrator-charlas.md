@@ -31,10 +31,8 @@ Después de lanzar un worker, consulta el sentinel esperado mediante `Test-Path`
 
 Una vez validado, lee `notes/phase-summary.md` y la evidencia referenciada estrictamente necesaria para decidir la transición. Las fases con el unico summary canonico corren secuencialmente por defecto. `allows_parallel_with` permanece como metadato de capacidad inactivo hasta que exista publicacion soportada con handoffs distintos; el padre transiciona solo desde `notes/phase-summary.md` validado.
 
-El worker sobrescribe `notes/phase-summary.md` y publica el sentinel al final mediante `scripts/agent_workflow/complete-phase.py`. El padre valida `run_id`, fase, intento y estado de ejecución antes de leer el resumen. La mera existencia del sentinel no implica finalización.
-
 ## Release
-`release` solo puede promover el candidato exacto aprobado por `review-final`. Antes de promoverlo, compara su SHA256 con el hash del candidato revisado; vuelve a calcular el SHA256 del archivo promovido y bloquea la release si cualquiera de los hashes difiere. Registra la identidad y hashes en el resumen de release mediante el flujo canónico.
+`release` puede promover el candidato exacto aprobado por `review` o, cuando hubo corrección, por `review-final`. El orquestador realiza la copia antes de completar la fase. `complete-phase.py` valida que el candidato aprobado y el artefacto final existan dentro de la charla, que sus SHA256 coincidan exactamente y que el sentinel predecesor tenga veredicto aprobado; solo entonces publica identidad y hashes en el sentinel de release.
 
 ## Corrección y bloqueos
 Si `review` requiere cambios, decide entre la transición permitida (`build-fix`, regreso de fase o `stop`) usando el reporte accionable. `build-fix` se limita a las slides y criterios de aceptación del paquete. `review-final` no aprobado termina en `stop`, salvo autorización explícita del usuario para un nuevo ciclo.

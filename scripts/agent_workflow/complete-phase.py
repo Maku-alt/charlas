@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 from contextlib import contextmanager
 from datetime import datetime
+import hashlib
 import importlib.util
 import json
 import os
@@ -161,11 +162,22 @@ def main() -> int:
                 "worker_id": _scalar(summary, "worker id"),
                 "session_id": _scalar(summary, "session id"),
             })
-        if workflow_contract.is_compact_boundary(summary):
+        if args.phase in workflow_contract.ARTIFACT_PHASES:
             payload.update({
-                "workflow_mode": workflow_contract.COMPACT_WORKFLOW_MODE,
                 "candidate_artifact": _scalar(summary, "candidate artifact"),
                 "candidate_sha256": _scalar(summary, "candidate sha256"),
+            })
+        if args.phase.startswith("review"):
+            payload["review_verdict"] = _scalar(summary, "review verdict")
+        if workflow_contract.is_compact_boundary(summary):
+            payload["workflow_mode"] = workflow_contract.COMPACT_WORKFLOW_MODE
+        if args.phase == "release":
+            final = (summary_path.parent.parent / _scalar(summary, "final artifact")).resolve()
+            payload.update({
+                "candidate_artifact": _scalar(summary, "candidate artifact"),
+                "candidate_sha256": _scalar(summary, "candidate sha256"),
+                "final_artifact": _scalar(summary, "final artifact"),
+                "final_sha256": hashlib.sha256(final.read_bytes()).hexdigest(),
             })
         _write_atomically(sentinel, payload)
     print(f"COMPLETED: {sentinel}")

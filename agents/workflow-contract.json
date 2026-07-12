@@ -78,7 +78,7 @@
     },
     "review": {
       "sentinel": ".phase-review.done",
-      "next": ["build-fix", "narrative", "image-close", "stop"],
+      "next": ["release", "build-fix", "narrative", "image-close", "stop"],
       "role": "review-charlas",
       "spec": "review-spec.md",
       "prompt": "run-review.md",

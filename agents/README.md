@@ -3,7 +3,7 @@
 Esta carpeta contiene roles especializados. El chat principal usa `orchestrator-charlas` para preparar el paquete de fase y no debe absorber el trabajo pesado de cada rol.
 
 ## Roles
-- `orchestrator-charlas`: coordina fase, dependencias, launch, paralelizacion y bloqueos.
+- `orchestrator-charlas`: coordina fase, dependencias, launch, secuenciacion y bloqueos.
 - `researcher-charlas`: investiga, tensiona tesis y devuelve research discutible.
 - `narrative-charlas`: convierte research convergido en narrativa de `8-10 slides`.
 - `deck-builder-charlas`: construye decks `pptx` nuevos con el renderer local del repo desde `deck-spec.json` y evidencia de QA; `pptx` queda solo para emergencia o diagnostico avanzado.
@@ -35,7 +35,7 @@ Cada fase pesada debe ejecutarse con contexto acotado:
 - spec desde `specs/` o `templates/charlas-sdd/`
 - prompt desde `templates/charlas-sdd/prompts/`
 - artefactos previos estrictamente necesarios
-- `notes/phase-summary.md` como handoff operativo, salvo summaries temporales de `build` + `image-close` paralelos
+- `notes/phase-summary.md` como unico handoff operativo
 - `model`, `reasoning_effort` y `fork_context: false` explicitos cuando se use subagente
 
 El rol no es opcional. Por ejemplo, narrativa requiere `agents/narrative-charlas.md` ademas de `narrative-spec.md` y `run-narrative.md`.
@@ -50,9 +50,9 @@ El rol no es opcional. Por ejemplo, narrativa requiere `agents/narrative-charlas
 - `review-charlas` depende de deck parcial o final, cierre y evidencia de build.
 - Si hay duda sobre fase o dependencias, empezar por `orchestrator-charlas`.
 
-`deck-builder-charlas` e `image-closer-charlas` pueden correr en paralelo solo si mensaje final, cita/fallback y direccion de cierre ya existen o se fijan antes.
+Las fases corren secuencialmente mientras compartan el unico summary canonico. `allows_parallel_with` es metadato de capacidad inactivo hasta que exista publicacion soportada con handoffs distintos.
 
-En hilos worker separados, el padre sigue `skills/worker-handoff` y las reglas concretas de `orchestrator-charlas`: verifica sentinels con `Test-Path`, no usa `read_thread` ni chat worker, y consolida summaries temporales solo en la bifurcacion `build` + `image-close`.
+En hilos worker separados, el padre sigue `skills/worker-handoff` y las reglas concretas de `orchestrator-charlas`: verifica sentinels con `Test-Path` y no usa `read_thread` ni chat worker.
 
 ## Artefactos obligatorios
 - Si hubo research externo, debe existir `notes/bibliografia.md`.

@@ -51,13 +51,23 @@ class WorkflowContractTests(unittest.TestCase):
         return summary, sentinel
 
     def write_valid_review_final(self, summary):
-        shutil.copy(FIXTURES / "valid-phase-summary.md", summary)
+        _, candidate_sha256 = self.make_candidate(summary.parent.parent)
+        text = (FIXTURES / "valid-phase-summary.md").read_text(encoding="utf-8")
+        summary.write_text(
+            text.replace(
+                "## Candidate artifact\nslides/candidate.pptx",
+                f"## Candidate artifact\nslides/candidate.pptx\n\n## Candidate SHA256\n{candidate_sha256}",
+            ),
+            encoding="utf-8",
+        )
         self.write_sentinel(
             summary,
             summary.parent / ".phase-build-fix.done",
             "build-fix",
             worker_id="builder-7",
             session_id="build-session-12",
+            candidate_artifact="slides/candidate.pptx",
+            candidate_sha256=candidate_sha256,
         )
 
     def write_sentinel(self, summary_path, sentinel, phase_name, **overrides):
@@ -70,6 +80,15 @@ class WorkflowContractTests(unittest.TestCase):
             "summary": "notes/phase-summary.md",
             "completed_at": "2026-07-10T12:05:00-05:00",
         }
+        parsed = self.workflow_contract.parse_summary(summary_path) if summary_path.is_file() else {}
+        scalar = lambda name: parsed.get(name, "").splitlines()[0].strip() if parsed.get(name, "").strip() else ""
+        if phase_name in self.workflow_contract.ARTIFACT_PHASES:
+            payload.update({
+                "candidate_artifact": scalar("candidate artifact"),
+                "candidate_sha256": scalar("candidate sha256"),
+            })
+        if phase_name.startswith("review"):
+            payload["review_verdict"] = scalar("review verdict")
         payload.update(overrides)
         sentinel.write_text(json.dumps(payload), encoding="utf-8")
         now = datetime.now().timestamp()
@@ -132,6 +151,34 @@ class WorkflowContractTests(unittest.TestCase):
         result = self.complete_phase(summary, phase="build")
         self.assertEqual(0, result.returncode, result.stdout)
         return candidate_sha256
+
+    def write_artifact_summary(
+        self, summary, *, phase, candidate_sha256, candidate_artifact="slides/candidate.pptx",
+        verdict="not_applicable", next_phase=None, worker_id="builder-7",
+        session_id="build-session-12", final_artifact="none",
+    ):
+        default_next = {
+            "build": "review", "review": "build-fix", "build-fix": "review-final",
+            "review-final": "release", "release": "none",
+        }
+        text = (FIXTURES / "valid-phase-summary.md").read_text(encoding="utf-8")
+        text = text.replace("## Phase\nreview-final", f"## Phase\n{phase}")
+        text = text.replace("## Review verdict\napproved", f"## Review verdict\n{verdict}")
+        text = text.replace("## Next phase\nrelease", f"## Next phase\n{next_phase or default_next[phase]}")
+        text = text.replace("## Worker ID\nreviewer-8", f"## Worker ID\n{worker_id}")
+        text = text.replace("## Session ID\nreview-session-13", f"## Session ID\n{session_id}")
+        text = text.replace(
+            "## Candidate artifact\nslides/candidate.pptx",
+            f"## Candidate artifact\n{candidate_artifact}\n\n## Candidate SHA256\n{candidate_sha256}",
+        )
+        text = text.replace("## Final artifact\nnone", f"## Final artifact\n{final_artifact}")
+        summary.write_text(text, encoding="utf-8")
+
+    def make_candidate(self, talk_root, content=b"exact candidate"):
+        candidate = talk_root / "slides" / "candidate.pptx"
+        candidate.parent.mkdir(exist_ok=True)
+        candidate.write_bytes(content)
+        return candidate, hashlib.sha256(content).hexdigest()
 
     def hold_publish_lock(self, sentinel):
         lock_path = sentinel.parent / f"{sentinel.name}.lock"
@@ -651,6 +698,211 @@ class WorkflowContractTests(unittest.TestCase):
                 )
                 self.assertTrue(any(expected in error for error in errors), errors)
 
+    def test_full_build_rejects_nonexistent_candidate(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            notes = Path(temp_dir) / "notes"
+            notes.mkdir()
+            summary = notes / "phase-summary.md"
+            self.write_artifact_summary(summary, phase="build", candidate_sha256="0" * 64)
+
+            result = self.complete_phase(summary, phase="build")
+
+            self.assertEqual(1, result.returncode)
+            self.assertIn("existing file inside the talk directory", result.stdout)
+
+    def test_full_build_rejects_candidate_sha_mismatch(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            notes = Path(temp_dir) / "notes"
+            notes.mkdir()
+            summary = notes / "phase-summary.md"
+            self.make_candidate(Path(temp_dir))
+            self.write_artifact_summary(summary, phase="build", candidate_sha256="0" * 64)
+
+            result = self.complete_phase(summary, phase="build")
+
+            self.assertEqual(1, result.returncode)
+            self.assertIn("SHA256", result.stdout)
+
+    def test_full_review_rejects_candidate_different_from_completed_build(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            notes = root / "notes"
+            notes.mkdir()
+            summary = notes / "phase-summary.md"
+            _, candidate_sha = self.make_candidate(root)
+            self.write_sentinel(
+                summary, notes / ".phase-build.done", "build", worker_id="builder-7",
+                session_id="build-session-12", candidate_artifact="slides/other.pptx",
+                candidate_sha256=candidate_sha,
+            )
+            self.write_artifact_summary(
+                summary, phase="review", candidate_sha256=candidate_sha,
+                verdict="requires_changes", worker_id="reviewer-8", session_id="review-session-13",
+            )
+
+            result = self.complete_phase(summary, phase="review")
+
+            self.assertEqual(1, result.returncode)
+            self.assertIn("candidate artifact does not match completed build", result.stdout)
+
+    def test_review_final_rejects_candidate_hash_different_from_build_fix(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            notes = root / "notes"
+            notes.mkdir()
+            summary = notes / "phase-summary.md"
+            _, candidate_sha = self.make_candidate(root)
+            self.write_sentinel(
+                summary, notes / ".phase-build-fix.done", "build-fix", worker_id="builder-7",
+                session_id="build-session-12", candidate_artifact="slides/candidate.pptx",
+                candidate_sha256="0" * 64,
+            )
+            self.write_artifact_summary(
+                summary, phase="review-final", candidate_sha256=candidate_sha, verdict="approved",
+                worker_id="reviewer-8", session_id="review-session-13",
+            )
+
+            result = self.complete_phase(summary, phase="review-final")
+
+            self.assertEqual(1, result.returncode)
+            self.assertIn("Candidate SHA256 does not match completed build-fix", result.stdout)
+
+    def test_full_artifact_sentinel_publishes_candidate_identity(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            notes = root / "notes"
+            notes.mkdir()
+            summary = notes / "phase-summary.md"
+            _, candidate_sha = self.make_candidate(root)
+            self.write_artifact_summary(summary, phase="build", candidate_sha256=candidate_sha)
+
+            result = self.complete_phase(summary, phase="build")
+
+            self.assertEqual(0, result.returncode, result.stdout)
+            payload = json.loads((notes / ".phase-build.done").read_text(encoding="utf-8"))
+            self.assertEqual("slides/candidate.pptx", payload["candidate_artifact"])
+            self.assertEqual(candidate_sha, payload["candidate_sha256"])
+
+    def test_approved_initial_review_may_advance_to_release(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            notes = root / "notes"
+            notes.mkdir()
+            summary = notes / "phase-summary.md"
+            _, candidate_sha = self.make_candidate(root)
+            self.write_sentinel(
+                summary, notes / ".phase-build.done", "build", worker_id="builder-7",
+                session_id="build-session-12", candidate_artifact="slides/candidate.pptx",
+                candidate_sha256=candidate_sha,
+            )
+            self.write_artifact_summary(
+                summary, phase="review", candidate_sha256=candidate_sha, verdict="approved",
+                next_phase="release", worker_id="reviewer-8", session_id="review-session-13",
+            )
+
+            result = self.complete_phase(summary, phase="review")
+
+            self.assertEqual(0, result.returncode, result.stdout)
+
+    def test_release_rejects_altered_final_artifact(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            notes = root / "notes"
+            notes.mkdir()
+            summary = notes / "phase-summary.md"
+            _, candidate_sha = self.make_candidate(root)
+            final = root / "slides" / "final.pptx"
+            final.write_bytes(b"altered")
+            self.write_sentinel(
+                summary, notes / ".phase-review.done", "review", worker_id="reviewer-8",
+                session_id="review-session-13", candidate_artifact="slides/candidate.pptx",
+                candidate_sha256=candidate_sha, review_verdict="approved",
+            )
+            self.write_artifact_summary(
+                summary, phase="release", candidate_sha256=candidate_sha,
+                candidate_artifact="slides/candidate.pptx", final_artifact="slides/final.pptx",
+            )
+
+            result = self.complete_phase(summary, phase="release")
+
+            self.assertEqual(1, result.returncode)
+            self.assertIn("Final artifact SHA256 does not match approved candidate", result.stdout)
+
+    def test_release_publishes_exact_approved_candidate_and_final_identity(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            notes = root / "notes"
+            notes.mkdir()
+            summary = notes / "phase-summary.md"
+            candidate, candidate_sha = self.make_candidate(root)
+            final = root / "slides" / "final.pptx"
+            shutil.copyfile(candidate, final)
+            self.write_sentinel(
+                summary, notes / ".phase-review.done", "review", worker_id="reviewer-8",
+                session_id="review-session-13", candidate_artifact="slides/candidate.pptx",
+                candidate_sha256=candidate_sha, review_verdict="approved",
+            )
+            self.write_artifact_summary(
+                summary, phase="release", candidate_sha256=candidate_sha,
+                candidate_artifact="slides/candidate.pptx", final_artifact="slides/final.pptx",
+            )
+
+            result = self.complete_phase(summary, phase="release")
+
+            self.assertEqual(0, result.returncode, result.stdout)
+            payload = json.loads((notes / ".phase-release.done").read_text(encoding="utf-8"))
+            self.assertEqual("slides/candidate.pptx", payload["candidate_artifact"])
+            self.assertEqual(candidate_sha, payload["candidate_sha256"])
+            self.assertEqual("slides/final.pptx", payload["final_artifact"])
+            self.assertEqual(candidate_sha, payload["final_sha256"])
+
+    def test_release_rejects_unapproved_predecessor(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            notes = root / "notes"
+            notes.mkdir()
+            summary = notes / "phase-summary.md"
+            candidate, candidate_sha = self.make_candidate(root)
+            final = root / "slides" / "final.pptx"
+            shutil.copyfile(candidate, final)
+            self.write_sentinel(
+                summary, notes / ".phase-review.done", "review", candidate_artifact="slides/candidate.pptx",
+                candidate_sha256=candidate_sha, review_verdict="requires_changes",
+            )
+            self.write_artifact_summary(
+                summary, phase="release", candidate_sha256=candidate_sha,
+                candidate_artifact="slides/candidate.pptx", final_artifact="slides/final.pptx",
+            )
+
+            result = self.complete_phase(summary, phase="release")
+
+            self.assertEqual(1, result.returncode)
+            self.assertIn("approved review sentinel", result.stdout)
+
+    def test_release_rejects_approved_predecessor_for_other_candidate(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            notes = root / "notes"
+            notes.mkdir()
+            summary = notes / "phase-summary.md"
+            candidate, candidate_sha = self.make_candidate(root)
+            final = root / "slides" / "final.pptx"
+            shutil.copyfile(candidate, final)
+            self.write_sentinel(
+                summary, notes / ".phase-review.done", "review",
+                candidate_artifact="slides/other.pptx", candidate_sha256=candidate_sha,
+                review_verdict="approved",
+            )
+            self.write_artifact_summary(
+                summary, phase="release", candidate_sha256=candidate_sha,
+                candidate_artifact="slides/candidate.pptx", final_artifact="slides/final.pptx",
+            )
+
+            result = self.complete_phase(summary, phase="release")
+
+            self.assertEqual(1, result.returncode)
+            self.assertIn("exact candidate", result.stdout)
+
     def test_compact_review_publication_rejects_shared_build_identity(self):
         temp_dir = tempfile.TemporaryDirectory()
         notes = Path(temp_dir.name) / "notes"
@@ -672,13 +924,17 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("worker_id", result.stdout)
         self.assertFalse((notes / ".phase-review.done").exists())
 
-    def test_full_build_and_review_publication_do_not_require_compact_boundary_fields(self):
+    def test_full_build_and_review_publication_enforce_candidate_without_compact_mode(self):
         temp_dir = tempfile.TemporaryDirectory()
         notes = Path(temp_dir.name) / "notes"
         notes.mkdir()
         summary = notes / "phase-summary.md"
         self.addCleanup(temp_dir.cleanup)
-        text = (FIXTURES / "valid-phase-summary.md").read_text(encoding="utf-8")
+        _, candidate_sha256 = self.make_candidate(Path(temp_dir.name))
+        text = (FIXTURES / "valid-phase-summary.md").read_text(encoding="utf-8").replace(
+            "## Candidate artifact\nslides/candidate.pptx",
+            f"## Candidate artifact\nslides/candidate.pptx\n\n## Candidate SHA256\n{candidate_sha256}",
+        )
         summary.write_text(
             text.replace("## Run ID\nreview-contract-20260710-1200", "## Run ID\nbuild-contract-20260710-1200")
             .replace("## Phase\nreview-final", "## Phase\nbuild")
@@ -714,7 +970,11 @@ class WorkflowContractTests(unittest.TestCase):
         notes.mkdir()
         summary = notes / "phase-summary.md"
         self.addCleanup(temp_dir.cleanup)
-        text = (FIXTURES / "valid-phase-summary.md").read_text(encoding="utf-8")
+        _, candidate_sha256 = self.make_candidate(Path(temp_dir.name))
+        text = (FIXTURES / "valid-phase-summary.md").read_text(encoding="utf-8").replace(
+            "## Candidate artifact\nslides/candidate.pptx",
+            f"## Candidate artifact\nslides/candidate.pptx\n\n## Candidate SHA256\n{candidate_sha256}",
+        )
         build_summary = (
             text.replace("## Phase\nreview-final", "## Phase\nbuild")
             .replace("## Review verdict\napproved", "## Review verdict\nnot_applicable")
@@ -751,7 +1011,11 @@ class WorkflowContractTests(unittest.TestCase):
         notes.mkdir()
         summary = notes / "phase-summary.md"
         self.addCleanup(temp_dir.cleanup)
-        text = (FIXTURES / "valid-phase-summary.md").read_text(encoding="utf-8")
+        _, candidate_sha256 = self.make_candidate(Path(temp_dir.name))
+        text = (FIXTURES / "valid-phase-summary.md").read_text(encoding="utf-8").replace(
+            "## Candidate artifact\nslides/candidate.pptx",
+            f"## Candidate artifact\nslides/candidate.pptx\n\n## Candidate SHA256\n{candidate_sha256}",
+        )
         summary.write_text(
             text.replace("## Phase\nreview-final", "## Phase\nbuild")
             .replace("## Review verdict\napproved", "## Review verdict\nnot_applicable")

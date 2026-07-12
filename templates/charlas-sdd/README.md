@@ -18,7 +18,7 @@ Usa `compact/` cuando la charla sea pequena, tenga tesis clara o no tenga claims
 2. `build-package.md`
 3. `review-package.md`
 
-Los paquetes compactos deben publicar `Workflow mode: compact` en su phase summary. La review debe coincidir con el modo del sentinel de build; solo el modo compacto activa la validacion de identidad y hash. La ausencia conserva el flujo full por compatibilidad cuando build tambien es full.
+Los paquetes compactos deben publicar `Workflow mode: compact` en su phase summary. La review debe coincidir con el modo del sentinel de build. Tanto full como compact exigen identidad de ejecucion distinta entre build y review, candidato existente dentro de la charla, SHA256 exacto y coincidencia de ruta/hash con el sentinel predecesor. La ausencia conserva el modo full por compatibilidad cuando build tambien es full.
 
 ## Paquete de ejecucion
 Cada fase pesada debe recibir:

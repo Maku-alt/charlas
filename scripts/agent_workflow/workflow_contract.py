@@ -97,7 +97,7 @@ def _candidate_identity_errors(summary: dict[str, str], summary_path: Path) -> l
     errors: list[str] = []
     for field in ("worker id", "session id", "candidate sha256"):
         if not _scalar(summary, field):
-            errors.append(f"Missing compact boundary field: {field}")
+            errors.append(f"Missing artifact boundary field: {field}")
     candidate = _candidate_path(summary, summary_path)
     if candidate is None or not candidate.is_file():
         return [*errors, "Candidate artifact must be an existing file inside the talk directory"]
@@ -135,6 +135,74 @@ def validate_compact_review_boundary(summary: dict[str, str], summary_path: Path
     if build.get("candidate_sha256") != _scalar(summary, "candidate sha256"):
         errors.append("Compact review Candidate SHA256 does not match completed build")
     return errors
+
+
+def _artifact_predecessor_errors(summary: dict[str, str], summary_path: Path) -> list[str]:
+    phase = _scalar(summary, "phase")
+    predecessor = {"review": "build", "review-final": "build-fix"}.get(phase)
+    if predecessor is None:
+        return []
+    sentinel = summary_path.parent / f".phase-{predecessor}.done"
+    if not sentinel.is_file():
+        return [f"{phase} requires a completed {predecessor} sentinel"]
+    try:
+        previous = json.loads(sentinel.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return [f"{predecessor} sentinel must contain valid JSON"]
+    if not isinstance(previous, dict) or previous.get("phase") != predecessor:
+        return [f"{phase} requires a {predecessor} sentinel"]
+    errors: list[str] = []
+    if previous.get("candidate_artifact") != _scalar(summary, "candidate artifact"):
+        errors.append(f"{phase} candidate artifact does not match completed {predecessor}")
+    if previous.get("candidate_sha256") != _scalar(summary, "candidate sha256"):
+        errors.append(f"Candidate SHA256 does not match completed {predecessor}")
+    return errors
+
+
+def _in_talk_file(summary: dict[str, str], summary_path: Path, field: str) -> Path | None:
+    value = _scalar(summary, field)
+    if not value or value == "none":
+        return None
+    talk_root = summary_path.parent.parent.resolve()
+    path = (talk_root / value).resolve()
+    try:
+        path.relative_to(talk_root)
+    except ValueError:
+        return None
+    return path if path.is_file() else None
+
+
+def _release_errors(summary: dict[str, str], summary_path: Path) -> list[str]:
+    if _scalar(summary, "phase") != "release":
+        return []
+    candidate_artifact = _scalar(summary, "candidate artifact")
+    candidate_sha256 = _scalar(summary, "candidate sha256")
+    approved = None
+    for phase in ("review-final", "review"):
+        sentinel = summary_path.parent / f".phase-{phase}.done"
+        if not sentinel.is_file():
+            continue
+        try:
+            payload = json.loads(sentinel.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+        if (
+            isinstance(payload, dict)
+            and payload.get("phase") == phase
+            and payload.get("review_verdict") == "approved"
+            and payload.get("candidate_artifact") == candidate_artifact
+            and payload.get("candidate_sha256") == candidate_sha256
+        ):
+            approved = payload
+            break
+    if approved is None:
+        return ["Release requires an approved review sentinel for the exact candidate"]
+    final = _in_talk_file(summary, summary_path, "final artifact")
+    if final is None:
+        return ["Final artifact must be an existing file inside the talk directory"]
+    if hashlib.sha256(final.read_bytes()).hexdigest() != candidate_sha256:
+        return ["Final artifact SHA256 does not match approved candidate"]
+    return []
 
 
 def _review_mode_errors(summary: dict[str, str], summary_path: Path) -> list[str]:
@@ -202,11 +270,10 @@ def validate_publication(summary: dict[str, str], contract: dict[str, Any], summ
     phase = _scalar(summary, "phase")
     errors = _identity_boundary_errors(summary, summary_path)
     errors.extend(_review_mode_errors(summary, summary_path))
-    if not is_compact_boundary(summary):
-        return errors
-    errors.extend(_candidate_identity_errors(summary, summary_path))
-    if phase == "review":
-        errors.extend(validate_compact_review_boundary(summary, summary_path))
+    if phase in ARTIFACT_PHASES:
+        errors.extend(_candidate_identity_errors(summary, summary_path))
+        errors.extend(_artifact_predecessor_errors(summary, summary_path))
+    errors.extend(_release_errors(summary, summary_path))
     return errors
 
 
@@ -333,13 +400,25 @@ def _validate_sentinel(
             if values.get(sentinel_field) != _scalar(summary, summary_field):
                 errors.append(f"Sentinel {sentinel_field.replace('_', ' ')} does not match summary")
 
-    if is_compact_boundary(summary):
+    if _scalar(summary, "phase") in ARTIFACT_PHASES:
         for sentinel_field, summary_field in (
-            ("workflow_mode", "workflow mode"),
             ("candidate_artifact", "candidate artifact"),
             ("candidate_sha256", "candidate sha256"),
         ):
             if values.get(sentinel_field) != _scalar(summary, summary_field):
+                errors.append(f"Sentinel {sentinel_field.replace('_', ' ')} does not match summary")
+    if is_compact_boundary(summary) and values.get("workflow_mode") != _scalar(summary, "workflow mode"):
+        errors.append("Sentinel workflow mode does not match summary")
+    if _scalar(summary, "phase") == "release":
+        final = _in_talk_file(summary, summary_path, "final artifact")
+        final_sha256 = hashlib.sha256(final.read_bytes()).hexdigest() if final else ""
+        for sentinel_field, expected_value in (
+            ("candidate_artifact", _scalar(summary, "candidate artifact")),
+            ("candidate_sha256", _scalar(summary, "candidate sha256")),
+            ("final_artifact", _scalar(summary, "final artifact")),
+            ("final_sha256", final_sha256),
+        ):
+            if values.get(sentinel_field) != expected_value:
                 errors.append(f"Sentinel {sentinel_field.replace('_', ' ')} does not match summary")
 
     run_id = expected["run_id"]
