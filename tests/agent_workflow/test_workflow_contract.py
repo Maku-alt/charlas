@@ -987,6 +987,8 @@ class WorkflowContractTests(unittest.TestCase):
     def test_worker_handoff_does_not_teach_legacy_summary_fields(self):
         handoff = (ROOT / "skills" / "worker-handoff" / "SKILL.md").read_text(encoding="utf-8")
 
+        self.assertNotIn(".phase-build.summary.md", handoff)
+        self.assertNotIn(".phase-image.summary.md", handoff)
         self.assertNotIn("## Last phase", handoff)
         self.assertNotIn("Pass / No Pass", handoff)
         self.assertIn("templates/charlas-sdd/phase-summary.md", handoff)

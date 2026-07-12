@@ -167,18 +167,9 @@ For audit-style tasks, the worker should produce:
 
 The parent should read the detailed report only after the summary references it and only if it is needed to decide the next transition.
 
-## Parallel Workers
+## Phase Sequencing
 
-Parallel workers may run only if their outputs do not overwrite each other.
-
-Use separate temporary summaries:
-
-```text
-notes/.phase-build.summary.md
-notes/.phase-image.summary.md
-```
-
-The parent validates each temporary handoff against its own sentinel, then consolidates both into `notes/phase-summary.md` and validates that consolidated summary. A transition may be decided only from the validated consolidated summary.
+Charla phases using the canonical single current summary execute sequentially by default. `allows_parallel_with` is contract capability metadata; do not use it until a supported publication mechanism provides distinct handoffs without competing writes. The parent transitions only from validated `notes/phase-summary.md`.
 
 ## Repository Adaptation
 
