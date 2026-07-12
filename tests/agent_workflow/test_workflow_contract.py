@@ -71,6 +71,7 @@ class WorkflowContractTests(unittest.TestCase):
             "attempt": 1,
             "execution_status": "completed",
             "summary": "notes/phase-summary.md",
+            "summary_sha256": hashlib.sha256(summary_path.read_bytes()).hexdigest(),
         }
         payload.update(overrides)
         sentinel.write_text(json.dumps(payload), encoding="utf-8")
@@ -276,9 +277,11 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertEqual("review-final", payload["phase"])
         self.assertEqual(1, payload["attempt"])
         self.assertEqual("completed", payload["execution_status"])
-        self.assertEqual("notes/phase-summary.md", payload["summary"])
+        self.assertEqual("notes/phase-summary.review-contract-20260710-1200.md", payload["summary"])
+        self.assertEqual(hashlib.sha256(summary.read_bytes()).hexdigest(), payload["summary_sha256"])
         self.assertIn("completed_at", payload)
-        self.assertEqual([], self.workflow_contract.validate_summary(summary, self.contract))
+        snapshot = self.immutable_summary_path(summary, "review-contract-20260710-1200")
+        self.assertEqual([], self.workflow_contract.validate_summary(snapshot, self.contract))
 
     def test_complete_phase_snapshots_exact_summary_and_hashes_it(self):
         temp_dir = tempfile.TemporaryDirectory()
@@ -694,7 +697,8 @@ class WorkflowContractTests(unittest.TestCase):
         self.addCleanup(temp_dir.cleanup)
         text = (FIXTURES / "valid-phase-summary.md").read_text(encoding="utf-8")
         summary.write_text(
-            text.replace("## Phase\nreview-final", "## Phase\nbuild")
+            text.replace("## Run ID\nreview-contract-20260710-1200", "## Run ID\nbuild-contract-20260710-1200")
+            .replace("## Phase\nreview-final", "## Phase\nbuild")
             .replace("## Review verdict\napproved", "## Review verdict\nnot_applicable")
             .replace("## Next phase\nrelease", "## Next phase\nreview")
             .replace(
@@ -703,7 +707,7 @@ class WorkflowContractTests(unittest.TestCase):
             ),
             encoding="utf-8",
         )
-        build = self.complete_phase(summary, phase="build")
+        build = self.complete_phase(summary, phase="build", run_id="build-contract-20260710-1200")
         self.assertEqual(0, build.returncode, build.stdout)
         summary.write_text(
             text.replace("## Phase\nreview-final", "## Phase\nreview")

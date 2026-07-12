@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 from contextlib import contextmanager
 from datetime import datetime
+import hashlib
 import importlib.util
 import json
 import os
@@ -95,6 +96,25 @@ def _write_atomically(sentinel: Path, payload: dict[str, object]) -> None:
             temporary_path.unlink()
 
 
+def _write_snapshot_atomically_exclusive(path: Path, content: bytes) -> None:
+    """Publish a durable summary snapshot without replacing historical evidence."""
+    with tempfile.NamedTemporaryFile(
+        mode="w+b", dir=path.parent, prefix=f".{path.name}.", suffix=".tmp", delete=False,
+    ) as temporary:
+        temporary.write(content)
+        temporary.flush()
+        os.fsync(temporary.fileno())
+        temporary_path = Path(temporary.name)
+    try:
+        try:
+            os.link(temporary_path, path)
+        except FileExistsError as error:
+            raise RuntimeError(f"Historical summary already exists: {path}") from error
+    finally:
+        if temporary_path.exists():
+            temporary_path.unlink()
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--contract", required=True)
@@ -118,18 +138,12 @@ def main() -> int:
     if summary_path.parent.name != "notes" or summary_path.name != "phase-summary.md":
         print("ERROR: --summary must resolve to <talk>/notes/phase-summary.md")
         return 1
-    summary = workflow_contract.parse_summary(summary_path)
-    errors = workflow_contract.validate_transition(summary, contract)
-    errors.extend(workflow_contract.validate_publication(summary, contract, summary_path))
-    errors.extend(_identity_errors(summary, args))
     phase_contract = contract.get("phases", {}).get(args.phase)
     if phase_contract is None:
-        errors.append(f"Unknown phase: {args.phase}")
+        print(f"ERROR: Unknown phase: {args.phase}")
+        return 1
     if args.attempt <= 0:
-        errors.append("Attempt must be a positive integer")
-    if errors:
-        for error in errors:
-            print(f"ERROR: {error}")
+        print("ERROR: Attempt must be a positive integer")
         return 1
 
     sentinel = summary_path.parent / phase_contract["sentinel"]
@@ -139,13 +153,31 @@ def main() -> int:
             print(f"ERROR: {stale_error}")
             return 1
 
+        summary_bytes = summary_path.read_bytes()
+        summary = workflow_contract.parse_summary_text(summary_bytes.decode("utf-8"))
+        errors = workflow_contract.validate_transition(summary, contract)
+        errors.extend(workflow_contract.validate_publication(summary, contract, summary_path))
+        errors.extend(_identity_errors(summary, args))
+        if errors:
+            for error in errors:
+                print(f"ERROR: {error}")
+            return 1
+
+        snapshot = summary_path.with_name(f"phase-summary.{args.run_id}.md")
+        try:
+            _write_snapshot_atomically_exclusive(snapshot, summary_bytes)
+        except RuntimeError as error:
+            print(f"ERROR: {error}")
+            return 1
+
         payload = {
             "contract_version": contract["contract_version"],
             "run_id": args.run_id,
             "phase": args.phase,
             "attempt": args.attempt,
             "execution_status": _scalar(summary, "execution status"),
-            "summary": f"{summary_path.parent.name}/{summary_path.name}",
+            "summary": f"{summary_path.parent.name}/{snapshot.name}",
+            "summary_sha256": hashlib.sha256(summary_bytes).hexdigest(),
             "completed_at": datetime.now(launched_at.tzinfo).isoformat(),
         }
         if workflow_contract.is_identity_boundary(summary):
@@ -159,7 +191,11 @@ def main() -> int:
                 "candidate_artifact": _scalar(summary, "candidate artifact"),
                 "candidate_sha256": _scalar(summary, "candidate sha256"),
             })
-        _write_atomically(sentinel, payload)
+        try:
+            _write_atomically(sentinel, payload)
+        except Exception:
+            snapshot.unlink()
+            raise
     print(f"COMPLETED: {sentinel}")
     return 0
 

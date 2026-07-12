@@ -44,14 +44,18 @@ def validate_compact_review_independence(
     return errors
 
 
-def parse_summary(path: str | Path) -> dict[str, str]:
-    """Return normalized H2 Markdown blocks from a phase summary."""
-    text = Path(path).read_text(encoding="utf-8")
+def parse_summary_text(text: str) -> dict[str, str]:
+    """Return normalized H2 Markdown blocks from phase-summary text."""
     blocks = re.split(r"(?m)^## +(.+?)\s*$", text)
     return {
         blocks[index].strip().lower(): blocks[index + 1].strip()
         for index in range(1, len(blocks), 2)
     }
+
+
+def parse_summary(path: str | Path) -> dict[str, str]:
+    """Return normalized H2 Markdown blocks from a phase summary."""
+    return parse_summary_text(Path(path).read_text(encoding="utf-8"))
 
 
 def _value(summary: dict[str, str], name: str) -> str:
@@ -296,6 +300,8 @@ def _validate_sentinel(
     for field, expected_value in expected.items():
         if values.get(field) != expected_value:
             errors.append(f"Sentinel {field.replace('_', ' ')} does not match summary")
+    if values.get("summary_sha256") != hashlib.sha256(summary_path.read_bytes()).hexdigest():
+        errors.append("Sentinel summary SHA256 does not match summary")
 
     if is_identity_boundary(summary):
         for sentinel_field, summary_field in (
