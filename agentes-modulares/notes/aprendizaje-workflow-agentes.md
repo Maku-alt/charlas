@@ -2,13 +2,27 @@
 
 ## Antes
 
-Las reglas y el conocimiento de cada fase se repetian entre instrucciones. El padre corria el riesgo de absorber contexto de ejecucion que luego competia con la conversacion necesaria para definir una buena charla.
+`develop` ya tenia bien disenados el aislamiento, los roles especializados y el handoff por archivos: `fork_context: false`, workers acotados, roles, specs, prompts, sentinels y un unico `notes/phase-summary.md`. El problema no era conceptual, sino operativo: las mismas reglas aparecian en varios Markdown, dependian de una interpretacion consistente y no siempre se podian validar automaticamente.
 
 ## Cambio central
 
 El padre conversa con el usuario, converge la idea y enruta el trabajo mediante el `workflow-contract.json` canonico. Ese contrato ordena fases y transiciones, pero no se convierte en el producto.
 
 Cada worker especializado recibe solo su rol, spec, prompt e inputs minimos, trabaja con `fork_context: false` y publica un handoff compacto en `notes/phase-summary.md`. El padre lee unicamente ese resumen actual cuando ya fue validado.
+
+## Comparacion con develop
+
+| En `develop` | Ahora | Mejora concreta |
+|---|---|---|
+| Buenas practicas descritas en varios Markdown. | Reglas estructurales centralizadas en `workflow-contract.json`. | Una fuente canonica reduce repeticion y contradicciones. |
+| El padre ya evitaba chats, logs y razonamiento de los workers. | Conserva ese aislamiento y consulta un contrato mas compacto. | No se reinventa el aislamiento; se formaliza y reduce la politica repetida en el padre. |
+| Roles, specs, prompts y `fork_context: false` ya acotaban cada worker. | Un paquete de ejecucion explicita identidad, inputs, outputs y restricciones. | Es mas facil comprobar que cada worker fue lanzado con el contexto correcto. |
+| El sentinel indicaba que una fase habia terminado. | Identifica contrato, corrida, fase, intento y estado. | Evita aceptar un sentinel viejo o perteneciente a otra ejecucion. |
+| `phase-summary.md` ya representaba el estado operativo actual. | Mantiene esa funcion con un formato canonico y validado. | El padre puede decidir la transicion sin convertir el summary en un log historico. |
+| La independencia de review se expresaba como instruccion. | Se verifica con identidades distintas de worker y sesion. | El builder no puede certificar su propio trabajo por omision o reutilizacion de identidad. |
+| Las transiciones vivian principalmente en el orquestador. | El contrato JSON define y el codigo valida las transiciones permitidas. | Una fase no puede avanzar por una ruta contradictoria. |
+| La review evaluaba el PPTX, pero no toda la cadena protegia la identidad exacta del archivo. | SHA256 enlaza build, review y release. | El PPTX liberado es exactamente el artefacto revisado y aprobado. |
+| La documentacion repetia algunas reglas y excepciones. | Los documentos explican responsabilidades y el contrato gobierna la estructura. | Menor carga de mantenimiento y menos drift entre instrucciones. |
 
 ## Flujo
 
