@@ -4,11 +4,16 @@ analysis/
 DeckLab/
 .codex/
 .agents/
+.superpowers/
 .worktrees/
 .ai/
 .venv/
 venv/
 env/
+docs/plans/
+smoke-workflow-v2*/
+**/__pycache__/
+*.py[cod]
 **/node_modules/
 **/node_modules/**
 **/preview/
@@ -52,6 +57,7 @@ SDD-IAgentica/**
 IA Agentica de Conversacion a Sistema/**
 Knowledge Repo 01 - Cuando Documentar Tablas se Vuelve Arquitectura de Conocimiento/**
 Knowledge Repo 02 - Buscar No Es Entender/**
+agentes-modulares/**
 
 # Re-include only the publishable structure per talk
 !Harness Engineer/
@@ -103,6 +109,12 @@ Knowledge Repo 02 - Buscar No Es Entender/**
 !Knowledge Repo 02 - Buscar No Es Entender/*.pptx
 !Knowledge Repo 02 - Buscar No Es Entender/notes/
 !Knowledge Repo 02 - Buscar No Es Entender/notes/**
+
+!agentes-modulares/
+!agentes-modulares/README.md
+!agentes-modulares/*.pptx
+!agentes-modulares/notes/
+!agentes-modulares/notes/**
 
 # Explicit technical artifacts to keep out even if structure changes
 researcher.md
