@@ -7,7 +7,7 @@
     "reasoning_effort": "medium",
     "record_actual_model": true
   },
-  "availability_note": "Use Terra xhigh until gpt-5.6-luna is accepted by spawn_agent; always record requested and actual model.",
+  "availability_note": "Use Sol medium for experience design/build and Terra xhigh for the remaining specialist roles until gpt-5.6-luna is accepted by spawn_agent; always record requested and actual model.",
   "auxiliary_roles": {
     "advisor-charlas": {"model": "gpt-5.6-sol", "reasoning_effort": "medium"}
   },
@@ -15,8 +15,8 @@
     "thesis-review": {"model": "gpt-5.6-terra", "reasoning_effort": "xhigh"},
     "research": {"model": "gpt-5.6-terra", "reasoning_effort": "xhigh", "research_effort": "standard"},
     "narrative": {"model": "gpt-5.6-terra", "reasoning_effort": "xhigh"},
-    "build": {"model": "gpt-5.6-terra", "reasoning_effort": "xhigh"},
-    "build-fix": {"model": "gpt-5.6-terra", "reasoning_effort": "xhigh"},
+    "build": {"model": "gpt-5.6-sol", "reasoning_effort": "medium"},
+    "build-fix": {"model": "gpt-5.6-sol", "reasoning_effort": "medium"},
     "review": {"model": "gpt-5.6-terra", "reasoning_effort": "xhigh"},
     "review-final": {"model": "gpt-5.6-terra", "reasoning_effort": "xhigh"}
   }

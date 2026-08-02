@@ -35,4 +35,4 @@ Cuando existan tareas realmente independientes puede usar workers paralelos con 
 
 ## Runtime
 
-El orquestador usa el modelo del hilo, normalmente Sol Medium. Los workers usan Terra X-High mientras Luna no este disponible para `spawn_agent`. Si el runtime habilita Luna, puede usarse para research acotado, build con spec cerrado y QA repetible; narrativa y review critico pueden permanecer en Terra.
+El orquestador usa el modelo del hilo, normalmente Sol Medium. `experience-designer-builder-charlas` tambien usa Sol Medium porque actua como orquestador especializado de la experiencia visual, la construccion y su QA. Los demas workers usan Terra X-High mientras Luna no este disponible para `spawn_agent`. Si el runtime habilita Luna, puede usarse para research acotado y QA repetible; narrativa y review critico pueden permanecer en Terra.
