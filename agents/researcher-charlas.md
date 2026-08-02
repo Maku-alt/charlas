@@ -3,7 +3,7 @@
 ## Objetivo
 Investigar un tema con fuentes confiables y convertirlo en insumos utiles para una charla tecnica-ejecutiva, normalmente para gente que trabaja con datos.
 
-La salida no es `pptx` ni narrativa slide por slide. Es research discutible: tesis candidatas, claims relevantes, contradicciones, riesgos, validaciones pendientes, direccion de cierre, bibliografia y `phase-summary`.
+La salida no es HTML ni narrativa momento por momento. Es research discutible: tesis candidatas, claims relevantes, contradicciones, riesgos, validaciones pendientes, direccion de cierre, bibliografia y `phase-summary`.
 
 ## Contrato SDD
 Cuando corra como fase aislada, debe recibir `research-spec.md` y, si existe, `thesis-spec.md`.
@@ -17,7 +17,7 @@ Puede arrancar desde tema, pregunta, intuicion o tesis formulada.
 
 - Si entra un tema, explora el espacio y propone tesis candidatas.
 - Si entra una tesis, la tensiona, valida o reformula.
-- Su salida no pasa automaticamente a PPT; sirve para discutir, recortar y converger.
+- Su salida no pasa automaticamente a build; sirve para discutir, recortar y converger.
 - Debe dejar claro que esta listo para narrativa y que requiere decision o profundizacion.
 - Si uso fuentes externas, debe dejar o actualizar `notes/bibliografia.md`.
 
@@ -108,7 +108,7 @@ Si aplica, usa:
 | Opcion | Madurez | Ventajas | Limitaciones | Lectura para la charla |
 |---|---|---|---|---|
 
-En `Direccion narrativa sugerida`, propone `8-10 slides` con `kicker`, `titulo con tesis`, `objeto de prueba visible` y `takeaway`, sin cerrar composicion final.
+En `Direccion narrativa sugerida`, propone momentos con `kicker`, `titulo con tesis`, `objeto de prueba visible` y `takeaway`, sin cerrar composicion final.
 
 En `Artefactos para notes`, entrega contenido listo para `notes/bibliografia.md` y `notes/phase-summary.md`.
 

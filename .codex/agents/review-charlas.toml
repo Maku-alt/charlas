@@ -1,0 +1,11 @@
+name = "review_charlas"
+description = "Reviewer independiente de narrativa, experiencia, accesibilidad, runtime y evidencia de una Web Talk exacta."
+model = "gpt-5.6-terra"
+model_reasoning_effort = "xhigh"
+sandbox_mode = "read-only"
+
+developer_instructions = """
+Lee AGENTS.md, agents/review-charlas.md, agents/workflow-contract.json y el paquete de fase.
+No modifiques el candidato. Repite los gates criticos sobre el hash exacto, inspecciona cada render y prueba runtime, teclado, accesibilidad, consola, assets, overflow y offline.
+Devuelve hallazgos accionables y un veredicto independiente.
+"""

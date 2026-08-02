@@ -1,15 +1,8 @@
 {
   "contract_version": 2,
+  "product": "web-talk",
   "current_summary": "notes/phase-summary.md",
-  "required_sentinel_fields": [
-    "contract_version",
-    "run_id",
-    "phase",
-    "attempt",
-    "execution_status",
-    "summary",
-    "completed_at"
-  ],
+  "required_sentinel_fields": ["contract_version", "run_id", "phase", "attempt", "execution_status", "summary", "completed_at"],
   "execution_statuses": ["completed", "blocked"],
   "decisions": ["advance", "iterate", "return", "stop"],
   "review_verdicts": ["not_applicable", "approved", "requires_changes"],
@@ -28,7 +21,7 @@
   "phases": {
     "thesis-review": {
       "sentinel": ".phase-thesis-review.done",
-      "next": ["research", "stop"],
+      "next": ["research", "narrative", "stop"],
       "role": "orchestrator-charlas or researcher-charlas",
       "spec": "thesis-spec.md",
       "prompt": "run-thesis-review.md",
@@ -48,53 +41,43 @@
     },
     "narrative": {
       "sentinel": ".phase-narrative.done",
-      "next": ["build", "image-close", "research"],
+      "next": ["build", "research"],
       "role": "narrative-charlas",
       "spec": "narrative-spec.md",
       "prompt": "run-narrative.md",
-      "required_inputs": ["narrative specification", "converged thesis", "approved research when research was required"],
-      "required_outputs": ["approved slide narrative", "slide sequence", "conclusion titles", "visual concepts", "defined closing direction", "phase summary"],
+      "required_inputs": ["narrative specification", "converged thesis", "approved research when required"],
+      "required_outputs": ["approved web-talk narrative", "moment sequence", "speech", "visual proof concepts", "phase summary"],
       "allows_parallel_with": []
-    },
-    "image-close": {
-      "sentinel": ".phase-image-close.done",
-      "next": ["build", "review", "narrative"],
-      "role": "image-closer-charlas",
-      "spec": "image-spec.md",
-      "prompt": "run-image-close.md",
-      "required_inputs": ["thesis", "final message", "real reference quote or justified fallback", "emotional tone", "closing direction"],
-      "required_outputs": ["final closing asset or concrete visual direction", "phase summary"],
-      "allows_parallel_with": ["build"]
     },
     "build": {
       "sentinel": ".phase-build.done",
       "next": ["review", "narrative"],
-      "role": "deck-builder-charlas",
+      "role": "experience-designer-builder-charlas",
       "spec": "build-spec.md",
       "prompt": "run-build.md",
-      "required_inputs": ["build specification", "narrative specification", "approved slide narrative", "closing direction"],
-      "required_outputs": ["editable PPTX candidate", "source deck specification", "textual and mechanical checks", "native PowerPoint evidence", "phase summary"],
-      "allows_parallel_with": ["image-close"]
+      "required_inputs": ["build specification", "approved narrative", "speech", "source and asset policy"],
+      "required_outputs": ["self-contained HTML candidate", "frontend source", "individual renders", "runtime tests", "self-audit", "phase summary"],
+      "allows_parallel_with": []
     },
     "review": {
       "sentinel": ".phase-review.done",
-      "next": ["release", "build-fix", "narrative", "image-close", "stop"],
+      "next": ["release", "build-fix", "narrative", "stop"],
       "role": "review-charlas",
       "spec": "review-spec.md",
       "prompt": "run-review.md",
-      "required_inputs": ["review specification", "target deck", "build evidence", "closing visual when applicable", "phase summary"],
-      "required_outputs": ["independent review verdict", "actionable review report when changes are required", "phase summary"],
+      "required_inputs": ["review specification", "exact HTML candidate and hash", "narrative", "build evidence", "phase summary"],
+      "required_outputs": ["independent review verdict", "actionable review report", "fix list when required", "phase summary"],
       "allows_parallel_with": [],
       "must_be_independent_from": ["build", "build-fix"]
     },
     "build-fix": {
       "sentinel": ".phase-build-fix.done",
       "next": ["review-final"],
-      "role": "deck-builder-charlas",
+      "role": "experience-designer-builder-charlas",
       "spec": "build-spec.md",
       "prompt": "run-build.md",
-      "required_inputs": ["review phase summary", "actionable review report", "current PPTX candidate and source", "specific slides to correct", "acceptance criteria"],
-      "required_outputs": ["corrected PPTX candidate", "corrected source", "fix evidence", "phase summary"],
+      "required_inputs": ["review phase summary", "fix list", "current HTML candidate and source", "localized acceptance criteria"],
+      "required_outputs": ["corrected HTML candidate", "regression evidence", "fresh renders", "phase summary"],
       "allows_parallel_with": []
     },
     "review-final": {
@@ -103,8 +86,8 @@
       "role": "review-charlas",
       "spec": "review-spec.md",
       "prompt": "run-review.md",
-      "required_inputs": ["review specification", "corrected PPTX candidate", "build-fix phase summary", "initial review report", "native PowerPoint evidence for the fix"],
-      "required_outputs": ["independent final review verdict", "final review report", "phase summary"],
+      "required_inputs": ["review specification", "corrected HTML candidate and hash", "build-fix summary", "initial review report", "regression evidence"],
+      "required_outputs": ["independent final verdict", "final review report", "phase summary"],
       "allows_parallel_with": [],
       "must_be_independent_from": ["build", "build-fix"]
     },
@@ -114,8 +97,8 @@
       "role": "orchestrator-charlas",
       "spec": "embedded release contract",
       "prompt": "not_applicable",
-      "required_inputs": ["approved review or review-final verdict for the exact candidate", "approved editable PPTX candidate hash", "current phase summary"],
-      "required_outputs": ["promoted final PPTX with recomputed SHA256", "release phase summary"],
+      "required_inputs": ["approved review or review-final verdict", "approved HTML candidate hash", "current phase summary"],
+      "required_outputs": ["promoted Web Talk with recomputed SHA256", "release metadata", "release phase summary"],
       "allows_parallel_with": []
     }
   }

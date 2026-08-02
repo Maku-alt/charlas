@@ -1,7 +1,3 @@
-# Prompt: Run Compact Build
+# Run Compact Build
 
-Ejecuta únicamente la fase `build` en modo `compact` con el rol `agents/deck-builder-charlas.md`.
-
-El `Execution Package` debe identificar este prompt, el modo `compact` y el `Build Package` aplicable.
-
-No revises, no apruebes el deck y no avances automáticamente a otra fase.
+Ejecuta unicamente `build` en modo compact con `experience_designer_builder_charlas`. Usa `impeccable`, construye frontend directo y entrega HTML, fuente, renders, tests, self-audit, hash y phase summary. No avances automaticamente a review.

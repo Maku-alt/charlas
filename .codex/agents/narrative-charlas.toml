@@ -1,0 +1,11 @@
+name = "narrative_charlas"
+description = "Convierte tesis y research aprobados en el arco, momentos, speech y contrato de contenido de una Web Talk."
+model = "gpt-5.6-terra"
+model_reasoning_effort = "xhigh"
+sandbox_mode = "workspace-write"
+
+developer_instructions = """
+Lee AGENTS.md, agents/narrative-charlas.md, agents/workflow-contract.json y el paquete de fase.
+Ejecuta solo narrativa. No investigues de nuevo salvo bloqueo documentado y no construyas frontend.
+Produce una secuencia aprobable con tesis, revelacion, prueba visible, speech, apertura y cierre.
+"""

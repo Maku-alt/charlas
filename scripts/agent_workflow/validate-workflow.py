@@ -21,8 +21,7 @@ ROLE_PATHS = {
     "orchestrator-charlas": "agents/orchestrator-charlas.md",
     "researcher-charlas": "agents/researcher-charlas.md",
     "narrative-charlas": "agents/narrative-charlas.md",
-    "image-closer-charlas": "agents/image-closer-charlas.md",
-    "deck-builder-charlas": "agents/deck-builder-charlas.md",
+    "experience-designer-builder-charlas": "agents/experience-designer-builder-charlas.md",
     "review-charlas": "agents/review-charlas.md",
 }
 

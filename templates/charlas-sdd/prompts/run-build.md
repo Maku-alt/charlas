@@ -1,7 +1,5 @@
-# Prompt: Run Build
+# Run Build
 
-Ejecuta únicamente la fase `build` o `build-fix` con el rol `agents/deck-builder-charlas.md`.
+Ejecuta unicamente `build` o `build-fix` con el custom agent `experience_designer_builder_charlas` y el metodo de `agents/experience-designer-builder-charlas.md`.
 
-El `Execution Package` debe identificar este prompt y el `Build Spec` aplicable.
-
-No hagas review, no apruebes el deck y no avances automáticamente a otra fase.
+Usa `impeccable`, consume solo el paquete validado y construye directamente la Web Talk. No investigues, no redefinas narrativa y no apruebes tu propio candidato. Publica evidencia y phase summary conforme al contrato.

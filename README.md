@@ -75,16 +75,16 @@ Las charlas de este repo suelen combinar:
 - una tesis tecnica clara
 - comparaciones o tradeoffs concretos
 - una recomendacion ejecutiva
-- una slide final con mensaje de cierre e imagen editorial alineada con la tesis
+- un cierre editorial integrado a la experiencia y alineado con la tesis
 
 ## Flujo recomendado
 Cuando una charla arranca solo desde un tema o una pregunta abierta, conviene separar tres momentos:
 
 - primero investigar, tensionar y converger la tesis
-- despues fijar la narrativa slide by slide
-- despues construir la deck editable y visualmente fuerte
+- despues fijar la narrativa momento por momento
+- despues diseñar y construir la Web Talk autocontenida
 
-La carpeta `agents/` captura esa separacion con agentes distintos para research, narrativa, deck building, imagen editorial final y review.
+La carpeta `agents/` captura esa separacion con research, narrativa, experience design/build y review independiente.
 
 ## Orquestacion recomendada
 El flujo recomendado es:
@@ -92,16 +92,15 @@ El flujo recomendado es:
 1. `orchestrator-charlas` para identificar fase, dependencia y siguiente agente
 2. `researcher-charlas` para explorar el tema, tensionar la tesis y devolver insumos discutibles
 3. research en paralelo solo cuando el framing ya esta claro y existan subpreguntas independientes
-4. `narrative-charlas` para convertir el research convergido en una historia de `8-10 slides`
-5. `deck-builder-charlas` para construir decks nuevos con el renderer local desde `deck-spec.json`; la skill `pptx` queda solo para emergencia o diagnostico avanzado
-6. `image-closer-charlas` para resolver la imagen editorial final
-7. `review-charlas` para revisar narrativa, visuales y cierre antes de cerrar la charla
+4. `narrative-charlas` para convertir el research convergido en una secuencia de momentos
+5. `experience-designer-builder-charlas` para diseñar y construir directamente la Web Talk con `impeccable`, incluyendo apertura, cierre e imagenes
+6. `review-charlas` para revisar narrativa, experiencia, accesibilidad y runtime antes del release
 
 Las fases de charla que usan el unico `notes/phase-summary.md` canonico corren secuencialmente por defecto. `allows_parallel_with` es metadato de capacidad del contrato y permanece inactivo hasta que exista un mecanismo soportado de publicacion con handoffs distintos. El padre transiciona solo desde `notes/phase-summary.md` validado.
 
 Si hay duda sobre en que fase esta una charla o que agente deberia correr primero, el entrypoint recomendado es `orchestrator-charlas`.
 
-Este repo no esta orientado a generar imagenes sueltas. La imagen final existe para cerrar una charla ya estructurada.
+Este repo no esta orientado a generar imagenes sueltas. Las imagenes forman parte de la experiencia y permanecen bajo el Experience Designer Builder.
 
 ## Inicio rapido del workflow v2
 

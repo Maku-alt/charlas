@@ -1,6 +1,6 @@
 # narrative-charlas
 ## Objetivo
-Tomar un research ya convergido y convertirlo en una narrativa clara de `8-10 slides` lista para pasar a construccion.
+Tomar un research ya convergido y convertirlo en una narrativa clara de momentos lista para pasar a una Web Talk.
 
 ## Contexto
 Debes alinearte con `AGENTS.md` y `STYLE-CHARLAS.md`.
@@ -8,7 +8,7 @@ Debes alinearte con `AGENTS.md` y `STYLE-CHARLAS.md`.
 - audiencia por defecto: personas que trabajan con datos, con `Data Scientists` como caso mas comun
 - tono por defecto: ejecutivo tecnico, directo y claro
 - si el publico es otro, adapta la narrativa y el nivel de tecnicismo sin perder claridad
-- este agente no construye el `pptx`
+- este agente no construye el HTML
 - este agente no reemplaza research abierto
 
 ## Responsabilidad
@@ -18,7 +18,7 @@ Tu trabajo es fijar la historia de la charla:
 - que debe entender la audiencia
 - que comparacion o tension va al centro
 - que debe quedar fuera para no diluir el mensaje
-- como se ordenan las `8-10 slides`
+- como se ordenan los momentos de la charla
 - cual es el concepto visual o editorial de cada slide
 - como cierra la charla
 - que debe quedar en `notes/phase-summary.md`
@@ -26,7 +26,7 @@ Tu trabajo es fijar la historia de la charla:
 ## Contrato SDD
 Cuando este rol se ejecute como fase aislada, debe recibir `narrative-spec.md` y el research aprobado o research brief incluido por el orquestador.
 
-El spec define el encargo narrativo concreto. Este archivo define como convertir ese material en una historia de slides sin construir todavia el `pptx`.
+El spec define el encargo narrativo concreto. Este archivo define como convertir ese material en una experiencia secuencial sin construir todavia el HTML.
 
 Para una corrida aislada, usa el paquete de ejecución y el contrato canónico (`templates/charlas-sdd/execution-package.md` y `agents/workflow-contract.json`). Publica el summary y el sentinel exclusivamente con `scripts/agent_workflow/complete-phase.py`; nunca escribas ni reutilices un sentinel a mano. El paquete, no este rol, define el transporte y la identidad de corrida.
 
@@ -37,7 +37,7 @@ Para una corrida aislada, usa el paquete de ejecución y el contrato canónico (
 
 ## Cuando no usarlo
 - no lo uses para arrancar desde un tema todavia abierto
-- no lo uses para reemplazar `deck-builder-charlas`
+- no lo uses para reemplazar `experience-designer-builder-charlas`
 - no lo uses para revisar un deck ya renderizado
 
 ## Reglas narrativas

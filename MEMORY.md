@@ -23,8 +23,8 @@ Los documentos raiz que gobiernan el trabajo son:
 - `AGENTS.md`: reglas persistentes de trabajo dentro de charlas
 - `STYLE-CHARLAS.md`: sistema visual y narrativo compartido
 - `agents/`: agentes especializados del flujo de charlas
-- `templates/charlas-sdd/`: metodologia SDD reutilizable para research, narrativa, build y review
-- `scripts/deck_renderer/`: renderer local para construir PPTX editables desde `deck-spec.json`
+- `templates/charlas-sdd/`: metodologia SDD reutilizable para research, narrativa, experiencia/build y review
+- `scripts/deck_renderer/`: soporte legado para PPTX historicas; no es la ruta de nuevas charlas
 
 ## Convencion por charla
 
@@ -32,8 +32,8 @@ La practica vigente del repo es:
 
 - `specs/`: specs SDD propios de la charla, copiados o adaptados desde `templates/charlas-sdd/`
 - `notes/`: narrativa, claims, fuentes, material validado y bibliografia
-- `slides/` o `deck/`: fuente editable y exportables
-- `assets/`: recursos visuales e imagen final cuando existan
+- `web/` o `talk/`: fuente frontend editable y release HTML
+- `assets/`: recursos visuales locales y su procedencia
 - `review/`: observaciones y ajustes finales cuando existan
 
 La bibliografia vive dentro de `notes/`.
@@ -75,17 +75,15 @@ El flujo especializado de este repo ya existe y fue disenado asi:
 - `orchestrator-charlas`
 - `researcher-charlas`
 - `narrative-charlas`
-- `deck-builder-charlas`
-- `image-closer-charlas`
+- `experience-designer-builder-charlas`
 - `review-charlas`
 
 Principio operativo:
 
 1. primero converger tesis y narrativa
-2. fijar una narrativa de `8-10 slides`
-3. despues construir la deck con el renderer local
-4. luego resolver el cierre visual
-5. finalmente revisar el artefacto
+2. fijar una narrativa de momentos
+3. diseñar y construir la experiencia web, incluido el cierre
+4. revisar de forma independiente el candidato exacto
 
 El research paralelo solo conviene cuando el framing ya esta claro y hay subpreguntas independientes.
 
@@ -93,11 +91,11 @@ Por defecto, las fases pesadas deben recibir contexto acotado: rol, spec, artefa
 
 ## Aprendizajes ya validados
 
-- no todo hallazgo del research pasa automaticamente a la PPT
-- el cierre visual debe existir como agente separado del deck builder
-- el review debe ocurrir sobre una deck o artefacto ya construido, no sobre ideas abiertas
-- el build normal de PPTX usa `scripts/deck_renderer/render-deck.js` desde `deck-spec.json`
-- PowerPoint nativo es el gate final de apertura/export
+- no todo hallazgo del research pasa automaticamente a la Web Talk
+- apertura, cierre, imagenes y frontend pertenecen a una sola experiencia
+- el review ocurre sobre un HTML construido y su hash, no sobre ideas abiertas
+- Impeccable es la ruta principal de diseño y build
+- DOM, tests, consola, teclado, accesibilidad, offline y renders son gates de release
 - el padre debe esperar 180 segundos antes del primer `Test-Path` sobre un sentinel worker
 - `researcher.md` se conserva como pieza portable, pero no forma parte de la documentacion publica del flujo de `charlas`
 

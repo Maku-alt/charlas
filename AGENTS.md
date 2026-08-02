@@ -1,78 +1,76 @@
-# AGENTS
+# Charlas
 
-Contrato operativo corto para este repo de charlas.
+## Producto vigente
 
-## Contexto repo-wide
-- Cada carpeta de primer nivel suele ser una charla, salvo infraestructura como `agents/`, `templates/`, `scripts/`, `skills/` y carpetas ocultas.
-- Audiencia por defecto: gente que trabaja con datos, usualmente `Data Scientists`.
-- Tono por defecto: ejecutivo, tecnico, directo y claro.
-- No amarrar la narrativa a telco salvo pedido explicito.
-- Verifica con fuentes actuales cualquier claim sobre precios, releases, compatibilidad, costos actuales o casos corporativos recientes.
+Este repositorio crea Web Talks: presentaciones HTML autocontenidas, navegables y listas para exponer. Las PPTX existentes son artefactos historicos; no definen el formato de nuevas charlas. Una exportacion PPTX es opcional y solo se produce cuando el usuario la pide.
 
-## Flujo base
-Toda charla pasa por tesis, research cuando haga falta, convergencia con el usuario, narrativa de `8-10 slides`, build `pptx`, cierre visual y review.
+Audiencia por defecto: personas que trabajan con datos, normalmente Data Scientists. Tono: ejecutivo, tecnico, directo y claro. Verifica con fuentes actuales precios, releases, compatibilidad, costos y casos recientes.
 
-El research no pasa automaticamente a PPT: primero se discute, se recorta y se fija el angulo.
+## Flujo
 
-Cada slide debe tener tesis, lectura ejecutiva, objeto visible y concepto visual. Si varias slides quedan como cajas, tablas o conectores sin idea visual clara, vuelve a narrativa o build antes de aprobar.
+`thesis-review -> research? -> narrative -> build -> review -> build-fix? -> review-final? -> release`
 
-## Donde vive cada regla
-- Roles especializados: `agents/*.md`.
-- Mapa de roles, paquetes y dependencias: `agents/README.md`.
-- Contrato canónico de fases, transiciones y publicación: `agents/workflow-contract.json`.
-- Orquestación y decisiones de transición: `agents/orchestrator-charlas.md`.
-- Specs y prompts SDD reutilizables: `templates/charlas-sdd/`.
-- Renderer local, theme default y comandos de build/QA: `scripts/deck_renderer/README.md`.
-- Ejemplo de `deck-spec.json`: `templates/deck-renderer/deck-spec.example.json`.
-- Protocolo repo-local de workers separados: `skills/worker-handoff`.
+- El hilo principal actua como `orchestrator-charlas`: decide fase, prepara handoffs, conserva decisiones y publica el release.
+- Cada fase pesada se ejecuta con el custom agent TOML correspondiente bajo `.codex/agents/`.
+- El orquestador no sustituye research, narrativa, experiencia/build ni review detallado.
+- La narrativa aprobada es la unica fuente de contenido del build.
+- El builder hace self-audit, pero nunca aprueba su propio artefacto.
+- El reviewer debe ser independiente y revisar el hash exacto del candidato.
+- Existe como maximo un ciclo normal de fix localizado; todo fix exige `review-final`.
 
-## Agentes
-- `orchestrator-charlas`: decide fase, dependencias, launch, workers y bloqueo.
-- `researcher-charlas`: investiga, tensiona tesis y entrega research discutible.
-- `narrative-charlas`: convierte research convergido en narrativa aprobable.
-- `deck-builder-charlas`: construye decks `pptx` y fixes puntuales.
-- `image-closer-charlas`: define imagen editorial de cierre.
-- `review-charlas`: valida deck, texto, visuales, cierre y evidencia.
+## Roles
 
-No omitas el rol especializado: el prompt de fase no reemplaza `agents/*.md`.
+- `researcher-charlas`: investiga, tensiona tesis y entrega evidencia discutible.
+- `narrative-charlas`: fija tesis, arco, momentos, speech y contrato de contenido.
+- `experience-designer-builder-charlas`: absorbe diseño, frontend, apertura, cierre, imagenes y build; usa `impeccable` como skill principal.
+- `review-charlas`: valida narrativa, experiencia, accesibilidad, runtime y evidencia sin modificar el candidato.
+- `advisor-charlas`: consulta excepcional para decisiones transversales complejas; no es fase ni gate.
+
+Los metodos detallados viven en `agents/*.md`; las fases y transiciones en `agents/workflow-contract.json`; las preferencias de runtime en `agents/runtime-defaults.json`.
+
+## Contrato Web Talk
+
+La salida canonica debe:
+
+- construirse directamente como HTML/CSS/JavaScript o React/TypeScript, nunca mediante conversion desde PPTX;
+- usar `impeccable` como flujo principal de diseño y ejecucion frontend;
+- funcionar sin dependencia de red en runtime cuando el paquete de release lo requiera;
+- ofrecer navegacion por teclado, controles visibles, posicion directa y fullscreen;
+- respetar foco visible, contraste y `prefers-reduced-motion`;
+- evitar scroll como navegacion primaria;
+- incluir bibliografia cuando existan fuentes externas;
+- producir renders individuales, pruebas, self-audit y hash del candidato;
+- mantener apertura, cierre e imagenes dentro de la responsabilidad del Experience Designer Builder.
+
+Screenshots ayudan a revisar, pero no sustituyen DOM, consola, tests, overflow, assets, navegacion y funcionamiento offline.
 
 ## Estructura por charla
-Convencion recomendada hacia adelante:
 
-- `notes/`: narrativa, claims, material validado, `bibliografia.md` y `phase-summary.md`
-- `slides/` o `deck/`: fuente editable y exportables locales
-- `assets/`: imagenes, prompts visuales y recursos de soporte
-- `specs/`: specs SDD locales copiados o adaptados desde `templates/charlas-sdd/`
-- `review/`: observaciones, ajustes y chequeos finales locales
+- `notes/`: tesis, research, bibliografia, narrativa, speech y `phase-summary.md`.
+- `web/` o `talk/`: fuente editable de la Web Talk.
+- `assets/`: imagenes y recursos locales con procedencia.
+- `specs/`: especificaciones de la charla.
+- `review/`: renders, reportes, fix-list y evidencia.
+- `release/`: candidato exacto aprobado y su identidad.
 
-No migres charlas antiguas salvo que se reabran. `slides/`, `assets/`, `specs/` y `review/` deben existir localmente cuando la charla los necesite, pero por defecto no se suben al remoto.
+No migres charlas historicas salvo que se reabran. Si una charla antigua se reabre para una nueva version, el nuevo entregable sigue este contrato web.
 
-Si hubo research externo, `notes/bibliografia.md` es obligatorio. Si corrio una fase pesada, `notes/phase-summary.md` debe existir y representar el estado actual.
+## Workers y publicacion
 
-## Specs SDD
-La metodologia vive en `templates/charlas-sdd/`.
+Los workers reciben paquetes acotados con inputs, outputs permitidos, criterios de aceptacion y `fork_context: false`. Se comunican mediante resultados estructurados y artefactos validados. El hilo principal integra, verifica y decide la siguiente transicion.
 
-- Usa `full/` para charlas normales o complejas: `thesis-spec.md`, `research-spec.md`, `narrative-spec.md`, `build-spec.md` y `review-spec.md`.
-- Usa `compact/` para charlas pequenas o con framing claro: `research-package.md`, `build-package.md` y `review-package.md`.
-- Usa los prompts de `templates/charlas-sdd/prompts/` para acotar cada fase.
+Si hubo research externo, `notes/bibliografia.md` es obligatorio. Si corrio una fase pesada, `notes/phase-summary.md` debe representar el estado actual. Release solo promueve el hash aprobado por review o review-final.
 
-## Build PPTX
-Para decks `pptx` nuevos desde cero, el build normal usa el renderer local del repo:
+## Validacion
 
-`deck-spec.json` -> `scripts/deck_renderer/render-deck.js` -> `scripts/deck_renderer/qa-deck.py` -> `scripts/deck_renderer/validate-powerpoint.ps1`
+Antes de cerrar una charla exige:
 
-El theme default es `scripts/deck_renderer/theme-charlas.json`. Los detalles de instalacion, dependencias y comandos viven en `scripts/deck_renderer/README.md`.
+- tesis y arco claros;
+- una lectura ejecutiva y objeto visible por momento;
+- HTML construido y probado;
+- renders inspeccionados individualmente;
+- navegacion, teclado, fullscreen, consola, assets, overflow, accesibilidad y offline verificados;
+- bibliografia cuando corresponda;
+- review independiente aprobada sobre el archivo exacto.
 
-La skill `pptx` queda solo para emergencia o diagnostico avanzado: inspeccion, extraccion, unpack/pack, reparacion puntual y diagnostico XML/estructura cuando los scripts del repo no expliquen el fallo.
-
-## Workers y handoff
-Las reglas operativas de workers, paquetes de ejecución, sentinels, identidad de corrida, esperas, consolidación y release viven en `agents/workflow-contract.json`, `agents/orchestrator-charlas.md`, `templates/charlas-sdd/execution-package.md` y `skills/worker-handoff`.
-
-Los workers se comunican mediante artefactos validados, no por su chat. La publicación de una fase usa `scripts/agent_workflow/complete-phase.py`; los detalles del transporte pertenecen al contrato canónico, no a este archivo.
-
-## Gates de cierre
-El entregable primario es un `pptx` editable compatible con PowerPoint nativo.
-
-Una charla no se cierra sin tesis clara, comparacion o tradeoff, lectura ejecutiva, cierre editorial fuerte, bibliografia si hubo fuentes externas, `notes/phase-summary.md` actualizado y review aprobada del artefacto exacto.
-
-PowerPoint nativo es el gate final de apertura/export. Los detalles de QA visual corresponden a `deck-builder-charlas`, `review-charlas` y `scripts/deck_renderer/README.md`; LibreOffice/Poppler son auxiliares y no aprueban build.
+Los scripts de `scripts/deck_renderer/` y la skill `pptx` quedan como soporte legado para presentaciones historicas, no como ruta normal de nuevas Web Talks.
