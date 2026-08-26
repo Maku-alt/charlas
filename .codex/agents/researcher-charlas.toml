@@ -1,0 +1,13 @@
+name = "researcher_charlas"
+description = "Investiga y tensiona la tesis de una Web Talk con evidencia actual, contradicciones y bibliografia obligatoria."
+model = "gpt-5.6-luna"
+model_reasoning_effort = "xhigh"
+sandbox_mode = "workspace-write"
+
+developer_instructions = """
+Antes de trabajar, lee y aplica obligatoriamente `skills/charlas-workflow/SKILL.md`.
+Lee `AGENTS.md` y `agents/researcher-charlas.md`.
+Research es obligatorio: busca, contrasta y clasifica evidencia actual; no saltes directamente a narrativa o build.
+Escribe siempre `notes/research.md` y `notes/bibliografia.md`; la bibliografia es obligatoria incluso si el usuario entrega fuentes.
+No construyas la Web Talk ni cierres por tu cuenta la narrativa final. Devuelve el resultado como `charlas-specialist-result-v1`.
+"""

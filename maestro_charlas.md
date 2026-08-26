@@ -129,7 +129,7 @@ Indice vivo de las charlas trabajadas en este repo.
 
 **Pregunta central:** Como pasar de conversaciones largas y fragiles a flujos con specs, handoffs, artefactos, review y decision de continuidad.
 
-**Estado:** Revisada. La version final aprobada es `SDD-IAgentica-v2.pptx`, alineada con `STYLE-CHARLAS.md`.
+**Estado:** Revisada como artefacto historico. La version final aprobada es `SDD-IAgentica-v2.pptx`, construida con el antiguo `STYLE-CHARLAS.md`; no define el producto vigente.
 
 **Material versionable esperado:**
 - `SDD-IAgentica-v2.pptx`
@@ -166,5 +166,5 @@ Indice vivo de las charlas trabajadas en este repo.
 
 ## Reglas de lectura
 - Este archivo es inventario editorial, no reemplaza `AGENTS.md`.
-- Para flujo operativo, agentes y SDD, usar `AGENTS.md`, `agents/README.md` y `templates/charlas-sdd/`.
+- Para producto, flujo y agentes vigentes, usar `PRODUCT.md`, `DESIGN.md`, `AGENTS.md` y `skills/charlas-workflow/`.
 - Los estados se actualizan cuando cambia el artefacto real, no solo cuando aparece una idea nueva.

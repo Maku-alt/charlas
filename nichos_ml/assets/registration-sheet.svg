@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-label="Hoja técnica registrada con una ventana de contraste">
+  <rect width="1200" height="760" fill="#b8d6d5" fill-opacity=".09"/>
+  <g fill="none" stroke="#9ad7d4" stroke-opacity=".64" stroke-width="2">
+    <rect x="86" y="72" width="1010" height="592"/>
+    <rect x="132" y="112" width="920" height="512" stroke-opacity=".28"/>
+    <path d="M60 154h54M60 154v54M1140 154h-54M1140 154v54M60 606h54M60 606v-54M1140 606h-54M1140 606v-54"/>
+    <path d="M170 248h310M170 280h250M170 312h360M720 246h270M720 278h350M720 310h190" stroke-opacity=".4"/>
+    <path d="M260 422h660M260 450h520M260 478h610" stroke-opacity=".33"/>
+    <path d="M606 72v592M86 368h1010" stroke="#f3a34f" stroke-opacity=".34" stroke-dasharray="8 12"/>
+    <rect x="490" y="286" width="270" height="164" stroke="#f3a34f" stroke-opacity=".9"/>
+    <path d="M490 286h24M490 286v24M760 286h-24M760 286v24M490 450h24M490 450v-24M760 450h-24M760 450v-24" stroke="#f3a34f"/>
+  </g>
+  <g fill="#c4e3df" fill-opacity=".7" font-family="Arial, sans-serif" font-size="18" letter-spacing="3">
+    <text x="170" y="188">REGISTERED SHEET / 07</text><text x="170" y="540">SEARCH SPACE</text><text x="720" y="540">REVIEW WINDOW</text>
+  </g>
+  <g fill="#f3a34f" fill-opacity=".9" font-family="Consolas, monospace" font-size="16"><text x="522" y="372">WHERE TO LOOK</text></g>
+</svg>

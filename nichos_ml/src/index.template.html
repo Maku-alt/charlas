@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c2033">
+  <title>PySubgroup · encontrar dónde mirar</title>
+  <style>/*__INLINE_CSS__*/</style>
+</head>
+<body>
+  <!-- Dirección: Mesa de registro / Capas funcionales. La superficie usa una mesa mineral azul y hojas registradas para hacer visible la pregunta que pysubgroup responde. La apertura parte del promedio y abre un hueco de descripción; las capas se vuelven piezas de API, la demo queda en una sola composición sintética con holdout y el cierre deja una regla visual protagonista. Datos, métricas y código se muestran como evidencia; la interacción revela estados deterministas, no adorno. Se evita el dashboard SaaS, la tarjeta repetida, el gradiente y el texto diminuto. -->
+  <div class="talk-shell" id="talk-shell">
+    <header class="topbar">
+      <div class="brand-lockup" aria-label="PySubgroup, charla de Data Science">
+        <span class="brand-mark" aria-hidden="true">PS</span>
+        <span>pysubgroup / registro de evidencia</span>
+      </div>
+      <div class="session-meta"><span>DATA SCIENCE</span><span class="meta-rule" aria-hidden="true"></span><span>26 AGO 2026</span></div>
+    </header>
+
+    <main class="stage" id="stage" aria-live="polite">
+      <section class="moment is-active" data-moment="1" aria-labelledby="m1-title">
+        <div class="moment-grid opening-grid">
+          <div class="opening-copy">
+            <p class="moment-count">01 / 07</p>
+            <h1 id="m1-title">El promedio dice cuánto.<br><em>La pregunta es dónde.</em></h1>
+            <p class="lead">Una sola cifra ordena la mesa. No nombra la región que merece una segunda mirada.</p>
+            <div class="question-line"><span class="question-pin" aria-hidden="true"></span><span>¿Qué combinación legible merece investigación?</span></div>
+          </div>
+          <div class="average-scene" aria-label="Una población resumida por un promedio y una región que se vuelve visible">
+            <div class="scene-label">POBLACIÓN / RESUMEN</div>
+            <div class="population-field">
+              <span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="dot d4"></span><span class="dot d5"></span><span class="dot d6"></span><span class="dot d7"></span><span class="dot d8"></span><span class="dot d9"></span><span class="dot d10"></span><span class="dot d11"></span><span class="dot d12"></span><span class="dot d13"></span><span class="dot d14"></span><span class="dot d15"></span><span class="dot d16"></span><span class="dot d17"></span><span class="dot d18"></span><span class="dot d19"></span><span class="dot d20"></span><span class="dot d21"></span><span class="dot d22"></span><span class="dot d23"></span><span class="dot d24"></span>
+              <div class="average-band"><span>promedio</span><strong>una cifra</strong></div>
+              <div class="region-window" aria-hidden="true"><span class="window-corner top-left"></span><span class="window-corner top-right"></span><span class="window-corner bottom-left"></span><span class="window-corner bottom-right"></span><i></i><i></i><i></i><i></i></div>
+            </div>
+            <div class="scene-foot"><span>resumen</span><span class="line-dash"></span><span class="hidden-note">región sin nombre</span></div>
+          </div>
+        </div>
+        <div class="moment-prompt"><kbd>ESPACIO</kbd><span>abre la región que el promedio no nombra</span></div>
+      </section>
+
+      <section class="moment" data-moment="2" aria-labelledby="m2-title" hidden>
+        <div class="moment-grid lenses-grid">
+          <div class="section-copy">
+            <p class="moment-count">02 / 07</p>
+            <h2 id="m2-title">Cuatro lentes.<br><em>Una pregunta distinta.</em></h2>
+            <p class="lead">No se trata de reemplazar herramientas. Se trata de no pedirles la misma respuesta.</p>
+            <p class="micro-note">Pulsa espacio para recorrer el registro.</p>
+          </div>
+          <div class="lens-board" data-inner="0">
+            <div class="board-top"><span>REGISTRO DE PREGUNTAS</span><span class="board-index" id="lens-index">A / 04</span></div>
+            <div class="lens-route is-focus" data-lens="0"><span class="route-glyph cut-glyph" aria-hidden="true"></span><div><strong>Segmento manual</strong><p>¿Qué corte operativo decidimos antes?</p></div><em>corte heredado</em></div>
+            <div class="lens-route" data-lens="1"><span class="route-glyph cluster-glyph" aria-hidden="true"></span><div><strong>Clustering</strong><p>¿Qué grupos se parecen entre sí?</p></div><em>similitud</em></div>
+            <div class="lens-route" data-lens="2"><span class="route-glyph score-glyph" aria-hidden="true"></span><div><strong>Modelo global</strong><p>¿Qué individuo ordena su score?</p></div><em>ranking</em></div>
+            <div class="lens-route" data-lens="3"><span class="route-glyph rule-glyph" aria-hidden="true"></span><div><strong>Subgroup Discovery</strong><p>¿Qué descripción cubre una región con contraste?</p></div><em>regla legible</em></div>
+            <div class="board-stamp">misma población / otra pregunta</div>
+          </div>
+        </div>
+        <div class="moment-prompt"><kbd>ESPACIO</kbd><span>avanza el foco · <kbd>R</kbd> reinicia</span></div>
+      </section>
+
+      <section class="moment" data-moment="3" aria-labelledby="m3-title" hidden>
+        <div class="moment-grid layers-grid">
+          <div class="section-copy layers-copy">
+            <p class="moment-count">03 / 07</p>
+            <h2 id="m3-title">La pregunta se arma<br><em>en cinco capas.</em></h2>
+            <p class="lead">Cada hoja declara una decisión: qué cubre, qué contrasta y cómo se revisa.</p>
+            <div class="formula-note"><span>quality</span><strong>contraste × tamaño</strong><small>no es un sello de verdad</small></div>
+          </div>
+          <div class="registered-stack" data-inner="0" role="group" aria-label="Cinco capas de la arquitectura pysubgroup">
+            <div class="stack-sheet sheet-selectors"><span class="sheet-index">01</span><strong>selectors</strong><small>cubren filas</small><div class="sheet-lines"><i></i><i></i><i></i></div></div>
+            <div class="stack-sheet sheet-target"><span class="sheet-index">02</span><strong>target</strong><code>BinaryTarget(…)</code><div class="target-dot"></div></div>
+            <div class="stack-sheet sheet-quality"><span class="sheet-index">03</span><strong>quality</strong><code>WRAccQF / StandardQF</code><div class="quality-cross">×</div></div>
+            <div class="stack-sheet sheet-search"><span class="sheet-index">04</span><strong>search</strong><code>DFS / Beam Search</code><div class="search-path"><i></i><i></i><i></i></div></div>
+            <div class="stack-sheet sheet-review"><span class="sheet-index">05</span><strong>soporte + revisión</strong><code>MinSupportConstraint</code><div class="review-tick">✓</div></div>
+            <div class="registration-window" aria-hidden="true"><span>rule window</span><strong>contract = …</strong></div>
+            <div class="registration-cross cross-a" aria-hidden="true">+</div><div class="registration-cross cross-b" aria-hidden="true">+</div>
+          </div>
+        </div>
+        <div class="moment-prompt"><kbd>ESPACIO</kbd><span>desplaza la hoja activa · <kbd>R</kbd> reinicia</span></div>
+      </section>
+
+      <section class="moment" data-moment="4" aria-labelledby="m4-title" hidden>
+        <div class="moment-grid demo-grid">
+          <div class="section-copy demo-copy">
+            <p class="moment-count">04 / 07</p>
+            <h2 id="m4-title">Una búsqueda completa<br><em>en una sola mesa.</em></h2>
+            <p class="lead">Configuración, contraste, tamaño y holdout: la lectura no se separa de la evidencia.</p>
+            <div class="demo-source"><span class="orange-pin"></span><div><strong>SINTÉTICO</strong><small>telecom · 11.000 por ventana · seed 20260826</small></div></div>
+            <p class="micro-note">Caso observacional; no es un benchmark ni una telco real.</p>
+          </div>
+          <div class="demo-table" data-inner="0">
+            <div class="demo-config">
+              <div class="demo-config-head"><span>CONFIG / DECLARACIÓN</span><span class="demo-step" id="demo-step">01 · config</span></div>
+              <code><span>create_selectors</span>(df, nbins=5)<br><span>BinaryTarget</span>(<b>"churn"</b>, True)<br><span>StandardQF</span>(alpha=1) · depth=3<br><span>MinSupportConstraint</span>(0.02)</code>
+            </div>
+            <div class="baseline-strip"><span>baseline global</span><strong>4.06%</strong><small>discovery · 447 / 11.000</small></div>
+            <div class="rule-reveal">
+              <div class="rule-header"><span>REGLA DESCUBIERTA</span><span class="rule-status">direction retained</span></div>
+              <strong class="rule-text">contract = month-to-month <i>∧</i> outages_90d ≥ 3 <i>∧</i> plan = basic</strong>
+              <div class="metric-row"><div><small>n / soporte</small><strong>467 <em>· 4.25%</em></strong></div><div><small>tasa subgrupo</small><strong>6.85%</strong></div><div><small>lift / diferencia</small><strong>1.69× <em>· +2.79 pp</em></strong></div><div><small>quality</small><strong>0.00092</strong></div></div>
+            </div>
+            <div class="holdout-strip"><div><span>holdout independiente</span><small>seed 20260827 · n=519 · baseline 4.08%</small></div><strong>5.01%</strong><em>1.23× · +0.93 pp · dirección retenida</em></div>
+            <div class="hypothesis"><span class="orange-pin"></span><div><small>HIPÓTESIS DE ACCIÓN</small><strong>priorizar una revisión de calidad y retención</strong><em>asociación ≠ causalidad</em></div></div>
+          </div>
+        </div>
+        <div class="moment-prompt"><kbd>ESPACIO</kbd><span>revela la misma mesa · <kbd>R</kbd> vuelve a config</span></div>
+      </section>
+
+      <section class="moment" data-moment="5" aria-labelledby="m5-title" hidden>
+        <div class="moment-grid choice-grid">
+          <div class="section-copy">
+            <p class="moment-count">05 / 07</p>
+            <h2 id="m5-title">La mejor elección<br><em>depende del marco.</em></h2>
+            <p class="lead">Para este equipo: menor fricción reproducible bajo Python 3.10. No es un ranking universal.</p>
+            <div class="pin-note"><span class="orange-pin"></span><code>pysubgroup==0.9.0</code><code>numpy==1.26.4</code><code>scikit-learn==1.7.2</code></div>
+          </div>
+          <div class="comparison-sheet">
+            <div class="compare-head"><span>DECISIÓN CONTEXTUAL</span><span>leer antes de elegir</span></div>
+            <div class="compare-row compare-main"><strong>pysubgroup</strong><span>API compacta · Python 3.10 fijado · Beta</span><b>encaja aquí</b></div>
+            <div class="compare-row"><strong>subgroups</strong><span>catálogo más amplio · metadata Python ≥ 3.11</span><b>revisar al migrar</b></div>
+            <div class="compare-row compare-muted"><strong>SYFLOW</strong><span>línea de investigación · más expresiva</span><b>otra pregunta</b></div>
+            <div class="compare-row compare-muted"><strong>Constrained SD</strong><span>restricciones SMT · coste experimental</span><b>otra escala</b></div>
+            <div class="compare-foot">Sin benchmark común de calidad o velocidad. El veredicto cambia si cambia el stack o el alcance.</div>
+          </div>
+        </div>
+        <div class="moment-prompt"><span>para este contexto ≠ mejor para todos</span></div>
+      </section>
+
+      <section class="moment" data-moment="6" aria-labelledby="m6-title" hidden>
+        <div class="moment-grid limits-grid">
+          <div class="section-copy">
+            <p class="moment-count">06 / 07</p>
+            <h2 id="m6-title">El hallazgo necesita<br><em>guardarraíles.</em></h2>
+            <p class="lead">Encontrar candidatos interpretables no convierte la exploración en confirmación.</p>
+          </div>
+          <div class="limits-board">
+            <div class="guardrail"><span class="guard-number">01</span><div><strong>Muchas combinaciones</strong><p>La selección explora hipótesis; replicar protege la lectura.</p></div><span class="guard-symbol">≋</span></div>
+            <div class="guardrail"><span class="guard-number">02</span><div><strong>Soporte insuficiente</strong><p>Más tamaño estabiliza; demasiado puede ocultar regiones.</p></div><span class="guard-symbol">∥</span></div>
+            <div class="guardrail"><span class="guard-number">03</span><div><strong>Reglas solapadas</strong><p>Varias descripciones pueden cubrir a las mismas personas.</p></div><span class="guard-symbol">∩</span></div>
+            <div class="guardrail"><span class="guard-number">04</span><div><strong>Asociación ≠ causalidad</strong><p>Temporalidad, confusión y experimento son otra capa.</p></div><span class="guard-symbol">≠</span></div>
+            <div class="extension-note"><span>EXTENSIÓN / AUDITORÍA DE MODELO</span><strong>SoftClassifierTarget + SubROC</strong><p>pregunta posterior: ¿dónde rinde distinto un clasificador existente?</p></div>
+          </div>
+        </div>
+        <div class="moment-prompt"><span>la herramienta encuentra candidatos · la confirmación exige diseño</span></div>
+      </section>
+
+      <section class="moment closing-moment" data-moment="7" aria-labelledby="m7-title" hidden>
+        <div class="closing-geometry" aria-hidden="true">
+          <img src="../assets/registration-sheet.svg" alt="" class="registration-image">
+          <div class="closing-average"><span>promedio</span><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="closing-lens"><span class="window-corner top-left"></span><span class="window-corner top-right"></span><span class="window-corner bottom-left"></span><span class="window-corner bottom-right"></span><strong>where to look</strong></div>
+        </div>
+        <div class="closing-copy">
+          <p class="moment-count">07 / 07</p>
+          <h2 id="m7-title">El promedio dice cuánto;<br><em>pysubgroup hace explícito dónde mirar.</em></h2>
+        </div>
+      </section>
+    </main>
+
+    <footer class="controls" aria-label="Navegación de la presentación">
+      <button class="control-button" id="prev-button" type="button" aria-label="Momento anterior">← <span>anterior</span></button>
+      <nav class="position-nav" aria-label="Ir a un momento">
+        <button type="button" data-go="1" class="position-button is-current" aria-label="Ir al momento 1" aria-current="step">01</button>
+        <button type="button" data-go="2" class="position-button" aria-label="Ir al momento 2">02</button>
+        <button type="button" data-go="3" class="position-button" aria-label="Ir al momento 3">03</button>
+        <button type="button" data-go="4" class="position-button" aria-label="Ir al momento 4">04</button>
+        <button type="button" data-go="5" class="position-button" aria-label="Ir al momento 5">05</button>
+        <button type="button" data-go="6" class="position-button" aria-label="Ir al momento 6">06</button>
+        <button type="button" data-go="7" class="position-button" aria-label="Ir al momento 7">07</button>
+      </nav>
+      <div class="control-right"><span class="control-hint">← → navegar · espacio revelar · R reiniciar</span><button class="control-button" id="fullscreen-button" type="button" aria-label="Entrar en pantalla completa">⛶ <span>pantalla completa</span></button><button class="control-button next-button" id="next-button" type="button" aria-label="Momento siguiente"><span>siguiente</span> →</button></div>
+    </footer>
+  </div>
+  <script>//__INLINE_JS__</script>
+</body>
+</html>

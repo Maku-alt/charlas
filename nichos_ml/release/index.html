@@ -1,0 +1,409 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c2033">
+  <title>PySubgroup · encontrar dónde mirar</title>
+  <style>:root {
+  --ink: #f3f6f7;
+  --muted: #aebdca;
+  --deep: #0c2033;
+  --field: #12324a;
+  --field-2: #1a4058;
+  --line: rgba(213, 229, 233, .22);
+  --line-strong: rgba(222, 239, 240, .62);
+  --cyan: #96d7d4;
+  --blue: #6da9dd;
+  --orange: #f3a34f;
+  --paper: rgba(224, 244, 242, .94);
+  --paper-ink: #0d2739;
+  --shadow: 0 18px 50px rgba(3, 13, 23, .26);
+  --sans: "Aptos", "Segoe UI", "Trebuchet MS", Arial, sans-serif;
+  --mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: var(--deep); }
+body { color: var(--ink); font-family: var(--sans); font-size: clamp(14px, 1.1vw, 20px); }
+button { font: inherit; }
+button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--orange); outline-offset: 4px; }
+::selection { background: var(--orange); color: var(--deep); }
+
+.talk-shell { position: relative; width: 100vw; height: 100vh; min-height: 560px; overflow: hidden; background: radial-gradient(circle at 78% 18%, rgba(74, 135, 152, .34), transparent 34%), linear-gradient(145deg, var(--field) 0%, var(--deep) 74%); }
+.talk-shell::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .34; background: linear-gradient(90deg, transparent 0 9.8%, rgba(166, 215, 214, .12) 9.9% 10%, transparent 10.1% 89.9%, rgba(166, 215, 214, .08) 90% 90.1%, transparent 90.2%), linear-gradient(0deg, transparent 0 14%, rgba(166, 215, 214, .08) 14.1% 14.2%, transparent 14.3% 85.8%, rgba(166, 215, 214, .07) 85.9% 86%, transparent 86.1%); }
+.topbar, .controls { position: absolute; z-index: 10; left: 4vw; right: 4vw; display: flex; align-items: center; justify-content: space-between; }
+.topbar { top: 3.1vh; font-size: .62rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.brand-lockup, .session-meta, .control-right, .question-line, .moment-prompt, .demo-source, .pin-note { display: flex; align-items: center; }
+.brand-lockup { gap: .7rem; }
+.brand-mark { display: grid; place-items: center; width: 2rem; height: 2rem; border: 1px solid var(--line-strong); color: var(--cyan); font-size: .63rem; letter-spacing: -.05em; }
+.session-meta { gap: .75rem; }
+.meta-rule { width: 2.5rem; height: 1px; background: var(--line-strong); }
+.stage { position: absolute; inset: 9vh 4vw 12vh; }
+.moment { position: absolute; inset: 0; display: grid; align-items: center; opacity: 0; transform: translateY(14px); pointer-events: none; transition: opacity .42s ease-out, transform .42s ease-out; }
+.moment.is-active { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.moment-grid { width: 100%; max-width: 1500px; margin: 0 auto; display: grid; gap: clamp(2rem, 5vw, 7rem); align-items: center; }
+.opening-grid { grid-template-columns: .84fr 1.16fr; }
+.lenses-grid, .layers-grid, .choice-grid, .limits-grid { grid-template-columns: .72fr 1.28fr; }
+.demo-grid { grid-template-columns: .62fr 1.38fr; gap: clamp(1.5rem, 3vw, 4rem); }
+.moment-count { margin: 0 0 1.3rem; color: var(--orange); font: 600 .67rem/1 var(--mono); letter-spacing: .13em; }
+h1, h2 { max-width: 13ch; margin: 0; color: var(--ink); font-weight: 700; letter-spacing: -.045em; line-height: .96; }
+h1 { font-size: clamp(3.3rem, 6.3vw, 7.6rem); }
+h2 { font-size: clamp(2.8rem, 5vw, 6rem); }
+h1 em, h2 em { color: var(--cyan); font-style: normal; }
+.lead { max-width: 34rem; margin: 1.8rem 0 0; color: var(--muted); font-size: clamp(1rem, 1.3vw, 1.35rem); line-height: 1.45; }
+.micro-note { margin: 1.2rem 0 0; color: var(--muted); font-size: .74rem; letter-spacing: .03em; }
+.question-line { gap: .65rem; margin-top: 3.2rem; color: var(--ink); font-size: clamp(.95rem, 1.3vw, 1.3rem); }
+.question-pin, .orange-pin { flex: 0 0 auto; width: .65rem; height: .65rem; border-radius: 50%; background: var(--orange); box-shadow: 0 0 0 .25rem rgba(243, 163, 79, .16); }
+.moment-prompt { position: absolute; left: 0; bottom: -1.3rem; gap: .7rem; color: var(--muted); font-size: .68rem; letter-spacing: .04em; }
+kbd { border: 1px solid var(--line-strong); padding: .27rem .44rem; color: var(--ink); font: 600 .56rem var(--mono); letter-spacing: .03em; }
+
+/* M1 */
+.average-scene { position: relative; min-height: 57vh; padding: 2.2rem 2.3rem; border: 1px solid var(--line); background: rgba(14, 42, 59, .26); box-shadow: var(--shadow); }
+.scene-label, .board-top, .demo-config-head, .compare-head, .rule-header { display: flex; justify-content: space-between; font: 600 .59rem var(--mono); letter-spacing: .12em; color: var(--muted); }
+.population-field { position: relative; height: 43vh; margin-top: 1.3rem; border: 1px solid rgba(201, 233, 231, .22); background: rgba(14, 45, 59, .5); overflow: hidden; }
+.population-field::before { content: ""; position: absolute; inset: 0; opacity: .3; background: linear-gradient(90deg, transparent 0 19.9%, var(--line) 20% 20.1%, transparent 20.2% 39.9%, var(--line) 40% 40.1%, transparent 40.2% 59.9%, var(--line) 60% 60.1%, transparent 60.2% 79.9%, var(--line) 80% 80.1%, transparent 80.2%), linear-gradient(0deg, transparent 0 24.9%, var(--line) 25% 25.1%, transparent 25.2% 49.9%, var(--line) 50% 50.1%, transparent 50.2% 74.9%, var(--line) 75% 75.1%, transparent 75.2%); }
+.dot { position: absolute; width: .45rem; height: .45rem; border-radius: 50%; background: rgba(154, 215, 213, .54); }
+.d1{left:10%;top:20%}.d2{left:18%;top:32%}.d3{left:25%;top:18%}.d4{left:34%;top:37%}.d5{left:46%;top:22%}.d6{left:55%;top:42%}.d7{left:63%;top:18%}.d8{left:73%;top:31%}.d9{left:84%;top:23%}.d10{left:12%;top:63%}.d11{left:26%;top:76%}.d12{left:39%;top:62%}.d13{left:53%;top:77%}.d14{left:67%;top:64%}.d15{left:81%;top:75%}.d16{left:30%;top:50%}.d17{left:44%;top:48%}.d18{left:72%;top:54%}.d19{left:90%;top:58%}.d20{left:7%;top:47%}.d21{left:20%;top:87%}.d22{left:58%;top:92%}.d23{left:88%;top:89%}.d24{left:49%;top:13%}
+.average-band { position: absolute; top: 49%; left: 8%; right: 8%; display: flex; align-items: center; justify-content: center; gap: 1.1rem; height: 3.2rem; border-top: 1px solid var(--cyan); border-bottom: 1px solid var(--cyan); color: var(--cyan); font: 600 .65rem var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+.average-band strong { color: var(--ink); font: 700 1.2rem var(--sans); letter-spacing: -.02em; text-transform: none; }
+.region-window { position: absolute; left: 57%; top: 57%; width: 25%; height: 28%; border: 1px solid var(--orange); opacity: .2; transform: scale(.82); transition: opacity .4s, transform .4s; }
+.moment.is-active .region-window { animation: windowBreath 3.4s ease-out .5s forwards; }
+.moment.is-active .average-scene.is-revealed .region-window { animation: none; transition: none; opacity: .95; transform: scale(1); }
+.region-window i { position: absolute; width: .4rem; height: .4rem; border-radius: 50%; background: var(--orange); opacity: .7; }
+.region-window i:nth-of-type(1){left:23%;top:31%}.region-window i:nth-of-type(2){left:52%;top:42%}.region-window i:nth-of-type(3){left:68%;top:69%}.region-window i:nth-of-type(4){left:31%;top:74%}
+.window-corner { position: absolute; width: .6rem; height: .6rem; border-color: var(--orange); border-style: solid; }
+.window-corner.top-left{left:-1px;top:-1px;border-width:1px 0 0 1px}.window-corner.top-right{right:-1px;top:-1px;border-width:1px 1px 0 0}.window-corner.bottom-left{left:-1px;bottom:-1px;border-width:0 0 1px 1px}.window-corner.bottom-right{right:-1px;bottom:-1px;border-width:0 1px 1px 0}
+.scene-foot { display: flex; gap: .8rem; align-items: center; margin-top: 1.1rem; font: .59rem var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .11em; }
+.line-dash { width: 4rem; border-top: 1px dashed var(--line-strong); }.hidden-note { color: var(--orange); }
+@keyframes windowBreath { to { opacity: .95; transform: scale(1); } }
+
+/* M2 */
+.section-copy { align-self: center; }
+.lens-board, .comparison-sheet, .limits-board { padding: 1.25rem 1.4rem; border: 1px solid var(--line-strong); background: rgba(202, 230, 226, .08); box-shadow: var(--shadow); }
+.lens-route { display: grid; grid-template-columns: 2.6rem 1fr auto; gap: 1rem; align-items: center; min-height: 10vh; border-bottom: 1px solid var(--line); opacity: .48; transition: opacity .35s, background .35s, transform .35s; }
+.lens-route.is-focus { opacity: 1; transform: translateX(.75rem); background: rgba(147, 210, 208, .12); }
+.lens-route strong { font-size: 1rem; }.lens-route p { margin: .2rem 0 0; color: var(--muted); font-size: .77rem; }.lens-route em { color: var(--cyan); font: .63rem var(--mono); font-style: normal; }
+.route-glyph { position: relative; display: block; width: 1.8rem; height: 1.8rem; border: 1px solid var(--line-strong); }.cut-glyph::before { content:""; position:absolute; left:50%; top:-1px; height:100%; border-left:1px dashed var(--orange); }.cluster-glyph { border-radius: 50%; box-shadow: .4rem -.25rem 0 -.25rem var(--cyan), -.35rem .35rem 0 -.25rem var(--blue); }.score-glyph::before { content:""; position:absolute; left:.25rem; right:.25rem; bottom:.4rem; height:1px; background:var(--cyan); transform:rotate(-22deg); box-shadow: .35rem -.35rem 0 0 var(--cyan), .7rem -.1rem 0 0 var(--cyan); }.rule-glyph::before { content:""; position:absolute; inset:.35rem; border:1px solid var(--orange); }.rule-glyph::after { content:""; position:absolute; left:.35rem; right:.35rem; top:50%; border-top:1px dashed var(--orange); }
+.board-stamp { margin-top: 1.2rem; color: var(--orange); font: .6rem var(--mono); letter-spacing: .11em; text-transform: uppercase; }
+
+/* M3 */
+.layers-copy { padding-bottom: 4rem; }.formula-note { margin-top: 2.8rem; padding-top: 1rem; border-top: 1px solid var(--line); max-width: 16rem; }.formula-note span, .formula-note small { display: block; color: var(--muted); font: .62rem var(--mono); letter-spacing: .1em; text-transform: uppercase; }.formula-note strong { display:block; margin: .45rem 0; color: var(--orange); font-size: 1.18rem; }
+.registered-stack { position: relative; min-height: 57vh; perspective: 1100px; }
+.stack-sheet { position: absolute; width: 72%; min-height: 14vh; padding: 1.2rem 1.4rem; color: var(--paper-ink); background: var(--paper); border: 1px solid rgba(8, 40, 55, .4); box-shadow: 10px 18px 26px rgba(4, 19, 29, .28); transform-origin: 20% 50%; transition: transform .45s ease-out, background .35s; }
+.stack-sheet::after { content:""; position:absolute; inset:.55rem; border:1px solid rgba(12, 39, 55, .24); pointer-events:none; }.sheet-index { position:relative; z-index:1; float:right; font: .58rem var(--mono); opacity: .6; }.stack-sheet strong, .stack-sheet code, .stack-sheet small { position: relative; z-index: 1; display: block; }.stack-sheet strong { font-size: 1.28rem; letter-spacing: -.03em; }.stack-sheet small { margin-top: .2rem; color: rgba(13, 39, 57, .66); font-size: .73rem; }.stack-sheet code { margin-top: .6rem; font: .66rem var(--mono); }.sheet-selectors { left: 3%; top: 2%; transform: rotate(-4deg); background: #d8ebe4; }.sheet-target { left: 12%; top: 19%; transform: rotate(2deg); background: #c7e1e2; }.sheet-quality { left: 21%; top: 36%; transform: rotate(-2deg); background: #c0d9ee; }.sheet-search { left: 30%; top: 53%; transform: rotate(3deg); background: #d5e4df; }.sheet-review { left: 39%; top: 70%; transform: rotate(-3deg); background: #edf1de; }.quality-cross { position:absolute; right:3rem; top:2rem; color:#1b5a77; font-size:2rem; }.target-dot { position:absolute; right:3rem; bottom:2rem; width:.55rem; height:.55rem; border-radius:50%; background:#1b5a77; }.search-path { position:absolute; right:2rem; bottom:1.5rem; width:4rem; height:1.3rem; border-bottom:1px solid #1b5a77; transform:skew(-30deg); }.search-path i { position:absolute; width:.35rem; height:.35rem; border-radius:50%; background:#1b5a77; }.search-path i:nth-child(1){left:0;bottom:-.2rem}.search-path i:nth-child(2){left:1.8rem;bottom:.35rem}.search-path i:nth-child(3){right:0;bottom:-.2rem}.review-tick { position:absolute; right:2rem; top:2rem; color:#1b5a77; font-size:2rem; }.registration-window { position:absolute; left:42%; top:42%; width:31%; min-height:14vh; padding: 1.15rem; display:flex; flex-direction:column; justify-content:center; color:var(--orange); border:1px solid var(--orange); background:rgba(12,32,51,.9); box-shadow:0 0 0 .4rem rgba(12,32,51,.6); transform:rotate(1deg); }.registration-window span { font: .55rem var(--mono); letter-spacing:.1em; text-transform:uppercase; }.registration-window strong { margin-top:.5rem; font-size:1.25rem; }.registration-cross { position:absolute; color:var(--orange); font:1.5rem var(--mono); }.cross-a{left:0;top:47%}.cross-b{right:2%;bottom:0}
+
+/* M4 */
+.demo-copy { align-self: start; padding-top: 4vh; }.demo-source { gap: .75rem; margin-top: 2.2rem; }.demo-source strong { display:block; color: var(--orange); font: 600 .72rem var(--mono); letter-spacing:.14em; }.demo-source small { display:block; margin-top:.35rem; color:var(--muted); font-size:.72rem; }.demo-table { border: 1px solid var(--line-strong); background: rgba(6, 24, 39, .42); box-shadow: var(--shadow); }.demo-config { padding:1rem 1.2rem; border-bottom:1px solid var(--line); }.demo-config code { display:block; margin-top:.8rem; color:#d5e9e5; font: .73rem/1.7 var(--mono); }.demo-config code span { color:var(--cyan); }.demo-config code b { color:var(--orange); font-weight:500; }.demo-step { color:var(--orange); }.baseline-strip { display:flex; align-items:baseline; gap:.8rem; padding:.78rem 1.2rem; background:rgba(151, 213, 210, .1); border-bottom:1px solid var(--line); }.baseline-strip span { color:var(--muted); font: .6rem var(--mono); text-transform:uppercase; letter-spacing:.09em; }.baseline-strip strong { font-size:1.65rem; color:var(--cyan); }.baseline-strip small { color:var(--muted); font-size:.64rem; }.rule-reveal { padding:1.15rem 1.2rem 1.25rem; border-bottom:1px solid var(--line); }.rule-status { color:var(--cyan); font: .58rem var(--mono); }.rule-text { display:block; max-width: 34rem; margin-top: .8rem; color: var(--ink); font: 600 clamp(.85rem, 1.1vw, 1.25rem)/1.35 var(--mono); }.rule-text i { color:var(--orange); font-style:normal; }.metric-row { display:grid; grid-template-columns:repeat(4,1fr); gap:.7rem; margin-top:1.2rem; }.metric-row small { display:block; color:var(--muted); font: .56rem var(--mono); text-transform:uppercase; letter-spacing:.08em; }.metric-row strong { display:block; margin-top:.35rem; color:var(--cyan); font-size:1.12rem; }.metric-row em { color:var(--muted); font-size:.68rem; font-style:normal; }.holdout-strip { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.85rem 1.2rem; background:rgba(243,163,79,.08); }.holdout-strip span { display:block; color:var(--orange); font: .58rem var(--mono); letter-spacing:.1em; text-transform:uppercase; }.holdout-strip small { display:block; margin-top:.25rem; color:var(--muted); font-size:.65rem; }.holdout-strip strong { color:var(--orange); font-size:1.5rem; }.holdout-strip em { color:var(--cyan); font: .65rem var(--mono); font-style:normal; }.hypothesis { display:flex; gap:.75rem; align-items:flex-start; padding:1rem 1.2rem; border-top:1px solid var(--line); }.hypothesis small { display:block; color:var(--orange); font: .56rem var(--mono); letter-spacing:.11em; }.hypothesis strong { display:block; margin-top:.28rem; font-size:.91rem; }.hypothesis em { display:block; margin-top:.3rem; color:var(--muted); font: .63rem var(--mono); font-style:normal; }
+.demo-table.is-interactive .baseline-strip,
+.demo-table.is-interactive .rule-reveal,
+.demo-table.is-interactive .holdout-strip,
+.demo-table.is-interactive .hypothesis { opacity:0; visibility:hidden; max-height:0; padding-top:0; padding-bottom:0; border-width:0; overflow:hidden; transform:translateY(.7rem); transition:opacity .28s ease-out, transform .28s ease-out, max-height .28s ease-out, padding .28s ease-out; }
+.demo-table.is-interactive[data-inner="1"] .baseline-strip,
+.demo-table.is-interactive[data-inner="2"] .baseline-strip,
+.demo-table.is-interactive[data-inner="3"] .baseline-strip,
+.demo-table.is-interactive[data-inner="2"] .rule-reveal,
+.demo-table.is-interactive[data-inner="3"] .rule-reveal,
+.demo-table.is-interactive[data-inner="3"] .holdout-strip,
+.demo-table.is-interactive[data-inner="3"] .hypothesis { opacity:1; visibility:visible; max-height:18rem; transform:none; overflow:visible; }
+.demo-table.is-interactive[data-inner="1"] .baseline-strip,
+.demo-table.is-interactive[data-inner="2"] .baseline-strip,
+.demo-table.is-interactive[data-inner="3"] .baseline-strip { padding:.78rem 1.2rem; border-bottom-width:1px; }
+.demo-table.is-interactive[data-inner="2"] .rule-reveal,
+.demo-table.is-interactive[data-inner="3"] .rule-reveal { padding:1.15rem 1.2rem 1.25rem; border-bottom-width:1px; }
+.demo-table.is-interactive[data-inner="3"] .holdout-strip { padding:.85rem 1.2rem; }
+.demo-table.is-interactive[data-inner="3"] .hypothesis { padding:1rem 1.2rem; border-top-width:1px; }
+
+/* M5 */
+.pin-note { flex-wrap:wrap; gap:.45rem .8rem; margin-top:2rem; }.pin-note .orange-pin { margin-right:.2rem; }.pin-note code { color:var(--cyan); font: .62rem var(--mono); }.compare-row { display:grid; grid-template-columns: 1fr 2.1fr 1.1fr; gap:1rem; align-items:center; padding:1.15rem 0; border-bottom:1px solid var(--line); }.compare-row strong { font-size:1.03rem; }.compare-row span { color:var(--muted); font-size:.77rem; }.compare-row b { color:var(--cyan); font: .6rem var(--mono); font-weight:500; text-transform:uppercase; letter-spacing:.08em; }.compare-main { background:rgba(151, 213, 210, .1); padding-left:.9rem; padding-right:.9rem; }.compare-main strong { color:var(--cyan); }.compare-muted { opacity:.65; }.compare-foot { margin-top:1rem; color:var(--muted); font-size:.68rem; line-height:1.45; }
+
+/* M6 */
+.guardrail { display:grid; grid-template-columns:2rem 1fr 2rem; gap:1rem; align-items:center; min-height:10vh; border-bottom:1px solid var(--line); }.guard-number { color:var(--orange); font: .62rem var(--mono); }.guardrail strong { font-size:1.03rem; }.guardrail p { margin:.3rem 0 0; color:var(--muted); font-size:.72rem; }.guard-symbol { color:var(--cyan); font-size:1.5rem; text-align:right; }.extension-note { margin-top:1rem; padding:1rem; border:1px solid rgba(243, 163, 79, .5); background:rgba(243,163,79,.08); }.extension-note span { color:var(--orange); font: .58rem var(--mono); letter-spacing:.1em; }.extension-note strong { display:block; margin-top:.45rem; font-size:1rem; }.extension-note p { margin:.35rem 0 0; color:var(--muted); font-size:.72rem; }
+
+/* M7 */
+.closing-moment { display:block; }.closing-geometry { position:absolute; inset: 1vh 0 0; overflow:hidden; }.registration-image { position:absolute; width:70vw; max-width:1100px; right:-7vw; top:-9vh; opacity:.38; mix-blend-mode:screen; transform:rotate(-5deg); }.closing-average { position:absolute; left:7vw; top:23vh; width:34vw; height:20vh; border-block:1px solid var(--cyan); display:flex; align-items:center; justify-content:center; gap:1.2rem; color:var(--muted); font: .68rem var(--mono); text-transform:uppercase; }.closing-average i { display:block; width:.55rem; height:.55rem; border-radius:50%; background:var(--cyan); }.closing-lens { position:absolute; left:40vw; top:29vh; width:22vw; height:20vh; display:grid; place-items:center; color:var(--orange); border:1px solid var(--orange); background:rgba(12,32,51,.78); box-shadow:0 0 0 1.2rem rgba(12,32,51,.36); transform:rotate(2deg); }.closing-lens strong { font:600 .8rem var(--mono); letter-spacing:.08em; text-transform:uppercase; }.closing-copy { position:absolute; left:0; right:0; bottom:13vh; z-index:2; text-align:center; }.closing-copy h2 { max-width: none; margin:0 auto; font-size:clamp(2.5rem, 5vw, 6.2rem); }.closing-copy .moment-count { margin-bottom:1.4rem; }
+
+/* controls */
+.controls { bottom: 3.2vh; min-height: 2.4rem; color:var(--muted); font-size:.65rem; }.control-button, .position-button { border:0; background:none; color:var(--muted); cursor:pointer; }.control-button { padding:.45rem 0; }.control-button:hover, .position-button:hover { color:var(--ink); }.control-button span { font-size:.6rem; letter-spacing:.06em; text-transform:uppercase; }.next-button { color:var(--ink); }.position-nav { display:flex; gap:.34rem; align-items:center; }.position-button { min-width:2rem; height:1.8rem; border-bottom:1px solid transparent; font: .61rem var(--mono); }.position-button.is-current { color:var(--orange); border-bottom-color:var(--orange); }.control-right { gap:1.1rem; }.control-hint { color:rgba(174,189,202,.72); font-size:.56rem; }
+
+@media (max-width: 1050px) { .stage { inset-inline:3vw; }.moment-grid { gap:2rem; }.lead { font-size:1rem; }.control-hint { display:none; }.topbar, .controls { left:3vw; right:3vw; }.average-scene { min-height:52vh; }.population-field { height:38vh; }.stack-sheet { width:78%; }.demo-grid { grid-template-columns:.48fr 1.52fr; }.demo-copy h2 { font-size:clamp(2.1rem,4.2vw,4rem); }.metric-row { gap:.4rem; }.metric-row strong { font-size:.9rem; } }
+@media (max-width: 760px) { html, body { overflow:auto; }.talk-shell { min-height:760px; height:100vh; }.stage { inset:10vh 5vw 18vh; overflow:auto; }.moment { position:relative; min-height:70vh; }.moment-grid, .opening-grid, .lenses-grid, .layers-grid, .demo-grid, .choice-grid, .limits-grid { grid-template-columns:1fr; gap:1.6rem; }.moment-prompt { bottom:-.2rem; }.average-scene { min-height:45vh; }.population-field { height:30vh; }.registered-stack { min-height:56vh; }.stack-sheet { min-height:12vh; }.demo-copy { padding-top:0; }.demo-table { margin-bottom:2rem; }.metric-row { grid-template-columns:repeat(2,1fr); }.controls { bottom:1.6vh; }.position-nav { order:3; }.controls { flex-wrap:wrap; gap:.5rem; }.control-right { margin-left:auto; }.closing-moment { min-height:70vh; }.closing-copy { bottom:5vh; }.closing-geometry { inset:0; }.closing-average { left:0; width:54vw; }.closing-lens { left:34vw; width:44vw; }.registration-image { width:100vw; right:-18vw; }.closing-copy h2 { font-size:clamp(2rem,8vw,3.6rem); } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; scroll-behavior:auto !important; }.moment { transform:none; }.region-window { opacity:.95; transform:none; }.demo-table.is-interactive .baseline-strip, .demo-table.is-interactive .rule-reveal, .demo-table.is-interactive .holdout-strip, .demo-table.is-interactive .hypothesis { opacity:1; visibility:visible; max-height:18rem; transform:none; overflow:visible; }.demo-table.is-interactive .baseline-strip { padding:.78rem 1.2rem; border-bottom-width:1px; }.demo-table.is-interactive .rule-reveal { padding:1.15rem 1.2rem 1.25rem; border-bottom-width:1px; }.demo-table.is-interactive .holdout-strip { padding:.85rem 1.2rem; }.demo-table.is-interactive .hypothesis { padding:1rem 1.2rem; border-top-width:1px; } }
+</style>
+</head>
+<body>
+  <!-- Dirección: Mesa de registro / Capas funcionales. La superficie usa una mesa mineral azul y hojas registradas para hacer visible la pregunta que pysubgroup responde. La apertura parte del promedio y abre un hueco de descripción; las capas se vuelven piezas de API, la demo queda en una sola composición sintética con holdout y el cierre deja una regla visual protagonista. Datos, métricas y código se muestran como evidencia; la interacción revela estados deterministas, no adorno. Se evita el dashboard SaaS, la tarjeta repetida, el gradiente y el texto diminuto. -->
+  <div class="talk-shell" id="talk-shell">
+    <header class="topbar">
+      <div class="brand-lockup" aria-label="PySubgroup, charla de Data Science">
+        <span class="brand-mark" aria-hidden="true">PS</span>
+        <span>pysubgroup / registro de evidencia</span>
+      </div>
+      <div class="session-meta"><span>DATA SCIENCE</span><span class="meta-rule" aria-hidden="true"></span><span>26 AGO 2026</span></div>
+    </header>
+
+    <main class="stage" id="stage" aria-live="polite">
+      <section class="moment is-active" data-moment="1" aria-labelledby="m1-title">
+        <div class="moment-grid opening-grid">
+          <div class="opening-copy">
+            <p class="moment-count">01 / 07</p>
+            <h1 id="m1-title">El promedio dice cuánto.<br><em>La pregunta es dónde.</em></h1>
+            <p class="lead">Una sola cifra ordena la mesa. No nombra la región que merece una segunda mirada.</p>
+            <div class="question-line"><span class="question-pin" aria-hidden="true"></span><span>¿Qué combinación legible merece investigación?</span></div>
+          </div>
+          <div class="average-scene" aria-label="Una población resumida por un promedio y una región que se vuelve visible">
+            <div class="scene-label">POBLACIÓN / RESUMEN</div>
+            <div class="population-field">
+              <span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="dot d4"></span><span class="dot d5"></span><span class="dot d6"></span><span class="dot d7"></span><span class="dot d8"></span><span class="dot d9"></span><span class="dot d10"></span><span class="dot d11"></span><span class="dot d12"></span><span class="dot d13"></span><span class="dot d14"></span><span class="dot d15"></span><span class="dot d16"></span><span class="dot d17"></span><span class="dot d18"></span><span class="dot d19"></span><span class="dot d20"></span><span class="dot d21"></span><span class="dot d22"></span><span class="dot d23"></span><span class="dot d24"></span>
+              <div class="average-band"><span>promedio</span><strong>una cifra</strong></div>
+              <div class="region-window" aria-hidden="true"><span class="window-corner top-left"></span><span class="window-corner top-right"></span><span class="window-corner bottom-left"></span><span class="window-corner bottom-right"></span><i></i><i></i><i></i><i></i></div>
+            </div>
+            <div class="scene-foot"><span>resumen</span><span class="line-dash"></span><span class="hidden-note">región sin nombre</span></div>
+          </div>
+        </div>
+        <div class="moment-prompt"><kbd>ESPACIO</kbd><span>abre la región que el promedio no nombra</span></div>
+      </section>
+
+      <section class="moment" data-moment="2" aria-labelledby="m2-title" hidden>
+        <div class="moment-grid lenses-grid">
+          <div class="section-copy">
+            <p class="moment-count">02 / 07</p>
+            <h2 id="m2-title">Cuatro lentes.<br><em>Una pregunta distinta.</em></h2>
+            <p class="lead">No se trata de reemplazar herramientas. Se trata de no pedirles la misma respuesta.</p>
+            <p class="micro-note">Pulsa espacio para recorrer el registro.</p>
+          </div>
+          <div class="lens-board" data-inner="0">
+            <div class="board-top"><span>REGISTRO DE PREGUNTAS</span><span class="board-index" id="lens-index">A / 04</span></div>
+            <div class="lens-route is-focus" data-lens="0"><span class="route-glyph cut-glyph" aria-hidden="true"></span><div><strong>Segmento manual</strong><p>¿Qué corte operativo decidimos antes?</p></div><em>corte heredado</em></div>
+            <div class="lens-route" data-lens="1"><span class="route-glyph cluster-glyph" aria-hidden="true"></span><div><strong>Clustering</strong><p>¿Qué grupos se parecen entre sí?</p></div><em>similitud</em></div>
+            <div class="lens-route" data-lens="2"><span class="route-glyph score-glyph" aria-hidden="true"></span><div><strong>Modelo global</strong><p>¿Qué individuo ordena su score?</p></div><em>ranking</em></div>
+            <div class="lens-route" data-lens="3"><span class="route-glyph rule-glyph" aria-hidden="true"></span><div><strong>Subgroup Discovery</strong><p>¿Qué descripción cubre una región con contraste?</p></div><em>regla legible</em></div>
+            <div class="board-stamp">misma población / otra pregunta</div>
+          </div>
+        </div>
+        <div class="moment-prompt"><kbd>ESPACIO</kbd><span>avanza el foco · <kbd>R</kbd> reinicia</span></div>
+      </section>
+
+      <section class="moment" data-moment="3" aria-labelledby="m3-title" hidden>
+        <div class="moment-grid layers-grid">
+          <div class="section-copy layers-copy">
+            <p class="moment-count">03 / 07</p>
+            <h2 id="m3-title">La pregunta se arma<br><em>en cinco capas.</em></h2>
+            <p class="lead">Cada hoja declara una decisión: qué cubre, qué contrasta y cómo se revisa.</p>
+            <div class="formula-note"><span>quality</span><strong>contraste × tamaño</strong><small>no es un sello de verdad</small></div>
+          </div>
+          <div class="registered-stack" data-inner="0" role="group" aria-label="Cinco capas de la arquitectura pysubgroup">
+            <div class="stack-sheet sheet-selectors"><span class="sheet-index">01</span><strong>selectors</strong><small>cubren filas</small><div class="sheet-lines"><i></i><i></i><i></i></div></div>
+            <div class="stack-sheet sheet-target"><span class="sheet-index">02</span><strong>target</strong><code>BinaryTarget(…)</code><div class="target-dot"></div></div>
+            <div class="stack-sheet sheet-quality"><span class="sheet-index">03</span><strong>quality</strong><code>WRAccQF / StandardQF</code><div class="quality-cross">×</div></div>
+            <div class="stack-sheet sheet-search"><span class="sheet-index">04</span><strong>search</strong><code>DFS / Beam Search</code><div class="search-path"><i></i><i></i><i></i></div></div>
+            <div class="stack-sheet sheet-review"><span class="sheet-index">05</span><strong>soporte + revisión</strong><code>MinSupportConstraint</code><div class="review-tick">✓</div></div>
+            <div class="registration-window" aria-hidden="true"><span>rule window</span><strong>contract = …</strong></div>
+            <div class="registration-cross cross-a" aria-hidden="true">+</div><div class="registration-cross cross-b" aria-hidden="true">+</div>
+          </div>
+        </div>
+        <div class="moment-prompt"><kbd>ESPACIO</kbd><span>desplaza la hoja activa · <kbd>R</kbd> reinicia</span></div>
+      </section>
+
+      <section class="moment" data-moment="4" aria-labelledby="m4-title" hidden>
+        <div class="moment-grid demo-grid">
+          <div class="section-copy demo-copy">
+            <p class="moment-count">04 / 07</p>
+            <h2 id="m4-title">Una búsqueda completa<br><em>en una sola mesa.</em></h2>
+            <p class="lead">Configuración, contraste, tamaño y holdout: la lectura no se separa de la evidencia.</p>
+            <div class="demo-source"><span class="orange-pin"></span><div><strong>SINTÉTICO</strong><small>telecom · 11.000 por ventana · seed 20260826</small></div></div>
+            <p class="micro-note">Caso observacional; no es un benchmark ni una telco real.</p>
+          </div>
+          <div class="demo-table" data-inner="0">
+            <div class="demo-config">
+              <div class="demo-config-head"><span>CONFIG / DECLARACIÓN</span><span class="demo-step" id="demo-step">01 · config</span></div>
+              <code><span>create_selectors</span>(df, nbins=5)<br><span>BinaryTarget</span>(<b>"churn"</b>, True)<br><span>StandardQF</span>(alpha=1) · depth=3<br><span>MinSupportConstraint</span>(0.02)</code>
+            </div>
+            <div class="baseline-strip"><span>baseline global</span><strong>4.06%</strong><small>discovery · 447 / 11.000</small></div>
+            <div class="rule-reveal">
+              <div class="rule-header"><span>REGLA DESCUBIERTA</span><span class="rule-status">direction retained</span></div>
+              <strong class="rule-text">contract = month-to-month <i>∧</i> outages_90d ≥ 3 <i>∧</i> plan = basic</strong>
+              <div class="metric-row"><div><small>n / soporte</small><strong>467 <em>· 4.25%</em></strong></div><div><small>tasa subgrupo</small><strong>6.85%</strong></div><div><small>lift / diferencia</small><strong>1.69× <em>· +2.79 pp</em></strong></div><div><small>quality</small><strong>0.00092</strong></div></div>
+            </div>
+            <div class="holdout-strip"><div><span>holdout independiente</span><small>seed 20260827 · n=519 · baseline 4.08%</small></div><strong>5.01%</strong><em>1.23× · +0.93 pp · dirección retenida</em></div>
+            <div class="hypothesis"><span class="orange-pin"></span><div><small>HIPÓTESIS DE ACCIÓN</small><strong>priorizar una revisión de calidad y retención</strong><em>asociación ≠ causalidad</em></div></div>
+          </div>
+        </div>
+        <div class="moment-prompt"><kbd>ESPACIO</kbd><span>revela la misma mesa · <kbd>R</kbd> vuelve a config</span></div>
+      </section>
+
+      <section class="moment" data-moment="5" aria-labelledby="m5-title" hidden>
+        <div class="moment-grid choice-grid">
+          <div class="section-copy">
+            <p class="moment-count">05 / 07</p>
+            <h2 id="m5-title">La mejor elección<br><em>depende del marco.</em></h2>
+            <p class="lead">Para este equipo: menor fricción reproducible bajo Python 3.10. No es un ranking universal.</p>
+            <div class="pin-note"><span class="orange-pin"></span><code>pysubgroup==0.9.0</code><code>numpy==1.26.4</code><code>scikit-learn==1.7.2</code></div>
+          </div>
+          <div class="comparison-sheet">
+            <div class="compare-head"><span>DECISIÓN CONTEXTUAL</span><span>leer antes de elegir</span></div>
+            <div class="compare-row compare-main"><strong>pysubgroup</strong><span>API compacta · Python 3.10 fijado · Beta</span><b>encaja aquí</b></div>
+            <div class="compare-row"><strong>subgroups</strong><span>catálogo más amplio · metadata Python ≥ 3.11</span><b>revisar al migrar</b></div>
+            <div class="compare-row compare-muted"><strong>SYFLOW</strong><span>línea de investigación · más expresiva</span><b>otra pregunta</b></div>
+            <div class="compare-row compare-muted"><strong>Constrained SD</strong><span>restricciones SMT · coste experimental</span><b>otra escala</b></div>
+            <div class="compare-foot">Sin benchmark común de calidad o velocidad. El veredicto cambia si cambia el stack o el alcance.</div>
+          </div>
+        </div>
+        <div class="moment-prompt"><span>para este contexto ≠ mejor para todos</span></div>
+      </section>
+
+      <section class="moment" data-moment="6" aria-labelledby="m6-title" hidden>
+        <div class="moment-grid limits-grid">
+          <div class="section-copy">
+            <p class="moment-count">06 / 07</p>
+            <h2 id="m6-title">El hallazgo necesita<br><em>guardarraíles.</em></h2>
+            <p class="lead">Encontrar candidatos interpretables no convierte la exploración en confirmación.</p>
+          </div>
+          <div class="limits-board">
+            <div class="guardrail"><span class="guard-number">01</span><div><strong>Muchas combinaciones</strong><p>La selección explora hipótesis; replicar protege la lectura.</p></div><span class="guard-symbol">≋</span></div>
+            <div class="guardrail"><span class="guard-number">02</span><div><strong>Soporte insuficiente</strong><p>Más tamaño estabiliza; demasiado puede ocultar regiones.</p></div><span class="guard-symbol">∥</span></div>
+            <div class="guardrail"><span class="guard-number">03</span><div><strong>Reglas solapadas</strong><p>Varias descripciones pueden cubrir a las mismas personas.</p></div><span class="guard-symbol">∩</span></div>
+            <div class="guardrail"><span class="guard-number">04</span><div><strong>Asociación ≠ causalidad</strong><p>Temporalidad, confusión y experimento son otra capa.</p></div><span class="guard-symbol">≠</span></div>
+            <div class="extension-note"><span>EXTENSIÓN / AUDITORÍA DE MODELO</span><strong>SoftClassifierTarget + SubROC</strong><p>pregunta posterior: ¿dónde rinde distinto un clasificador existente?</p></div>
+          </div>
+        </div>
+        <div class="moment-prompt"><span>la herramienta encuentra candidatos · la confirmación exige diseño</span></div>
+      </section>
+
+      <section class="moment closing-moment" data-moment="7" aria-labelledby="m7-title" hidden>
+        <div class="closing-geometry" aria-hidden="true">
+          <img src="../assets/registration-sheet.svg" alt="" class="registration-image">
+          <div class="closing-average"><span>promedio</span><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="closing-lens"><span class="window-corner top-left"></span><span class="window-corner top-right"></span><span class="window-corner bottom-left"></span><span class="window-corner bottom-right"></span><strong>where to look</strong></div>
+        </div>
+        <div class="closing-copy">
+          <p class="moment-count">07 / 07</p>
+          <h2 id="m7-title">El promedio dice cuánto;<br><em>pysubgroup hace explícito dónde mirar.</em></h2>
+        </div>
+      </section>
+    </main>
+
+    <footer class="controls" aria-label="Navegación de la presentación">
+      <button class="control-button" id="prev-button" type="button" aria-label="Momento anterior">← <span>anterior</span></button>
+      <nav class="position-nav" aria-label="Ir a un momento">
+        <button type="button" data-go="1" class="position-button is-current" aria-label="Ir al momento 1" aria-current="step">01</button>
+        <button type="button" data-go="2" class="position-button" aria-label="Ir al momento 2">02</button>
+        <button type="button" data-go="3" class="position-button" aria-label="Ir al momento 3">03</button>
+        <button type="button" data-go="4" class="position-button" aria-label="Ir al momento 4">04</button>
+        <button type="button" data-go="5" class="position-button" aria-label="Ir al momento 5">05</button>
+        <button type="button" data-go="6" class="position-button" aria-label="Ir al momento 6">06</button>
+        <button type="button" data-go="7" class="position-button" aria-label="Ir al momento 7">07</button>
+      </nav>
+      <div class="control-right"><span class="control-hint">← → navegar · espacio revelar · R reiniciar</span><button class="control-button" id="fullscreen-button" type="button" aria-label="Entrar en pantalla completa">⛶ <span>pantalla completa</span></button><button class="control-button next-button" id="next-button" type="button" aria-label="Momento siguiente"><span>siguiente</span> →</button></div>
+    </footer>
+  </div>
+  <script>(() => {
+  const moments = [...document.querySelectorAll('.moment')];
+  const positionButtons = [...document.querySelectorAll('.position-button')];
+  const prev = document.querySelector('#prev-button');
+  const next = document.querySelector('#next-button');
+  const fullscreen = document.querySelector('#fullscreen-button');
+  const stage = document.querySelector('#stage');
+  let current = 1;
+  const innerState = new Map([[1, 0], [2, 0], [3, 0], [4, 0]]);
+
+  const resetInner = (index) => {
+    innerState.set(index, 0);
+    if (index === 2) {
+      document.querySelectorAll('.lens-route').forEach((el, i) => el.classList.toggle('is-focus', i === 0));
+      document.querySelector('#lens-index').textContent = 'A / 04';
+    }
+    if (index === 3) {
+      document.querySelector('.registered-stack').dataset.inner = '0';
+    }
+    if (index === 4) {
+      document.querySelector('#demo-step').textContent = '01 · config';
+      document.querySelector('.demo-table').dataset.inner = '0';
+    }
+  };
+
+  const updateMoment = (nextIndex, { focus = true } = {}) => {
+    current = Math.max(1, Math.min(7, nextIndex));
+    moments.forEach((moment, i) => {
+      const active = i + 1 === current;
+      moment.classList.toggle('is-active', active);
+      moment.hidden = !active;
+    });
+    positionButtons.forEach((button, i) => {
+      const active = i + 1 === current;
+      button.classList.toggle('is-current', active);
+      if (active) button.setAttribute('aria-current', 'step'); else button.removeAttribute('aria-current');
+    });
+    stage.dataset.moment = String(current);
+    if (focus) {
+      const heading = moments[current - 1].querySelector('h1, h2');
+      heading?.focus?.({ preventScroll: true });
+    }
+  };
+
+  const advanceInner = () => {
+    if (current === 2) {
+      const value = (innerState.get(2) + 1) % 4; innerState.set(2, value);
+      document.querySelectorAll('.lens-route').forEach((el, i) => el.classList.toggle('is-focus', i === value));
+      document.querySelector('#lens-index').textContent = String.fromCharCode(65 + value) + ' / 04';
+    } else if (current === 3) {
+      const value = (innerState.get(3) + 1) % 5; innerState.set(3, value);
+      const sheets = document.querySelectorAll('.stack-sheet');
+      sheets.forEach((sheet, i) => sheet.style.transform = i === value ? 'translateX(3.2rem) rotate(0deg)' : '');
+      document.querySelector('.registered-stack').dataset.inner = String(value);
+    } else if (current === 4) {
+      const value = Math.min(3, innerState.get(4) + 1); innerState.set(4, value);
+      const labels = ['01 · config', '02 · baseline', '03 · rule + métricas', '04 · holdout + hipótesis'];
+      document.querySelector('#demo-step').textContent = labels[value];
+      const table = document.querySelector('.demo-table');
+      table.dataset.inner = String(value);
+      const focusTargets = ['.demo-config', '.baseline-strip', '.rule-reveal', '.holdout-strip'];
+      table.querySelector(focusTargets[value])?.focus?.({ preventScroll: true });
+    } else if (current === 1) {
+      document.querySelector('.average-scene').classList.add('is-revealed');
+    }
+  };
+
+  const resetCurrent = () => {
+    resetInner(current);
+    if (current === 1) document.querySelector('.average-scene').classList.remove('is-revealed');
+    if (current === 4) document.querySelector('.demo-table').dataset.inner = '0';
+    if (current === 3) document.querySelectorAll('.stack-sheet').forEach(sheet => sheet.style.transform = '');
+  };
+
+  prev.addEventListener('click', () => updateMoment(current - 1));
+  next.addEventListener('click', () => updateMoment(current + 1));
+  positionButtons.forEach(button => button.addEventListener('click', () => updateMoment(Number(button.dataset.go))));
+  fullscreen.addEventListener('click', async () => {
+    try {
+      if (!document.fullscreenElement) await document.documentElement.requestFullscreen(); else await document.exitFullscreen();
+    } catch { fullscreen.setAttribute('aria-label', 'Pantalla completa no disponible en este navegador'); }
+  });
+  document.addEventListener('fullscreenchange', () => {
+    const active = Boolean(document.fullscreenElement);
+    fullscreen.querySelector('span').textContent = active ? 'salir' : 'pantalla completa';
+    fullscreen.setAttribute('aria-label', active ? 'Salir de pantalla completa' : 'Entrar en pantalla completa');
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowRight' || event.key === 'PageDown') { event.preventDefault(); updateMoment(current + 1); return; }
+    if (event.key === 'ArrowLeft' || event.key === 'PageUp') { event.preventDefault(); updateMoment(current - 1); return; }
+    if (event.key === 'Home') { event.preventDefault(); updateMoment(1); return; }
+    if (event.key === 'End') { event.preventDefault(); updateMoment(7); return; }
+    if (event.key.toLowerCase() === 'r') { event.preventDefault(); resetCurrent(); return; }
+    if (event.key === ' ' || event.key === 'Enter') {
+      if (event.target.matches('button, input, textarea, select')) return;
+      event.preventDefault(); advanceInner();
+    }
+  });
+  // Headings are not interactive, but focus them on navigation for a readable
+  // announcement in assistive technology without adding a focus trap.
+  moments.forEach(moment => moment.querySelector('h1, h2')?.setAttribute('tabindex', '-1'));
+  document.querySelectorAll('.demo-config, .baseline-strip, .rule-reveal, .holdout-strip').forEach(el => el.setAttribute('tabindex', '-1'));
+  document.querySelector('.demo-table')?.classList.add('is-interactive');
+  resetInner(2);
+  updateMoment(1, { focus: false });
+})();
+</script>
+</body>
+</html>
+

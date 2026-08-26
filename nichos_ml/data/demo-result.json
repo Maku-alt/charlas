@@ -1,0 +1,63 @@
+{
+  "seed": 20260826,
+  "n_per_window": 11000,
+  "columns": [
+    "churn",
+    "complaints_90d",
+    "outages_90d",
+    "tenure_months",
+    "contract_type",
+    "plan_type",
+    "autopay",
+    "monthly_charge"
+  ],
+  "discovery": {
+    "description": "contract_type=='month-to-month' AND outages_90d>=3 AND plan_type=='basic'",
+    "n": 467,
+    "support": 0.04245454545454545,
+    "rate": 0.06852248394004283,
+    "baseline": 0.04063636363636364,
+    "lift": 1.6862356226856177,
+    "difference": 0.027886120303679193,
+    "quality": 0.0009193553719008265,
+    "holdout_n": 519,
+    "holdout_support": 0.04718181818181818,
+    "holdout_rate": 0.05009633911368015,
+    "holdout_baseline": 0.040818181818181816,
+    "holdout_lift": 1.2273045217159948,
+    "holdout_difference": 0.009278157295498336,
+    "holdout_direction_retained": true
+  },
+  "windows": {
+    "discovery": {
+      "seed": 20260826,
+      "churn_rate": 0.04063636363636364,
+      "intercept": -3.5105567450835613,
+      "interaction_expected_rate": 0.21767058541330592
+    },
+    "holdout": {
+      "seed": 20260827,
+      "churn_rate": 0.040818181818181816,
+      "intercept": -3.502671178024941,
+      "interaction_expected_rate": 0.21018265917177686
+    }
+  },
+  "environment": {
+    "python": "3.10.11",
+    "executable": "C:\\Users\\Victor\\AppData\\Local\\Temp\\nichos_ml_pysubgroup_smoke_20260826\\Scripts\\python.exe",
+    "pysubgroup": "0.9.0",
+    "numpy": "1.26.4",
+    "pandas": "2.2.3",
+    "scikit_learn": "1.7.2",
+    "scipy": "1.14.1",
+    "matplotlib": "3.9.4",
+    "statsmodels": "0.14.5"
+  },
+  "api": {
+    "target": "BinaryTarget('churn', True)",
+    "quality": "StandardQF(1)",
+    "search": "BeamSearch(beam_width=50)",
+    "depth": 3,
+    "min_support": 0.02
+  }
+}

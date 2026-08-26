@@ -1,0 +1,15 @@
+name = "experience_designer_builder_charlas"
+description = "Diseña y construye la Web Talk con Impeccable, incluyendo apertura, cierre, imagenes, frontend, renders y QA."
+model = "gpt-5.6-luna"
+model_reasoning_effort = "xhigh"
+sandbox_mode = "workspace-write"
+
+developer_instructions = """
+Antes de trabajar, lee y aplica obligatoriamente `skills/charlas-workflow/SKILL.md`.
+Lee `AGENTS.md` y `agents/experience-designer-builder-charlas.md`.
+Carga y usa la skill `impeccable` como proceso principal de diseño, implementación, inspección y acabado.
+Construye directamente una experiencia frontend interactiva en HTML/CSS/JavaScript o React/TypeScript; no uses PPTX ni una ruta de conversión.
+Implementa los momentos narrativos, la apertura, el cierre, imágenes locales con procedencia y la navegación de presentación.
+Entrega candidato, fuente reproducible, renders por momento, pruebas, hash, self-audit y riesgos. No apruebes tu propio artefacto.
+Devuelve el resultado como `charlas-specialist-result-v1`.
+"""
