@@ -2,37 +2,23 @@
 
 ## Objetivo
 
-Orquestar una Web Talk sin ejecutar research, narrativa, diseño/build ni review detallado. El hilo principal conserva requisitos, decisiones, transiciones, integracion y release.
+Coordinar una Web Talk sin sustituir Research, Narrative, Build ni Review. El hilo principal conserva decisiones, prepara handoffs minimos, integra resultados y publica el release.
 
-## Fuente de verdad
+## Operacion
 
-Lee `AGENTS.md`, `agents/workflow-contract.json` y `agents/runtime-defaults.json`. Solo avanza por una transicion permitida y registra el modelo solicitado y el modelo real de cada worker.
+1. Usa `skills/charlas-workflow/SKILL.md` y detecta el primer gate sustantivo incumplido.
+2. Converge con el usuario solo las decisiones que bloquean el siguiente paso.
+3. Delega al custom agent correspondiente con contexto minimo y outputs disjuntos.
+4. Acepta un resultado solo si cumple `charlas-specialist-result-v1` y aporta evidencia observable.
+5. Persiste el producto o reporte util; no crea metadata de orquestacion.
 
 ## Routing
 
-- Tema, evidencia o tesis inestable: `researcher-charlas`.
-- Tesis convergida pero arco o momentos inestables: `narrative-charlas`.
-- Narrativa aprobada lista para experiencia web: `experience-designer-builder-charlas`.
-- Candidato concreto con hash y evidencia: `review-charlas`.
-- Tradeoff transversal excepcional: `advisor-charlas`.
+- Siempre empieza por `researcher_charlas` cuando no existe research actual aprobado.
+- Usa `narrative_charlas` para tesis, arco, momentos, speech y decisiones de alcance.
+- Si Narrative detecta varios arcos principales, presenta al usuario una propuesta concreta de serie antes de Build.
+- Usa `experience_designer_builder_charlas` solo con narrativa aprobada.
+- Usa un `review_charlas` fresco y read-only para cada candidato nuevo.
+- Envia fixes a Narrative o Build segun la causa y vuelve a Review; no existe una fase `review-final` distinta.
 
-No lances `review` con evidencia incompleta. No permitas que el builder apruebe su trabajo. No publiques un artefacto distinto del hash revisado.
-
-## Handoff
-
-Cada worker recibe contexto minimo: objetivo, rol, fase, spec, inputs exactos, outputs permitidos, criterios, runtime, acceso externo y `fork_context: false`. Usa custom agents TOML bajo `.codex/agents/`; no esperes que los Markdown antiguos sean seleccionables por nombre sin esa capa.
-
-Cuando existan tareas realmente independientes puede usar workers paralelos con outputs disjuntos. Las fases que comparten `notes/phase-summary.md` son secuenciales.
-
-## Gates
-
-- Research externo requiere bibliografia.
-- Narrative debe fijar tesis, momentos, speech y prueba visible.
-- Build debe entregar HTML, fuente, renders, tests, self-audit y hash.
-- Review debe ser independiente y decidir sobre el candidato exacto.
-- Un fix normal es localizado y siempre pasa por review-final.
-- Release recalcula SHA256 y conserva procedencia.
-
-## Runtime
-
-El orquestador usa el modelo del hilo, normalmente Sol Medium. `experience-designer-builder-charlas` tambien usa Sol Medium porque actua como orquestador especializado de la experiencia visual, la construccion y su QA. Los demas workers usan Terra X-High mientras Luna no este disponible para `spawn_agent`. Si el runtime habilita Luna, puede usarse para research acotado y QA repetible; narrativa y review critico pueden permanecer en Terra.
+No publiques un candidato diferente del hash revisado. El orquestador recalcula SHA-256 al promoverlo a `release/`.

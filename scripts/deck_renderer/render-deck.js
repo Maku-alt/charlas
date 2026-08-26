@@ -124,9 +124,18 @@ function footer(slide, idx) {
 }
 
 function bulletList(slide, items, x, y, w, h, color = T.ink) {
-  const value = (items || []).map((item) => `\u2022 ${item}`).join("\n");
-  text(slide, value, x, y, w, h, {
-    font: T.bodyFont, size: 13.3, color, margin: 0.03
+  const runs = (items || []).map((item, idx, arr) => ({
+    text: String(item ?? ""),
+    options: { bullet: true, breakLine: idx < arr.length - 1 }
+  }));
+  slide.addText(runs, {
+    x, y, w, h,
+    fontFace: T.bodyFont,
+    fontSize: 13.3,
+    color,
+    margin: 0.03,
+    fit: "shrink",
+    paraSpaceAfterPt: 0
   });
 }
 

@@ -1,34 +1,20 @@
 # Agentes de Charlas
 
-El chat principal orquesta; los custom agents TOML bajo `.codex/agents/` ejecutan fases especializadas y cargan estos contratos Markdown como metodo de trabajo.
+El hilo principal orquesta y los custom agents bajo `.codex/agents/` ejecutan cuatro responsabilidades especializadas. La autoridad operativa compartida es `skills/charlas-workflow/SKILL.md`; estos Markdown describen solo el criterio propio de cada rol.
 
-## Roles vigentes
+## Roles
 
-- `orchestrator-charlas`: hilo principal; decide fase, dependencias, handoff, fix y release.
-- `researcher-charlas`: evidencia, contradicciones, claims y bibliografia.
-- `narrative-charlas`: tesis, arco, momentos, speech y contrato visual/contenido.
-- `experience-designer-builder-charlas`: sistema visual, experiencia, imagenes, frontend, QA y fixes localizados.
-- `review-charlas`: gate independiente del candidato exacto.
-- `advisor-charlas`: recomendacion excepcional sin autoridad de fase.
+- `researcher_charlas`: research obligatorio, tesis, evidencia y bibliografia.
+- `narrative_charlas`: arco, momentos y speech sin cuota fija.
+- `experience_designer_builder_charlas`: experiencia, imagenes, frontend, renders y QA con Impeccable.
+- `review_charlas`: gate independiente y read-only del candidato exacto.
 
-`experience-designer-builder-charlas` reemplaza a los antiguos `deck-builder-charlas` e `image-closer-charlas`. Apertura, cierre e imagenes forman parte de una sola experiencia y no son fases separadas.
+Todos usan `gpt-5.6-luna` con razonamiento `xhigh`. El modelo se configura exclusivamente en los TOML.
 
-## Fuentes de verdad
+## Handoffs
 
-| Concern | Canonical source |
-|---|---|
-| Principios del repo | `AGENTS.md` |
-| Fases y transiciones | `agents/workflow-contract.json` |
-| Runtime solicitado | `agents/runtime-defaults.json` |
-| Metodo de rol | `agents/<role>.md` |
-| Configuracion nativa | `.codex/agents/*.toml` |
-| Requisitos de charla | `<talk>/specs/*.md` |
-| Estado actual | `<talk>/notes/phase-summary.md` |
+Cada worker recibe objetivo, charla, inputs exactos, outputs que posee, restricciones y criterios observables. Devuelve solamente `charlas-specialist-result-v1` con rutas y evidencia compacta.
 
-Los defaults de runtime expresan preferencia, no disponibilidad. Cada corrida registra modelo solicitado y modelo real. Mientras Luna no este habilitada para `spawn_agent`, los TOML usan Terra X-High como fallback operativo.
+No se crean execution packages, phase summaries, sentinels ni logs de routing. El estado se deduce de los artefactos reales y la skill enruta desde el primer gate incumplido.
 
-## Handoff
-
-Cada worker recibe solo objetivo, rol, spec, inputs necesarios, outputs permitidos, criterios de aceptacion, runtime y politica de acceso externo. El worker devuelve un resumen compacto y evidencia por rutas; no vuelca logs ni depende del historial completo del padre.
-
-El builder produce evidencia y self-audit. El reviewer repite los gates criticos de forma independiente. El orquestador publica exclusivamente el candidato aprobado por hash.
+Build entrega candidato, hash, renders y QA. Review recalcula el hash, prueba la experiencia y devuelve el veredicto al orquestador, que persiste el reporte. Release promueve solo el SHA-256 aprobado.

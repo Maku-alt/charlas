@@ -2,7 +2,9 @@
 outputs/
 analysis/
 DeckLab/
-.codex/
+.codex/*
+!.codex/agents/
+!.codex/agents/*.toml
 .agents/
 .superpowers/
 .worktrees/
@@ -46,7 +48,8 @@ scripts/deck_renderer/node_modules/**
 !README.md
 !maestro_charlas.md
 !AGENTS.md
-!STYLE-CHARLAS.md
+!PRODUCT.md
+!DESIGN.md
 
 # Ignore everything inside talk folders by default
 Harness Engineer/**
@@ -129,6 +132,18 @@ researcher.md
 **/validation/
 **/validation/**
 **/artifact-build-manifest.json
+
+# Canonical Web Talk product and final evidence
+!**/web/
+!**/web/**
+!**/talk/
+!**/talk/**
+!**/assets/
+!**/assets/**
+!**/review/
+!**/review/**
+!**/release/
+!**/release/**
 
 # Obsidian local UI state
 **/.obsidian/workspace*.json

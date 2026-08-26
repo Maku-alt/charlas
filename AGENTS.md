@@ -1,76 +1,59 @@
 # Charlas
 
-## Producto vigente
+## Producto y autoridad
 
-Este repositorio crea Web Talks: presentaciones HTML autocontenidas, navegables y listas para exponer. Las PPTX existentes son artefactos historicos; no definen el formato de nuevas charlas. Una exportacion PPTX es opcional y solo se produce cuando el usuario la pide.
+Este repositorio produce Web Talks: experiencias frontend autocontenidas para presentar una tesis investigada mediante momentos editoriales, visuales e interactivos. El entregable canonico se construye directamente como HTML/CSS/JavaScript o React/TypeScript. PPTX es solo una exportacion opcional cuando el usuario la solicita.
 
-Audiencia por defecto: personas que trabajan con datos, normalmente Data Scientists. Tono: ejecutivo, tecnico, directo y claro. Verifica con fuentes actuales precios, releases, compatibilidad, costos y casos recientes.
+Para crear, continuar, construir, revisar o liberar una charla usa primero `skills/charlas-workflow/SKILL.md`. La skill gobierna routing, handoffs y gates con progressive disclosure.
 
-## Flujo
+Fuentes de verdad, en orden:
 
-`thesis-review -> research? -> narrative -> build -> review -> build-fix? -> review-final? -> release`
+1. La instruccion actual del usuario.
+2. El brief y las restricciones concretas de la charla.
+3. El research aprobado y `notes/bibliografia.md`.
+4. La narrativa y el speech aprobados.
+5. `PRODUCT.md` y `DESIGN.md`.
+6. `skills/charlas-workflow/`.
+7. El candidato frontend, su review exacto y el release.
 
-- El hilo principal actua como `orchestrator-charlas`: decide fase, prepara handoffs, conserva decisiones y publica el release.
-- Cada fase pesada se ejecuta con el custom agent TOML correspondiente bajo `.codex/agents/`.
-- El orquestador no sustituye research, narrativa, experiencia/build ni review detallado.
-- La narrativa aprobada es la unica fuente de contenido del build.
-- El builder hace self-audit, pero nunca aprueba su propio artefacto.
-- El reviewer debe ser independiente y revisar el hash exacto del candidato.
-- Existe como maximo un ciclo normal de fix localizado; todo fix exige `review-final`.
+## Invariantes
 
-## Roles
+- Research es obligatorio. Toda charla debe tensionar la tesis, verificar claims actuales y mantener `notes/bibliografia.md` con las fuentes realmente usadas.
+- La narrativa aprobada es la unica fuente de contenido del Build. Si cambia la tesis o el arco, vuelve a Narrative.
+- Build usa obligatoriamente `impeccable` como proceso principal de direccion y ejecucion. Construye frontend directo; nunca convierte PPTX al artefacto canonico.
+- Una Web Talk se compone de momentos, no necesariamente slides. Puede combinar escenas editoriales, visualizaciones, simulaciones, comparadores, demos y cierres visuales cuando ayuden a comprender la tesis.
+- No existe un numero fijo de momentos. Narrative elige la extension minima que sostenga la tesis y el tiempo disponible; si el tema contiene varios arcos o exige demasiada profundidad, propone dividirlo en una serie y consulta al usuario antes de Build.
+- La interaccion debe ser presentable: determinista, reiniciable, operable por teclado, legible en proyector y con fallback claro. No uses interactividad decorativa.
+- El cierre contiene una sola idea o mensaje y una imagen protagonista vinculada con la tesis. Una cita real es opcional, nunca un requisito artificial.
+- La presentacion ofrece navegacion lineal, posicion directa, controles visibles y fullscreen; evita scroll como navegacion primaria.
+- Respeta foco visible, contraste, semantica y `prefers-reduced-motion`. Cuando el release promete autonomia, funciona sin red y usa assets locales.
+- Review lo ejecuta un agente distinto, read-only, sobre el HTML, hash y renders exactos. Cualquier mutacion invalida el veredicto.
+- Release contiene exactamente el candidato aprobado. El orquestador recalcula SHA-256 antes de promoverlo.
 
-- `researcher-charlas`: investiga, tensiona tesis y entrega evidencia discutible.
-- `narrative-charlas`: fija tesis, arco, momentos, speech y contrato de contenido.
-- `experience-designer-builder-charlas`: absorbe diseño, frontend, apertura, cierre, imagenes y build; usa `impeccable` como skill principal.
-- `review-charlas`: valida narrativa, experiencia, accesibilidad, runtime y evidencia sin modificar el candidato.
-- `advisor-charlas`: consulta excepcional para decisiones transversales complejas; no es fase ni gate.
+## Flujo y roles
 
-Los metodos detallados viven en `agents/*.md`; las fases y transiciones en `agents/workflow-contract.json`; las preferencias de runtime en `agents/runtime-defaults.json`.
+`brief -> research -> narrative -> build <-> review -> release`
 
-## Contrato Web Talk
+- `researcher_charlas`: valida tesis, evidencia, contradicciones, actualidad y bibliografia.
+- `narrative_charlas`: convierte research aprobado en tesis, arco, momentos y speech.
+- `experience_designer_builder_charlas`: define la experiencia, imagenes, frontend, renders y QA con Impeccable.
+- `review_charlas`: revisa de forma independiente el candidato exacto y devuelve veredicto y fixes accionables.
 
-La salida canonica debe:
+Los cuatro custom agents usan `gpt-5.6-luna` con razonamiento `xhigh`. El hilo principal es el orquestador: conserva decisiones, envia handoffs minimos, integra resultados y publica release.
 
-- construirse directamente como HTML/CSS/JavaScript o React/TypeScript, nunca mediante conversion desde PPTX;
-- usar `impeccable` como flujo principal de diseño y ejecucion frontend;
-- funcionar sin dependencia de red en runtime cuando el paquete de release lo requiera;
-- ofrecer navegacion por teclado, controles visibles, posicion directa y fullscreen;
-- respetar foco visible, contraste y `prefers-reduced-motion`;
-- evitar scroll como navegacion primaria;
-- incluir bibliografia cuando existan fuentes externas;
-- producir renders individuales, pruebas, self-audit y hash del candidato;
-- mantener apertura, cierre e imagenes dentro de la responsabilidad del Experience Designer Builder.
+El pipeline es serial por defecto. Usa subagentes en paralelo solo para dos o mas trabajos sustanciales, independientes y con outputs disjuntos. Nunca permitas escrituras concurrentes sobre el mismo archivo.
 
-Screenshots ayudan a revisar, pero no sustituyen DOM, consola, tests, overflow, assets, navegacion y funcionamiento offline.
+## Estado y evidencia
 
-## Estructura por charla
+Infiere el estado desde los artefactos sustantivos de la charla. Para ejecuciones nuevas no crees execution packages, phase summaries, sentinels, snapshots, routing logs ni manifests de corrida.
 
-- `notes/`: tesis, research, bibliografia, narrativa, speech y `phase-summary.md`.
-- `web/` o `talk/`: fuente editable de la Web Talk.
-- `assets/`: imagenes y recursos locales con procedencia.
-- `specs/`: especificaciones de la charla.
-- `review/`: renders, reportes, fix-list y evidencia.
-- `release/`: candidato exacto aprobado y su identidad.
+Persiste solo producto y evidencia util: brief, research, bibliografia, narrativa, speech, fuente frontend, assets usados, candidato, renders finales, review/fix-list y release.
 
-No migres charlas historicas salvo que se reabran. Si una charla antigua se reabre para una nueva version, el nuevo entregable sigue este contrato web.
+Los contratos SDD, sentinels, scripts y decks PPTX antiguos son historia del repositorio; no gobiernan nuevas Web Talks. No migres charlas historicas salvo que se reabran.
 
-## Workers y publicacion
+## Operacion segura
 
-Los workers reciben paquetes acotados con inputs, outputs permitidos, criterios de aceptacion y `fork_context: false`. Se comunican mediante resultados estructurados y artefactos validados. El hilo principal integra, verifica y decide la siguiente transicion.
-
-Si hubo research externo, `notes/bibliografia.md` es obligatorio. Si corrio una fase pesada, `notes/phase-summary.md` debe representar el estado actual. Release solo promueve el hash aprobado por review o review-final.
-
-## Validacion
-
-Antes de cerrar una charla exige:
-
-- tesis y arco claros;
-- una lectura ejecutiva y objeto visible por momento;
-- HTML construido y probado;
-- renders inspeccionados individualmente;
-- navegacion, teclado, fullscreen, consola, assets, overflow, accesibilidad y offline verificados;
-- bibliografia cuando corresponda;
-- review independiente aprobada sobre el archivo exacto.
-
-Los scripts de `scripts/deck_renderer/` y la skill `pptx` quedan como soporte legado para presentaciones historicas, no como ruta normal de nuevas Web Talks.
+- Revisa `git status --short` antes de editar y conserva cambios ajenos.
+- Delimita la carpeta de la charla y evita cargar `node_modules`, builds, renders o candidatos historicos si la fase no los necesita.
+- Los workers reciben objetivo, inputs exactos, outputs permitidos, restricciones y criterios observables. Devuelven `charlas-specialist-result-v1`; no entregan logs ni razonamiento interno.
+- Pide al usuario solo decisiones que bloqueen materialmente el siguiente paso.
