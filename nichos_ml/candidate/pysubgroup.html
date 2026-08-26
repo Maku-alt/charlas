@@ -1,0 +1,508 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7fb">
+  <meta name="description" content="Web Talk: pysubgroup, nichos que el promedio esconde">
+  <title>pysubgroup: nichos que el promedio esconde</title>
+  <style>:root {
+  --bg: #f5f7fb;
+  --surface: #ffffff;
+  --surface-blue: #eef4ff;
+  --surface-orange: #fff2e8;
+  --ink: #101828;
+  --muted: #475467;
+  --soft: #667085;
+  --line: #d0d5dd;
+  --line-soft: #e4e7ec;
+  --blue: #155eef;
+  --blue-deep: #0b3db8;
+  --orange: #f97316;
+  --orange-deep: #c2410c;
+  --shadow: 0 20px 55px rgba(16, 24, 40, .12);
+  --sans: "Segoe UI", "Aptos", Arial, sans-serif;
+  --mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: var(--bg); }
+body { color: var(--ink); font-family: var(--sans); font-size: 16px; }
+button, a { font: inherit; }
+button { cursor: pointer; }
+button:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--orange); outline-offset: 4px; }
+::selection { background: var(--orange); color: var(--ink); }
+
+.talk-shell { position: relative; width: 100vw; height: 100vh; min-height: 560px; overflow: hidden; background: var(--bg); }
+.talk-shell::after { content: ""; position: absolute; z-index: 0; left: 4vw; right: 4vw; bottom: 9vh; border-bottom: 1px solid var(--line-soft); pointer-events: none; }
+.topbar, .controls { position: absolute; z-index: 10; left: 4vw; right: 4vw; display: flex; align-items: center; justify-content: space-between; }
+.topbar { top: 2.9vh; min-height: 2rem; }
+.brand-lockup { display: inline-flex; align-items: baseline; gap: .7rem; color: var(--ink); text-decoration: none; }
+.brand-word { color: var(--blue); font: 800 1.08rem/1 var(--mono); letter-spacing: -.08em; }
+.brand-slash { color: var(--orange); font-size: 1.3rem; font-weight: 700; }
+.brand-sub, .session-meta { color: var(--soft); font: 600 .62rem/1 var(--mono); letter-spacing: .11em; text-transform: uppercase; }
+.session-meta { display: flex; align-items: center; gap: .8rem; }
+.meta-rule { width: 2.3rem; height: 1px; background: var(--line); }
+.stage { position: absolute; z-index: 1; inset: 9.5vh 4vw 12.5vh; }
+.moment { position: absolute; inset: 0; display: grid; align-items: center; opacity: 0; transform: translateY(14px); pointer-events: none; transition: opacity .38s ease-out, transform .38s ease-out; }
+.moment.is-active { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.moment-inner { width: 92vw; max-width: 1520px; height: 100%; margin: 0 auto; display: grid; align-items: center; }
+.opening-layout { grid-template-columns: .82fr 1.18fr; gap: clamp(2rem, 4.3vw, 5.5rem); }
+.lenses-layout, .architecture-layout, .comparison-layout, .guardrails-layout { grid-template-columns: .68fr 1.32fr; gap: clamp(2rem, 4.5vw, 6rem); }
+.demo-layout { grid-template-columns: .53fr 1.47fr; gap: clamp(1.8rem, 3.5vw, 4.5rem); }
+.moment-marker { margin: 0 0 1.35rem; color: var(--orange-deep); font: 700 .68rem/1 var(--mono); letter-spacing: .13em; text-transform: uppercase; }
+h1, h2 { max-width: 13ch; margin: 0; color: var(--ink); font-weight: 800; letter-spacing: -.065em; line-height: .95; }
+h1 { font-size: clamp(3.5rem, 6.2vw, 7rem); }
+h2 { font-size: clamp(3rem, 5vw, 5.9rem); }
+h1 em, h2 em { color: var(--blue); font-style: normal; }
+.product-name { color: var(--blue); }
+.lead { max-width: 35rem; margin: 1.8rem 0 0; color: var(--muted); font-size: clamp(1.2rem, 1.42vw, 1.5rem); line-height: 1.34; }
+.micro-note { margin: 1.35rem 0 0; color: var(--soft); font: 600 .78rem/1.3 var(--mono); letter-spacing: .02em; }
+.moment-prompt { position: absolute; left: 4vw; bottom: -3.3vh; display: flex; align-items: center; gap: .7rem; color: var(--soft); font: 600 .68rem/1 var(--mono); letter-spacing: .02em; }
+kbd { border: 1px solid var(--line); border-radius: 4px; padding: .28rem .45rem; color: var(--ink); background: var(--surface); font: 700 .58rem/1 var(--mono); letter-spacing: .04em; }
+
+/* Moment 1: the product and its promise arrive immediately. */
+.opening-copy { padding-bottom: 1rem; }
+.opening-rule { max-width: 40rem; margin-top: 2.35rem; padding: 1rem 1.2rem; display: flex; align-items: center; gap: .7rem; border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); color: var(--ink); font: 700 clamp(.8rem, 1vw, 1.05rem)/1.1 var(--mono); }
+.opening-rule b { color: var(--orange-deep); font-size: .72em; letter-spacing: .08em; }
+.opening-rule strong { color: var(--blue); font-family: var(--sans); }
+.rule-bracket { color: var(--orange); font: 500 2rem/1 var(--sans); }
+.rule-arrow { margin-left: auto; color: var(--orange); font-size: 1.7rem; }
+.search-field { min-height: 52vh; padding: clamp(1.2rem, 2.1vw, 2rem); border: 1px solid var(--line); border-radius: 16px; background: var(--surface); box-shadow: var(--shadow); }
+.field-head, .field-foot, .rail-label, .churn-topline { display: flex; align-items: center; justify-content: space-between; color: var(--soft); font: 700 .63rem/1 var(--mono); letter-spacing: .11em; text-transform: uppercase; }
+.dot-field { position: relative; height: 41vh; margin: 1.35rem 0 1.05rem; overflow: hidden; border: 1px solid var(--line-soft); background: #fbfcfe; }
+.dot-field::before, .dot-field::after { content: ""; position: absolute; inset: 0; pointer-events: none; }
+.dot-field::before { border: 18px solid rgba(21, 94, 239, .035); }
+.dot-field::after { left: 25%; right: 25%; top: 50%; bottom: 50%; border-top: 1px solid var(--line-soft); opacity: .65; }
+.dot-field > i { position: absolute; z-index: 1; left: var(--x); top: var(--y); width: .58rem; height: .58rem; border-radius: 50%; background: #98a2b3; transform: translate(-50%, -50%); }
+.dot-field > i:nth-of-type(3n) { background: #667085; }
+.mean-line { position: absolute; z-index: 2; left: 5%; right: 5%; top: 49%; display: flex; align-items: center; justify-content: center; gap: 1rem; min-height: 3.8rem; border-top: 1px solid var(--orange); border-bottom: 1px solid var(--orange); color: var(--ink); background: rgba(255,255,255,.82); }
+.mean-line span { color: var(--orange-deep); font: 700 .63rem/1 var(--mono); letter-spacing: .11em; text-transform: uppercase; }
+.mean-line strong { font-size: 1.4rem; }
+.focus-window { position: absolute; z-index: 3; left: 59%; top: 58%; width: 27%; height: 28%; display: grid; place-content: center; padding: .8rem; border: 3px solid var(--blue); background: rgba(238,244,255,.78); color: var(--blue-deep); text-align: center; box-shadow: 0 0 0 10px rgba(21,94,239,.08); transform: translateY(7px); animation: focus-in .75s .35s ease-out forwards; }
+.focus-window b { font: 800 clamp(.85rem, 1vw, 1.1rem)/1.08 var(--sans); }
+.opening-field.is-emphasis .focus-window { box-shadow: 0 0 0 14px rgba(21,94,239,.13), 0 18px 30px rgba(21,94,239,.18); }
+.corner { position: absolute; width: .8rem; height: .8rem; border-color: var(--orange); border-style: solid; }
+.corner.tl { left: -3px; top: -3px; border-width: 3px 0 0 3px; }.corner.tr { right: -3px; top: -3px; border-width: 3px 3px 0 0; }.corner.bl { left: -3px; bottom: -3px; border-width: 0 0 3px 3px; }.corner.br { right: -3px; bottom: -3px; border-width: 0 3px 3px 0; }
+.field-foot { justify-content: flex-start; gap: .65rem; letter-spacing: .03em; text-transform: none; }
+.blue-dot, .orange-dot { display: inline-block; flex: 0 0 auto; width: .55rem; height: .55rem; border-radius: 50%; }
+.blue-dot { background: var(--blue); }.orange-dot { background: var(--orange); box-shadow: 0 0 0 .3rem rgba(249,115,22,.12); }
+@keyframes focus-in { to { transform: translateY(0); } }
+
+/* Moment 2: a large rail makes the conceptual comparison scannable. */
+.lens-rail { padding: 1.35rem 1.5rem 1.15rem; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); box-shadow: var(--shadow); }
+.rail-label { padding-bottom: .9rem; }
+.lens-row { width: 100%; min-height: 10vh; padding: .9rem 0; display: grid; grid-template-columns: 2.5rem 1.02fr 1.3fr .85fr; align-items: center; gap: 1rem; border: 0; border-top: 1px solid var(--line-soft); color: var(--ink); background: transparent; text-align: left; transition: background .25s ease-out, transform .25s ease-out; }
+.lens-row:hover { background: var(--surface-blue); }
+.lens-row.is-focus { padding-left: .65rem; padding-right: .65rem; background: var(--surface-blue); transform: translateX(.45rem); }
+.lens-row.is-focus .lens-letter, .lens-row.is-focus .lens-name { color: var(--blue); }
+.lens-letter { color: var(--orange-deep); font: 800 1.15rem/1 var(--mono); }
+.lens-name { font-size: clamp(1rem, 1.25vw, 1.35rem); font-weight: 800; }
+.lens-question { color: var(--muted); font-size: clamp(.87rem, 1vw, 1.05rem); }
+.lens-tag { justify-self: end; color: var(--soft); font: 700 .62rem/1 var(--mono); letter-spacing: .04em; text-transform: uppercase; }
+.winner-line { border-bottom: 2px solid var(--blue); }
+.rail-caption { display: flex; align-items: center; gap: .65rem; padding-top: 1rem; color: var(--soft); font: 600 .72rem/1.2 var(--mono); }
+.rail-caption strong { color: var(--orange-deep); }
+
+/* Moment 3: architecture is a horizontal reading order. */
+.architecture-copy { align-self: center; }.architecture-note { max-width: 20rem; margin-top: 2.3rem; padding-top: 1rem; border-top: 2px solid var(--blue); }.architecture-note span, .architecture-note small { display: block; color: var(--soft); font: 700 .64rem/1.2 var(--mono); letter-spacing: .08em; text-transform: uppercase; }.architecture-note strong { display: block; margin: .55rem 0 .35rem; color: var(--orange-deep); font-size: 1.45rem; }.architecture-note small { letter-spacing: 0; text-transform: none; }
+.pipeline { position: relative; display: grid; grid-template-columns: 1.1fr .22fr 1.1fr .22fr 1.1fr .22fr 1.1fr .22fr 1.1fr; align-items: center; gap: .4rem; }
+.pipeline-line { position: absolute; left: 5%; right: 5%; top: 50%; border-top: 2px dashed var(--line); pointer-events: none; }
+.pipeline-node { position: relative; z-index: 1; min-height: 25vh; padding: 1rem; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink); box-shadow: 0 10px 24px rgba(16,24,40,.07); text-align: left; transition: border-color .25s, box-shadow .25s, transform .25s; }
+.pipeline-node.is-focus { border: 3px solid var(--blue); box-shadow: 0 14px 28px rgba(21,94,239,.17); transform: translateY(-6px); }.pipeline-node:hover { border-color: var(--blue); }
+.node-index { color: var(--orange-deep); font: 700 .62rem/1 var(--mono); }.pipeline-node strong { margin-top: .75rem; color: var(--blue-deep); font-size: clamp(1rem, 1.25vw, 1.35rem); line-height: 1.05; }.pipeline-node small { min-height: 2.5em; margin-top: .45rem; color: var(--muted); font-size: .78rem; line-height: 1.22; }.pipeline-node code { margin-top: .75rem; color: var(--ink); font: 700 .64rem/1.2 var(--mono); }.result-node { border-color: var(--orange); }.result-node strong { color: var(--orange-deep); }.pipeline-arrow { position: relative; z-index: 2; color: var(--orange); font-size: 1.65rem; text-align: center; }.pipeline-footer { grid-column: 1 / -1; display: flex; justify-content: space-between; padding: 1rem .25rem 0; color: var(--soft); font: 700 .64rem/1 var(--mono); letter-spacing: .11em; text-transform: uppercase; }
+
+/* Moment 4: comparison gets the whole stage and a visible verdict. */
+.comparison-layout { grid-template-columns: .52fr 1.48fr; }.comparison-stage { padding: 1.5rem; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); box-shadow: var(--shadow); }.compare-context { display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 1.1rem; border-bottom: 1px solid var(--blue); }.compare-context span { color: var(--orange-deep); font: 700 .68rem/1 var(--mono); letter-spacing: .1em; }.compare-context strong { color: var(--blue-deep); font-size: 1.15rem; }.compare-grid { display: grid; grid-template-columns: .72fr 1.2fr 1.2fr 1.25fr; align-items: stretch; border-bottom: 1px solid var(--line-soft); }.compare-grid > * { padding: 1.05rem .85rem; display: flex; align-items: center; color: var(--muted); font-size: clamp(.78rem, .98vw, 1rem); line-height: 1.2; }.compare-grid > strong { color: var(--ink); font-size: .86rem; }.compare-header > * { color: var(--soft); font: 700 .62rem/1.15 var(--mono); letter-spacing: .08em; text-transform: uppercase; }.compare-py { background: var(--surface-blue); color: var(--blue-deep) !important; font-weight: 700; }.compare-verdict { margin-top: 1.2rem; padding: 1.1rem 1.25rem; display: grid; grid-template-columns: auto auto 1fr; gap: .75rem; align-items: center; border-radius: 10px; color: var(--surface); background: var(--blue); }.verdict-mark { width: 2rem; height: 2rem; display: grid; place-items: center; border-radius: 50%; color: var(--blue); background: var(--surface); font-weight: 900; }.compare-verdict strong { font-size: clamp(1.1rem, 1.6vw, 1.55rem); }.compare-verdict > span:last-child { color: #eaf2ff; font-size: .9rem; line-height: 1.2; }.compare-foot { margin: 1rem 0 0; color: var(--soft); font-size: .76rem; line-height: 1.25; }
+
+/* Moment 5: one theoretical churn scene, no runtime or benchmark language. */
+.demo-intro { align-self: center; }.synthetic-note { max-width: 23rem; margin-top: 2.15rem; padding-top: 1rem; display: flex; gap: .8rem; border-top: 2px solid var(--orange); }.synthetic-note strong { display: block; color: var(--orange-deep); font: 800 .7rem/1 var(--mono); letter-spacing: .1em; }.synthetic-note small { display: block; margin-top: .38rem; color: var(--soft); font-size: .78rem; line-height: 1.25; }.churn-stage { padding: 1.35rem 1.6rem 1.1rem; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); box-shadow: var(--shadow); }.churn-topline { padding-bottom: 1rem; border-bottom: 1px solid var(--line-soft); }.rate-transform { position: relative; display: grid; grid-template-columns: 1fr auto 1fr auto; align-items: center; gap: 1.25rem; padding: 1.35rem 0 1.15rem; }.rate-block { min-height: 16vh; padding: 1.1rem 1.2rem; display: flex; flex-direction: column; justify-content: center; border: 1px solid var(--line); border-radius: 12px; }.global-rate { background: #f8fafc; }.niche-rate { border: 3px solid var(--orange); background: var(--surface-orange); }.churn-stage.is-focus .niche-rate { box-shadow: 0 0 0 8px rgba(249,115,22,.12); }.churn-stage.is-focus .transform-arrow { transform: scale(1.22); }.rate-label, .demo-reading span, .rule-label { color: var(--soft); font: 700 .64rem/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; }.rate-block strong { margin-top: .45rem; color: var(--ink); font-size: clamp(3.9rem, 5.4vw, 6.2rem); line-height: .82; letter-spacing: -.08em; }.niche-rate strong { color: var(--orange-deep); }.rate-block small { margin-top: .55rem; color: var(--muted); font-size: .8rem; }.transform-arrow { color: var(--blue); font-size: 2.25rem; font-weight: 800; transition: transform .22s ease-out; }.lift-badge { min-width: 5.4rem; min-height: 5.4rem; padding: .65rem; display: grid; place-content: center; border-radius: 50%; color: var(--surface); background: var(--blue); text-align: center; transform: rotate(6deg); }.lift-badge span { font: 700 .55rem/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; }.lift-badge strong { margin-top: .3rem; font-size: 1.65rem; }.rule-panel { padding: 1rem 1.15rem; border: 2px solid var(--orange); border-radius: 10px; background: var(--surface-orange); }.rule-panel strong { display: block; margin-top: .65rem; color: var(--ink); font: 800 clamp(1rem, 1.35vw, 1.35rem)/1.25 var(--mono); }.rule-panel b { color: var(--orange-deep); font-size: .78em; }.rule-help { display: block; margin-top: .55rem; color: var(--muted); font-size: .78rem; }.demo-reading { margin-top: 1rem; display: grid; grid-template-columns: .85fr 1.15fr; gap: 1rem; }.demo-reading > div { padding: .85rem 1rem; border-top: 2px solid var(--blue); background: var(--surface-blue); }.demo-reading strong { display: block; margin-top: .45rem; color: var(--blue-deep); font-size: 1rem; line-height: 1.2; }.demo-reading i { color: var(--orange); font-style: normal; }.causal-note { margin-top: 1rem; padding: .75rem .9rem; display: flex; align-items: center; gap: .65rem; color: var(--muted); background: #fffaf5; font-size: .76rem; }.causal-note strong { color: var(--orange-deep); }.causal-note span:last-child { margin-left: auto; }
+
+/* Moment 6: the choice remains useful because its boundaries remain visible. */
+.pin-line { max-width: 31rem; margin-top: 2rem; padding-top: 1rem; display: flex; flex-wrap: wrap; gap: .6rem; border-top: 2px solid var(--blue); }.pin-line code { padding: .45rem .6rem; border: 1px solid #b2ccff; border-radius: 5px; color: var(--blue-deep); background: var(--surface-blue); font: 700 .68rem/1 var(--mono); }.pin-line span { align-self: center; color: var(--soft); font-size: .78rem; }.guardrails { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }.guardrail { min-height: 13vh; padding: 1rem 1.1rem; display: grid; grid-template-columns: 2rem 1fr; column-gap: .7rem; border-top: 2px solid var(--line); }.guardrail > span { color: var(--orange-deep); font: 800 .72rem/1 var(--mono); }.guardrail strong { color: var(--ink); font-size: 1.02rem; }.guardrail p { grid-column: 2; margin: .35rem 0 0; color: var(--muted); font-size: .82rem; line-height: 1.25; }.extension-band { grid-column: 1 / -1; padding: 1rem 1.1rem; border: 2px solid var(--blue); background: var(--surface-blue); }.extension-band span { display: block; color: var(--blue-deep); font: 700 .64rem/1 var(--mono); letter-spacing: .1em; }.extension-band strong { display: block; margin-top: .55rem; color: var(--blue-deep); font-size: 1.35rem; }.extension-band p { margin: .35rem 0 0; color: var(--muted); font-size: .82rem; }
+
+/* Moment 7: close on one line and one visual. */
+.closing-moment { grid-template-columns: 1.05fr .95fr; gap: clamp(2rem, 5vw, 6rem); }.closing-visual { width: min(47vw, 680px); justify-self: end; }.closing-visual svg { display: block; width: 100%; height: auto; }.closing-copy { justify-self: start; }.closing-copy h2 { max-width: 11ch; }.closing-copy .moment-marker { margin-bottom: 1.7rem; }
+
+.controls { bottom: 2.5vh; min-height: 2rem; }
+.control-button { padding: .48rem .7rem; border: 0; color: var(--muted); background: transparent; font: 700 .68rem/1 var(--mono); letter-spacing: .03em; }.control-button:hover { color: var(--blue); }.control-button:disabled { color: #98a2b3; cursor: not-allowed; }.next-button { color: var(--blue-deep); }.position-nav { display: flex; align-items: center; gap: .34rem; }.position-button { width: 2.2rem; height: 1.8rem; padding: 0; border: 1px solid transparent; border-radius: 4px; color: var(--soft); background: transparent; font: 700 .65rem/1 var(--mono); }.position-button:hover { border-color: var(--line); color: var(--blue); }.position-button.is-current { border-color: var(--blue); color: var(--surface); background: var(--blue); }.control-right { display: flex; align-items: center; gap: .6rem; }.control-hint { display: inline-flex; align-items: center; gap: .25rem; color: var(--soft); font: 600 .62rem/1 var(--mono); }.control-hint kbd { padding: .22rem .32rem; }.sr-status { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+}
+
+@media (max-width: 1180px) {
+  h1 { font-size: clamp(3rem, 5.6vw, 5.6rem); }
+  h2 { font-size: clamp(2.55rem, 4.4vw, 4.6rem); }
+  .opening-layout, .lenses-layout, .architecture-layout, .comparison-layout, .guardrails-layout, .demo-layout { gap: 2.2rem; }
+  .lens-row { grid-template-columns: 2rem 1fr 1.25fr; }.lens-tag { display: none; }
+  .pipeline { grid-template-columns: repeat(5, 1fr); gap: .8rem; }.pipeline-line, .pipeline-arrow { display: none; }.pipeline-node { min-height: 21vh; }.pipeline-footer { margin-top: .8rem; }
+  .compare-grid { grid-template-columns: .7fr 1.1fr 1.1fr 1.15fr; }.compare-grid > * { padding: .75rem .55rem; font-size: .78rem; }
+  .rate-transform { gap: .7rem; }.rate-block strong { font-size: clamp(3.3rem, 5vw, 5rem); }
+}
+
+@media (max-width: 820px) {
+  html, body { overflow: hidden; }.talk-shell { min-height: 0; }.topbar { top: 2vh; left: 5vw; right: 5vw; }.brand-sub, .session-meta { display: none; }.stage { inset: 8vh 5vw 11vh; overflow: hidden; }.moment-inner { width: 90vw; height: 100%; overflow-y: auto; padding: .8rem 0 1.2rem; align-content: start; }.moment-inner::-webkit-scrollbar { width: 0; }.moment { align-items: start; }.opening-layout, .lenses-layout, .architecture-layout, .comparison-layout, .guardrails-layout, .demo-layout, .closing-moment { display: block; }.section-copy, .opening-copy, .demo-intro, .comparison-headline, .architecture-copy { margin-bottom: 1.3rem; }.moment-marker { margin-bottom: .8rem; } h1 { font-size: clamp(2.55rem, 11vw, 4rem); } h2 { font-size: clamp(2.25rem, 9vw, 3.45rem); }.lead { margin-top: 1rem; font-size: 1.08rem; line-height: 1.32; }.opening-rule { margin-top: 1.2rem; font-size: .76rem; }.search-field { min-height: 47vh; padding: .9rem; }.dot-field { height: 32vh; margin-top: 1rem; }.focus-window { left: 56%; width: 34%; }.mean-line { min-height: 2.8rem; }.mean-line strong { font-size: 1.1rem; }.moment-prompt { left: 5vw; bottom: -2.8vh; font-size: .58rem; }.lens-rail, .comparison-stage, .churn-stage { padding: 1rem; }.lens-row { min-height: 8vh; grid-template-columns: 1.6rem 1.1fr 1.25fr; gap: .45rem; }.lens-letter { font-size: .9rem; }.lens-name { font-size: .87rem; }.lens-question { font-size: .74rem; }.rail-caption { font-size: .6rem; }.pipeline { grid-template-columns: 1fr; gap: .6rem; }.pipeline-node { min-height: 11vh; padding: .8rem; }.pipeline-node strong { margin-top: .35rem; font-size: 1rem; }.pipeline-node small { min-height: 0; }.pipeline-node code { margin-top: .45rem; }.pipeline-footer { padding-top: .4rem; font-size: .55rem; }.compare-context { display: block; }.compare-context strong { display: block; margin-top: .45rem; font-size: .95rem; }.compare-grid { grid-template-columns: .7fr 1.1fr 1.1fr 1.1fr; }.compare-grid > * { padding: .55rem .35rem; font-size: .61rem; }.compare-header > * { font-size: .5rem; }.compare-verdict { grid-template-columns: auto 1fr; }.compare-verdict > span:last-child { grid-column: 2; font-size: .72rem; }.compare-verdict strong { font-size: .98rem; }.compare-foot { font-size: .64rem; }.rate-transform { grid-template-columns: 1fr auto 1fr; gap: .55rem; }.rate-block { min-height: 13vh; padding: .7rem; }.rate-block strong { font-size: clamp(2.8rem, 12vw, 4.5rem); }.rate-block small { font-size: .66rem; }.rate-label { font-size: .55rem; }.transform-arrow { font-size: 1.5rem; }.lift-badge { position: absolute; right: -.3rem; top: -.25rem; min-width: 3.7rem; min-height: 3.7rem; }.lift-badge strong { font-size: 1.15rem; }.lift-badge span { font-size: .43rem; }.rule-panel strong { font-size: .83rem; }.rule-help { font-size: .66rem; }.demo-reading { grid-template-columns: 1fr; gap: .6rem; }.demo-reading strong { font-size: .82rem; }.causal-note { align-items: flex-start; flex-wrap: wrap; font-size: .65rem; }.causal-note span:last-child { margin-left: 1.2rem; }.guardrails { gap: .5rem; }.guardrail { min-height: 11vh; padding: .7rem .5rem; grid-template-columns: 1.4rem 1fr; }.guardrail strong { font-size: .78rem; }.guardrail p { font-size: .64rem; }.extension-band { padding: .7rem; }.extension-band strong { font-size: 1rem; }.extension-band p { font-size: .66rem; }.pin-line { margin-top: 1rem; }.pin-line code, .pin-line span { font-size: .6rem; }.closing-visual { width: 100%; margin-bottom: 1.4rem; }.closing-copy h2 { max-width: 100%; }.controls { left: 5vw; right: 5vw; bottom: 1.7vh; }.control-hint { display: none; }.position-button { width: 1.75rem; }.control-button { padding: .45rem .2rem; font-size: .58rem; }
+}
+
+@media (max-width: 430px) {
+  .position-nav { gap: .12rem; }.position-button { width: 1.45rem; font-size: .55rem; }.next-button, #prev-button { font-size: .52rem; }.field-head, .field-foot, .rail-label, .churn-topline { font-size: .53rem; }.opening-rule { gap: .35rem; padding: .75rem .55rem; font-size: .66rem; }.rule-bracket { font-size: 1.4rem; }.lens-row { grid-template-columns: 1.3rem 1fr 1.2fr; }.lens-name { font-size: .76rem; }.lens-question { font-size: .63rem; }.compare-grid > * { font-size: .56rem; }.compare-context span { font-size: .56rem; }.compare-context strong { font-size: .82rem; }.compare-verdict strong { font-size: .82rem; }.rate-block strong { font-size: 3.1rem; }.rate-block small { font-size: .58rem; }.rule-panel strong { font-size: .71rem; }.guardrail strong { font-size: .7rem; }.guardrail p { font-size: .58rem; }.closing-copy h2 { font-size: 2.35rem; }
+}
+</style>
+</head>
+<body>
+  <!--
+    THESIS: pysubgroup hace visible una combinacion interpretable que el promedio no nombra; rechaza el layout de portada, la estetica mesa/papel y el ranking universal.
+    OWN-WORLD: pizarra de busqueda en fondo frio, tinta carbon, azul intenso para la herramienta y naranja para el contraste; lineas, flechas y ventanas de foco llevan el ojo.
+    STORY: el visitante separa preguntas, sigue la arquitectura, ve el comparativo y entiende un ejemplo teorico de churn antes de tomar una decision contextual.
+    FIRST VIEWPORT: marca pysubgroup y tesis a la izquierda; regla generica y campo de puntos a la derecha; navegacion visible abajo, sin scroll.
+    FORM: secuencia de siete momentos de evidencia, pinned por REDESIGN-HANDOFF.md; una sola revelacion controlada en el ejemplo teorico.
+    FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
+  -->
+  <div class="talk-shell" id="talk-shell">
+    <header class="topbar">
+      <a class="brand-lockup" href="#moment-1" aria-label="Ir al inicio de pysubgroup">
+        <span class="brand-word">pysubgroup</span>
+        <span class="brand-slash" aria-hidden="true">/</span>
+        <span class="brand-sub">nichos que el promedio esconde</span>
+      </a>
+      <div class="session-meta" aria-label="Charla de Data Science, agosto de 2026">
+        <span>DATA SCIENCE</span><span class="meta-rule" aria-hidden="true"></span><span>26 AGO 2026</span>
+      </div>
+    </header>
+
+    <main class="stage" id="stage" aria-live="polite">
+      <section class="moment is-active" data-moment="1" id="moment-1" aria-labelledby="m1-title">
+        <div class="moment-inner opening-layout">
+          <div class="opening-copy">
+            <p class="moment-marker">01 / 07 &middot; PREGUNTA</p>
+            <h1 id="m1-title"><span class="product-name">pysubgroup</span><br>hace expl&iacute;cito<br><em>d&oacute;nde mirar.</em></h1>
+            <p class="lead">Una forma interpretable de encontrar combinaciones de condiciones donde el target se comporta de manera excepcional.</p>
+            <div class="opening-rule" aria-label="Regla generica de ejemplo">
+              <span class="rule-bracket">[</span>
+              <span>condici&oacute;n A <b>AND</b> condici&oacute;n B</span>
+              <span class="rule-arrow" aria-hidden="true">&rarr;</span>
+              <strong>subgrupo legible</strong>
+              <span class="rule-bracket">]</span>
+            </div>
+          </div>
+          <div class="search-field opening-field" role="img" aria-label="Un campo de observaciones con una ventana de busqueda que vuelve visible una region">
+            <div class="field-head"><span>POBLACI&Oacute;N COMPLETA</span><span>resumen &rarr; contraste</span></div>
+            <div class="dot-field" aria-hidden="true">
+              <i style="--x:7%;--y:17%"></i><i style="--x:16%;--y:31%"></i><i style="--x:25%;--y:20%"></i><i style="--x:34%;--y:39%"></i><i style="--x:43%;--y:27%"></i><i style="--x:54%;--y:15%"></i><i style="--x:66%;--y:28%"></i><i style="--x:78%;--y:18%"></i><i style="--x:89%;--y:34%"></i>
+              <i style="--x:9%;--y:60%"></i><i style="--x:20%;--y:75%"></i><i style="--x:31%;--y:57%"></i><i style="--x:42%;--y:72%"></i><i style="--x:53%;--y:55%"></i><i style="--x:64%;--y:78%"></i><i style="--x:75%;--y:61%"></i><i style="--x:87%;--y:73%"></i><i style="--x:94%;--y:54%"></i>
+              <i style="--x:13%;--y:44%"></i><i style="--x:28%;--y:48%"></i><i style="--x:39%;--y:47%"></i><i style="--x:58%;--y:42%"></i><i style="--x:70%;--y:47%"></i><i style="--x:82%;--y:43%"></i>
+              <div class="mean-line"><span>promedio</span><strong>una cifra</strong></div>
+              <div class="focus-window"><span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span><b>regi&oacute;n<br>que merece<br>otra mirada</b></div>
+            </div>
+            <div class="field-foot"><span class="blue-dot"></span><span>la descripci&oacute;n es la unidad de lectura</span></div>
+          </div>
+        </div>
+        <div class="moment-prompt"><kbd>ESPACIO</kbd><span>abre la ventana de contraste &middot; <kbd>R</kbd> reinicia</span></div>
+      </section>
+
+      <section class="moment" data-moment="2" id="moment-2" aria-labelledby="m2-title" hidden>
+        <div class="moment-inner lenses-layout">
+          <div class="section-copy">
+            <p class="moment-marker">02 / 07 &middot; LENTES</p>
+            <h2 id="m2-title">La misma poblaci&oacute;n.<br><em>Cuatro preguntas.</em></h2>
+            <p class="lead">Segmentar, agrupar, predecir y descubrir no son sin&oacute;nimos. Cada lente deja una clase distinta de evidencia.</p>
+            <p class="micro-note">Pulsa espacio para mover el foco.</p>
+          </div>
+          <div class="lens-rail" role="group" aria-label="Comparacion conceptual de cuatro lentes" data-inner="0">
+            <div class="rail-label"><span>LO QUE QUEREMOS SABER</span><span id="lens-index">A / 04</span></div>
+            <button class="lens-row is-focus" type="button" data-lens="0"><span class="lens-letter">A</span><span class="lens-name">Segmento manual</span><span class="lens-question">&iquest;Qu&eacute; corte decidimos antes?</span><span class="lens-tag">corte heredado</span></button>
+            <button class="lens-row" type="button" data-lens="1"><span class="lens-letter">B</span><span class="lens-name">Clustering</span><span class="lens-question">&iquest;Qu&eacute; grupos se parecen?</span><span class="lens-tag">similitud</span></button>
+            <button class="lens-row" type="button" data-lens="2"><span class="lens-letter">C</span><span class="lens-name">Modelo global</span><span class="lens-question">&iquest;Qu&eacute; individuo ordena su score?</span><span class="lens-tag">ranking</span></button>
+            <button class="lens-row winner-line" type="button" data-lens="3"><span class="lens-letter">D</span><span class="lens-name">Subgroup Discovery</span><span class="lens-question">&iquest;Qu&eacute; descripci&oacute;n cubre un contraste?</span><span class="lens-tag">regla legible</span></button>
+            <div class="rail-caption"><span class="orange-dot"></span><strong>responde otra pregunta</strong><span>no reemplaza las dem&aacute;s</span></div>
+          </div>
+        </div>
+        <div class="moment-prompt"><kbd>ESPACIO</kbd><span>mueve el foco &middot; <kbd>R</kbd> reinicia</span></div>
+      </section>
+
+      <section class="moment" data-moment="3" id="moment-3" aria-labelledby="m3-title" hidden>
+        <div class="moment-inner architecture-layout">
+          <div class="section-copy architecture-copy">
+            <p class="moment-marker">03 / 07 &middot; ARQUITECTURA</p>
+            <h2 id="m3-title">La pregunta se arma<br><em>en cinco piezas.</em></h2>
+            <p class="lead">Cada pieza hace visible una decisi&oacute;n: qu&eacute; cubre, qu&eacute; contrasta y c&oacute;mo se busca.</p>
+            <div class="architecture-note"><span>QUALITY FUNCTION</span><strong>contraste &times; tama&ntilde;o</strong><small>ordena la revisi&oacute;n; no prueba causalidad.</small></div>
+          </div>
+          <div class="pipeline" data-inner="0" role="group" aria-label="Flujo conceptual de pysubgroup">
+            <div class="pipeline-line" aria-hidden="true"></div>
+            <button class="pipeline-node is-focus" type="button" data-node="0"><span class="node-index">01</span><strong>selectors</strong><small>cubren filas</small><code>create_selectors(...)</code></button>
+            <span class="pipeline-arrow" aria-hidden="true">&rarr;</span>
+            <button class="pipeline-node" type="button" data-node="1"><span class="node-index">02</span><strong>target</strong><small>define qu&eacute; contrastar</small><code>BinaryTarget</code></button>
+            <span class="pipeline-arrow" aria-hidden="true">&rarr;</span>
+            <button class="pipeline-node" type="button" data-node="2"><span class="node-index">03</span><strong>quality function</strong><small>pesa contraste + tama&ntilde;o</small><code>StandardQF</code></button>
+            <span class="pipeline-arrow" aria-hidden="true">&rarr;</span>
+            <button class="pipeline-node" type="button" data-node="3"><span class="node-index">04</span><strong>search</strong><small>explora descripciones</small><code>DFS / Beam Search</code></button>
+            <span class="pipeline-arrow" aria-hidden="true">&rarr;</span>
+            <button class="pipeline-node result-node" type="button" data-node="4"><span class="node-index">05</span><strong>resultado</strong><small>regla para revisar</small><code>+ MinSupportConstraint</code></button>
+            <div class="pipeline-footer"><span>configurable</span><span>interpretable</span><span>revisable</span></div>
+          </div>
+        </div>
+        <div class="moment-prompt"><kbd>ESPACIO</kbd><span>recorre la arquitectura &middot; <kbd>R</kbd> reinicia</span></div>
+      </section>
+
+      <section class="moment" data-moment="4" id="moment-4" aria-labelledby="m4-title" hidden>
+        <div class="moment-inner comparison-layout">
+          <div class="comparison-headline">
+            <p class="moment-marker">04 / 07 &middot; DECISI&Oacute;N</p>
+            <h2 id="m4-title">La elecci&oacute;n depende<br><em>del contexto.</em></h2>
+            <p class="lead">No hay ranking universal. Hay un stack, una versi&oacute;n y una pregunta concreta.</p>
+          </div>
+          <div class="comparison-stage" role="table" aria-label="Comparativo contextual de librerias">
+            <div class="compare-context"><span>PARA NUESTRO EQUIPO</span><strong>Python 3.10 + caso pr&aacute;ctico</strong></div>
+            <div class="compare-grid compare-header" role="row"><span role="columnheader">CRITERIO</span><span role="columnheader" class="compare-py">pysubgroup</span><span role="columnheader">subgroups</span><span role="columnheader">Research especializado</span></div>
+            <div class="compare-grid" role="row"><strong role="rowheader">Python</strong><span class="compare-py">3.10 con entorno fijado</span><span>metadata actual: 3.11+</span><span>variable por proyecto</span></div>
+            <div class="compare-grid" role="row"><strong role="rowheader">Filosof&iacute;a</strong><span class="compare-py">framework configurable</span><span>cat&aacute;logo amplio de algoritmos</span><span>soluci&oacute;n espec&iacute;fica</span></div>
+            <div class="compare-grid" role="row"><strong role="rowheader">Uso pr&aacute;ctico</strong><span class="compare-py">alto en este alcance</span><span>alto al migrar stack</span><span>mayor fricci&oacute;n de integraci&oacute;n</span></div>
+            <div class="compare-grid" role="row"><strong role="rowheader">Auditor&iacute;a</strong><span class="compare-py">SoftClassifierTarget / SubROC</span><span>no es su foco principal</span><span>depende del proyecto</span></div>
+            <div class="compare-verdict"><span class="verdict-mark">&check;</span><strong>Gana pysubgroup en este contexto.</strong><span>Funciona con Python 3.10 y cubre el caso pr&aacute;ctico sin migrar el stack.</span></div>
+            <p class="compare-foot">No afirmamos superioridad algor&iacute;tmica ni benchmark com&uacute;n. Si cambia el stack, se revisa el veredicto.</p>
+          </div>
+        </div>
+        <div class="moment-prompt"><span>veredicto contextual &ne; ganador universal</span></div>
+      </section>
+
+      <section class="moment" data-moment="5" id="moment-5" aria-labelledby="m5-title" hidden>
+        <div class="moment-inner demo-layout">
+          <div class="demo-intro">
+            <p class="moment-marker">05 / 07 &middot; EJEMPLO &Uacute;NICO</p>
+            <h2 id="m5-title">El promedio es 4%.<br><em>La regla encuentra 12%.</em></h2>
+            <p class="lead">Ejemplo te&oacute;rico e ilustrativo: una sola regla, una sola lectura, ninguna ejecuci&oacute;n en vivo.</p>
+            <div class="synthetic-note"><span class="orange-dot"></span><div><strong>SINT&Eacute;TICO / TE&Oacute;RICO</strong><small>las cifras explican la mec&aacute;nica, no describen una telco.</small></div></div>
+          </div>
+          <div class="churn-stage" data-inner="0" role="group" aria-label="Transformacion teorica de churn global a nicho">
+            <div class="churn-topline"><span>DE BASELINE A REGLA</span><span id="demo-step">01 &middot; baseline</span></div>
+            <div class="rate-transform">
+              <div class="rate-block global-rate"><span class="rate-label">churn global</span><strong>4%</strong><small>toda la poblaci&oacute;n</small></div>
+              <span class="transform-arrow" aria-hidden="true">&rarr;</span>
+              <div class="rate-block niche-rate"><span class="rate-label">nicho te&oacute;rico</span><strong>12%</strong><small>6% de clientes</small></div>
+              <div class="lift-badge"><span>contraste</span><strong>3&times;</strong></div>
+            </div>
+            <div class="rule-panel"><span class="rule-label">REGLA LEGIBLE</span><strong>reclamos_90d &ge; 2 <b>AND</b> indisponibilidad_90d &ge; 3 <b>AND</b> contrato = mensual</strong><span class="rule-help">una combinaci&oacute;n de condiciones que merece investigaci&oacute;n</span></div>
+            <div class="demo-reading"><div><span>lectura</span><strong>4% global <i>&rarr;</i> 12% en el nicho</strong></div><div><span>acci&oacute;n prudente</span><strong>revisar calidad de servicio y retenci&oacute;n</strong></div></div>
+            <div class="causal-note"><span class="orange-dot"></span><strong>Asociaci&oacute;n &ne; causalidad</strong><span>replicar, controlar confusores y probar antes de intervenir.</span></div>
+          </div>
+        </div>
+        <div class="moment-prompt"><kbd>ESPACIO</kbd><span>enfatiza la transformaci&oacute;n &middot; <kbd>R</kbd> vuelve al baseline</span></div>
+      </section>
+
+      <section class="moment" data-moment="6" id="moment-6" aria-labelledby="m6-title" hidden>
+        <div class="moment-inner guardrails-layout">
+          <div class="section-copy">
+            <p class="moment-marker">06 / 07 &middot; CONDICIONES</p>
+            <h2 id="m6-title">Elegimos la herramienta.<br><em>Con los l&iacute;mites a la vista.</em></h2>
+            <p class="lead">La opci&oacute;n pragm&aacute;tica bajo Python 3.10 no convierte un hallazgo en evidencia confirmatoria.</p>
+            <div class="pin-line"><code>pysubgroup==0.9.0</code><code>numpy&lt;2.0.0</code><span>estado declarado: Beta</span></div>
+          </div>
+          <div class="guardrails" role="list" aria-label="Guardarrailes para interpretar un subgrupo">
+            <div class="guardrail" role="listitem"><span>01</span><strong>Muchas combinaciones</strong><p>La b&uacute;squeda genera hip&oacute;tesis; la replicaci&oacute;n las pone a prueba.</p></div>
+            <div class="guardrail" role="listitem"><span>02</span><strong>Soporte m&iacute;nimo</strong><p>Sin tama&ntilde;o suficiente, una tasa puede ser inestable.</p></div>
+            <div class="guardrail" role="listitem"><span>03</span><strong>Reglas solapadas</strong><p>Varias descripciones pueden cubrir a casi las mismas personas.</p></div>
+            <div class="guardrail" role="listitem"><span>04</span><strong>Asociaci&oacute;n &ne; causalidad</strong><p>Temporalidad, confusi&oacute;n y experimento son otra capa.</p></div>
+            <div class="extension-band"><span>EXTENSI&Oacute;N POSTERIOR</span><strong>SoftClassifierTarget + SubROC</strong><p>auditar d&oacute;nde rinde distinto un clasificador existente.</p></div>
+          </div>
+        </div>
+        <div class="moment-prompt"><span>candidatos interpretables &middot; confirmaci&oacute;n adicional</span></div>
+      </section>
+
+      <section class="moment closing-moment" data-moment="7" id="moment-7" aria-labelledby="m7-title" hidden>
+        <div class="closing-visual" aria-hidden="true">
+          <svg viewBox="0 0 720 520" role="img" focusable="false">
+            <rect x="2" y="2" width="716" height="516" rx="24" fill="#ffffff" stroke="#d0d5dd" stroke-width="3"/>
+            <path d="M74 118H646M74 200H646M74 282H646M74 364H646" stroke="#e4e7ec" stroke-width="2"/>
+            <path d="M140 62V452M260 62V452M380 62V452M500 62V452M620 62V452" stroke="#eef0f3" stroke-width="2"/>
+            <g fill="#98a2b3">
+              <circle cx="124" cy="151" r="8"/><circle cx="183" cy="186" r="8"/><circle cx="238" cy="138" r="8"/><circle cx="310" cy="173" r="8"/><circle cx="395" cy="143" r="8"/><circle cx="456" cy="184" r="8"/><circle cx="558" cy="140" r="8"/><circle cx="615" cy="178" r="8"/>
+              <circle cx="105" cy="335" r="8"/><circle cx="194" cy="386" r="8"/><circle cx="296" cy="323" r="8"/><circle cx="410" cy="392" r="8"/><circle cx="500" cy="330" r="8"/><circle cx="612" cy="385" r="8"/>
+            </g>
+            <path d="M85 260H638" stroke="#f97316" stroke-width="4" stroke-dasharray="10 12"/>
+            <rect x="342" y="288" width="232" height="144" rx="14" fill="#155eef" fill-opacity=".08" stroke="#155eef" stroke-width="5"/>
+            <g fill="#155eef"><circle cx="390" cy="326" r="9"/><circle cx="452" cy="354" r="9"/><circle cx="528" cy="318" r="9"/><circle cx="488" cy="402" r="9"/></g>
+            <path d="M574 322l42 -38M616 284v34M616 284h-34" stroke="#f97316" stroke-width="5" fill="none"/>
+            <text x="82" y="90" font-family="Arial,sans-serif" font-size="20" font-weight="700" letter-spacing="4" fill="#667085">PROMEDIO</text>
+            <text x="364" y="473" font-family="Arial,sans-serif" font-size="20" font-weight="700" letter-spacing="3" fill="#155eef">COMBINACI&Oacute;N VISIBLE</text>
+          </svg>
+        </div>
+        <div class="closing-copy">
+          <p class="moment-marker">07 / 07 &middot; CIERRE</p>
+          <h2 id="m7-title">No buscamos otro promedio.<br><em>Buscamos la combinaci&oacute;n<br>que merece atenci&oacute;n.</em></h2>
+        </div>
+        <div class="moment-prompt"><span>fin &middot; preguntas despu&eacute;s de la imagen</span></div>
+      </section>
+    </main>
+
+    <footer class="controls" aria-label="Navegacion de la presentacion">
+      <button class="control-button" id="prev-button" type="button" aria-label="Momento anterior"><span aria-hidden="true">&larr;</span> anterior</button>
+      <nav class="position-nav" aria-label="Ir a un momento">
+        <button type="button" data-go="1" class="position-button is-current" aria-label="Ir al momento 1" aria-current="step">01</button>
+        <button type="button" data-go="2" class="position-button" aria-label="Ir al momento 2">02</button>
+        <button type="button" data-go="3" class="position-button" aria-label="Ir al momento 3">03</button>
+        <button type="button" data-go="4" class="position-button" aria-label="Ir al momento 4">04</button>
+        <button type="button" data-go="5" class="position-button" aria-label="Ir al momento 5">05</button>
+        <button type="button" data-go="6" class="position-button" aria-label="Ir al momento 6">06</button>
+        <button type="button" data-go="7" class="position-button" aria-label="Ir al momento 7">07</button>
+      </nav>
+      <div class="control-right">
+        <span class="control-hint"><kbd>&larr;</kbd><kbd>&rarr;</kbd> navegar <span class="hint-optional">&middot; ESPACIO foco &middot; R reiniciar</span></span>
+        <button class="control-button" id="fullscreen-button" type="button" aria-label="Entrar en pantalla completa"><span aria-hidden="true">&#x26F6;</span> <span id="fullscreen-label">pantalla completa</span></button>
+        <button class="control-button next-button" id="next-button" type="button" aria-label="Momento siguiente">siguiente <span aria-hidden="true">&rarr;</span></button>
+      </div>
+    </footer>
+    <div class="sr-status" id="sr-status" role="status" aria-live="polite"></div>
+  </div>
+  <script>(() => {
+  const moments = [...document.querySelectorAll('.moment')];
+  const positionButtons = [...document.querySelectorAll('.position-button')];
+  const prev = document.querySelector('#prev-button');
+  const next = document.querySelector('#next-button');
+  const fullscreen = document.querySelector('#fullscreen-button');
+  const fullscreenLabel = document.querySelector('#fullscreen-label');
+  const stage = document.querySelector('#stage');
+  const status = document.querySelector('#sr-status');
+  const count = moments.length;
+  const innerState = new Map([[1, 0], [2, 0], [3, 0], [5, 0]]);
+  let current = 1;
+
+  const getMomentFromLocation = () => {
+    const queryMoment = Number(new URLSearchParams(window.location.search).get('moment'));
+    const hashMatch = window.location.hash.match(/(?:moment-?|m)(\d+)/i);
+    const hashMoment = hashMatch ? Number(hashMatch[1]) : 0;
+    const candidate = queryMoment || hashMoment;
+    return candidate >= 1 && candidate <= count ? candidate : 1;
+  };
+
+  const announce = (message) => {
+    if (status) status.textContent = message;
+  };
+
+  const updateMoment = (nextIndex, { focus = true, writeHash = true } = {}) => {
+    current = Math.max(1, Math.min(count, Number(nextIndex) || 1));
+    moments.forEach((moment, index) => {
+      const active = index + 1 === current;
+      moment.classList.toggle('is-active', active);
+      moment.hidden = !active;
+    });
+    positionButtons.forEach((button, index) => {
+      const active = index + 1 === current;
+      button.classList.toggle('is-current', active);
+      if (active) button.setAttribute('aria-current', 'step');
+      else button.removeAttribute('aria-current');
+    });
+    if (prev) prev.disabled = current === 1;
+    if (next) next.disabled = current === count;
+    stage.dataset.moment = String(current);
+    if (writeHash) history.replaceState(null, '', `#moment-${current}`);
+    const heading = moments[current - 1].querySelector('h1, h2');
+    announce(`Momento ${current} de ${count}: ${heading?.textContent.trim() || ''}`);
+    if (focus) heading?.focus({ preventScroll: true });
+  };
+
+  const setLens = (value) => {
+    const normalized = ((value % 4) + 4) % 4;
+    innerState.set(2, normalized);
+    document.querySelectorAll('.lens-row').forEach((row, index) => row.classList.toggle('is-focus', index === normalized));
+    const lensIndex = document.querySelector('#lens-index');
+    if (lensIndex) lensIndex.textContent = `${String.fromCharCode(65 + normalized)} / 04`;
+  };
+
+  const setPipeline = (value) => {
+    const normalized = ((value % 5) + 5) % 5;
+    innerState.set(3, normalized);
+    document.querySelectorAll('.pipeline-node').forEach((node, index) => node.classList.toggle('is-focus', index === normalized));
+  };
+
+  const setDemo = (value) => {
+    const normalized = value > 0 ? 1 : 0;
+    innerState.set(5, normalized);
+    const scene = document.querySelector('.churn-stage');
+    scene?.classList.toggle('is-focus', normalized === 1);
+    const step = document.querySelector('#demo-step');
+    if (step) step.textContent = normalized ? '02 · regla + contraste' : '01 · baseline';
+  };
+
+  const resetInner = (index) => {
+    if (index === 1) {
+      document.querySelector('.opening-field')?.classList.remove('is-emphasis');
+      innerState.set(1, 0);
+    }
+    if (index === 2) setLens(0);
+    if (index === 3) setPipeline(0);
+    if (index === 5) setDemo(0);
+  };
+
+  const resetCurrent = () => {
+    resetInner(current);
+    announce(`Momento ${current} reiniciado`);
+  };
+
+  const advanceInner = () => {
+    if (current === 1) {
+      const emphasis = innerState.get(1) === 0 ? 1 : 0;
+      innerState.set(1, emphasis);
+      document.querySelector('.opening-field')?.classList.toggle('is-emphasis', emphasis === 1);
+      announce(emphasis ? 'La ventana de contraste queda en foco' : 'La poblacion vuelve a su estado resumido');
+      return;
+    }
+    if (current === 2) {
+      const nextLens = (innerState.get(2) + 1) % 4;
+      setLens(nextLens);
+      announce(`Lente ${String.fromCharCode(65 + nextLens)} de 04`);
+      return;
+    }
+    if (current === 3) {
+      const nextNode = (innerState.get(3) + 1) % 5;
+      setPipeline(nextNode);
+      announce(`Pieza ${nextNode + 1} de 05`);
+      return;
+    }
+    if (current === 5) {
+      setDemo(1 - innerState.get(5));
+      announce(innerState.get(5) ? 'Contraste enfatizado: 4 por ciento a 12 por ciento' : 'Baseline visible');
+    }
+  };
+
+  prev?.addEventListener('click', () => updateMoment(current - 1));
+  next?.addEventListener('click', () => updateMoment(current + 1));
+  positionButtons.forEach((button) => button.addEventListener('click', () => updateMoment(button.dataset.go)));
+  document.querySelectorAll('.lens-row').forEach((row, index) => row.addEventListener('click', () => setLens(index)));
+  document.querySelectorAll('.pipeline-node').forEach((node, index) => node.addEventListener('click', () => setPipeline(index)));
+
+  fullscreen?.addEventListener('click', async () => {
+    try {
+      if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
+      else await document.exitFullscreen();
+    } catch {
+      fullscreen.setAttribute('aria-label', 'Pantalla completa no disponible en este navegador');
+      announce('Pantalla completa no disponible en este navegador');
+    }
+  });
+  document.addEventListener('fullscreenchange', () => {
+    const active = Boolean(document.fullscreenElement);
+    if (fullscreenLabel) fullscreenLabel.textContent = active ? 'salir' : 'pantalla completa';
+    fullscreen?.setAttribute('aria-label', active ? 'Salir de pantalla completa' : 'Entrar en pantalla completa');
+  });
+
+  document.addEventListener('keydown', (event) => {
+    const target = event.target;
+    const isControl = target.matches('button, a, input, textarea, select');
+    if (event.key === 'ArrowRight' || event.key === 'PageDown') { event.preventDefault(); updateMoment(current + 1); return; }
+    if (event.key === 'ArrowLeft' || event.key === 'PageUp') { event.preventDefault(); updateMoment(current - 1); return; }
+    if (event.key === 'Home') { event.preventDefault(); updateMoment(1); return; }
+    if (event.key === 'End') { event.preventDefault(); updateMoment(count); return; }
+    if (event.key.toLowerCase() === 'r' && !isControl) { event.preventDefault(); resetCurrent(); return; }
+    if ((event.key === ' ' || event.key === 'Enter') && !isControl) { event.preventDefault(); advanceInner(); }
+  });
+
+  window.addEventListener('hashchange', () => updateMoment(getMomentFromLocation(), { focus: true, writeHash: false }));
+  moments.forEach((moment) => moment.querySelector('h1, h2')?.setAttribute('tabindex', '-1'));
+  updateMoment(getMomentFromLocation(), { focus: false, writeHash: false });
+})();
+</script>
+</body>
+</html>
+

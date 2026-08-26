@@ -4,103 +4,144 @@
   const prev = document.querySelector('#prev-button');
   const next = document.querySelector('#next-button');
   const fullscreen = document.querySelector('#fullscreen-button');
+  const fullscreenLabel = document.querySelector('#fullscreen-label');
   const stage = document.querySelector('#stage');
+  const status = document.querySelector('#sr-status');
+  const count = moments.length;
+  const innerState = new Map([[1, 0], [2, 0], [3, 0], [5, 0]]);
   let current = 1;
-  const innerState = new Map([[1, 0], [2, 0], [3, 0], [4, 0]]);
 
-  const resetInner = (index) => {
-    innerState.set(index, 0);
-    if (index === 2) {
-      document.querySelectorAll('.lens-route').forEach((el, i) => el.classList.toggle('is-focus', i === 0));
-      document.querySelector('#lens-index').textContent = 'A / 04';
-    }
-    if (index === 3) {
-      document.querySelector('.registered-stack').dataset.inner = '0';
-    }
-    if (index === 4) {
-      document.querySelector('#demo-step').textContent = '01 · config';
-      document.querySelector('.demo-table').dataset.inner = '0';
-    }
+  const getMomentFromLocation = () => {
+    const queryMoment = Number(new URLSearchParams(window.location.search).get('moment'));
+    const hashMatch = window.location.hash.match(/(?:moment-?|m)(\d+)/i);
+    const hashMoment = hashMatch ? Number(hashMatch[1]) : 0;
+    const candidate = queryMoment || hashMoment;
+    return candidate >= 1 && candidate <= count ? candidate : 1;
   };
 
-  const updateMoment = (nextIndex, { focus = true } = {}) => {
-    current = Math.max(1, Math.min(7, nextIndex));
-    moments.forEach((moment, i) => {
-      const active = i + 1 === current;
+  const announce = (message) => {
+    if (status) status.textContent = message;
+  };
+
+  const updateMoment = (nextIndex, { focus = true, writeHash = true } = {}) => {
+    current = Math.max(1, Math.min(count, Number(nextIndex) || 1));
+    moments.forEach((moment, index) => {
+      const active = index + 1 === current;
       moment.classList.toggle('is-active', active);
       moment.hidden = !active;
     });
-    positionButtons.forEach((button, i) => {
-      const active = i + 1 === current;
+    positionButtons.forEach((button, index) => {
+      const active = index + 1 === current;
       button.classList.toggle('is-current', active);
-      if (active) button.setAttribute('aria-current', 'step'); else button.removeAttribute('aria-current');
+      if (active) button.setAttribute('aria-current', 'step');
+      else button.removeAttribute('aria-current');
     });
+    if (prev) prev.disabled = current === 1;
+    if (next) next.disabled = current === count;
     stage.dataset.moment = String(current);
-    if (focus) {
-      const heading = moments[current - 1].querySelector('h1, h2');
-      heading?.focus?.({ preventScroll: true });
-    }
+    if (writeHash) history.replaceState(null, '', `#moment-${current}`);
+    const heading = moments[current - 1].querySelector('h1, h2');
+    announce(`Momento ${current} de ${count}: ${heading?.textContent.trim() || ''}`);
+    if (focus) heading?.focus({ preventScroll: true });
   };
 
-  const advanceInner = () => {
-    if (current === 2) {
-      const value = (innerState.get(2) + 1) % 4; innerState.set(2, value);
-      document.querySelectorAll('.lens-route').forEach((el, i) => el.classList.toggle('is-focus', i === value));
-      document.querySelector('#lens-index').textContent = String.fromCharCode(65 + value) + ' / 04';
-    } else if (current === 3) {
-      const value = (innerState.get(3) + 1) % 5; innerState.set(3, value);
-      const sheets = document.querySelectorAll('.stack-sheet');
-      sheets.forEach((sheet, i) => sheet.style.transform = i === value ? 'translateX(3.2rem) rotate(0deg)' : '');
-      document.querySelector('.registered-stack').dataset.inner = String(value);
-    } else if (current === 4) {
-      const value = Math.min(3, innerState.get(4) + 1); innerState.set(4, value);
-      const labels = ['01 · config', '02 · baseline', '03 · rule + métricas', '04 · holdout + hipótesis'];
-      document.querySelector('#demo-step').textContent = labels[value];
-      const table = document.querySelector('.demo-table');
-      table.dataset.inner = String(value);
-      const focusTargets = ['.demo-config', '.baseline-strip', '.rule-reveal', '.holdout-strip'];
-      table.querySelector(focusTargets[value])?.focus?.({ preventScroll: true });
-    } else if (current === 1) {
-      document.querySelector('.average-scene').classList.add('is-revealed');
+  const setLens = (value) => {
+    const normalized = ((value % 4) + 4) % 4;
+    innerState.set(2, normalized);
+    document.querySelectorAll('.lens-row').forEach((row, index) => row.classList.toggle('is-focus', index === normalized));
+    const lensIndex = document.querySelector('#lens-index');
+    if (lensIndex) lensIndex.textContent = `${String.fromCharCode(65 + normalized)} / 04`;
+  };
+
+  const setPipeline = (value) => {
+    const normalized = ((value % 5) + 5) % 5;
+    innerState.set(3, normalized);
+    document.querySelectorAll('.pipeline-node').forEach((node, index) => node.classList.toggle('is-focus', index === normalized));
+  };
+
+  const setDemo = (value) => {
+    const normalized = value > 0 ? 1 : 0;
+    innerState.set(5, normalized);
+    const scene = document.querySelector('.churn-stage');
+    scene?.classList.toggle('is-focus', normalized === 1);
+    const step = document.querySelector('#demo-step');
+    if (step) step.textContent = normalized ? '02 · regla + contraste' : '01 · baseline';
+  };
+
+  const resetInner = (index) => {
+    if (index === 1) {
+      document.querySelector('.opening-field')?.classList.remove('is-emphasis');
+      innerState.set(1, 0);
     }
+    if (index === 2) setLens(0);
+    if (index === 3) setPipeline(0);
+    if (index === 5) setDemo(0);
   };
 
   const resetCurrent = () => {
     resetInner(current);
-    if (current === 1) document.querySelector('.average-scene').classList.remove('is-revealed');
-    if (current === 4) document.querySelector('.demo-table').dataset.inner = '0';
-    if (current === 3) document.querySelectorAll('.stack-sheet').forEach(sheet => sheet.style.transform = '');
+    announce(`Momento ${current} reiniciado`);
   };
 
-  prev.addEventListener('click', () => updateMoment(current - 1));
-  next.addEventListener('click', () => updateMoment(current + 1));
-  positionButtons.forEach(button => button.addEventListener('click', () => updateMoment(Number(button.dataset.go))));
-  fullscreen.addEventListener('click', async () => {
+  const advanceInner = () => {
+    if (current === 1) {
+      const emphasis = innerState.get(1) === 0 ? 1 : 0;
+      innerState.set(1, emphasis);
+      document.querySelector('.opening-field')?.classList.toggle('is-emphasis', emphasis === 1);
+      announce(emphasis ? 'La ventana de contraste queda en foco' : 'La poblacion vuelve a su estado resumido');
+      return;
+    }
+    if (current === 2) {
+      const nextLens = (innerState.get(2) + 1) % 4;
+      setLens(nextLens);
+      announce(`Lente ${String.fromCharCode(65 + nextLens)} de 04`);
+      return;
+    }
+    if (current === 3) {
+      const nextNode = (innerState.get(3) + 1) % 5;
+      setPipeline(nextNode);
+      announce(`Pieza ${nextNode + 1} de 05`);
+      return;
+    }
+    if (current === 5) {
+      setDemo(1 - innerState.get(5));
+      announce(innerState.get(5) ? 'Contraste enfatizado: 4 por ciento a 12 por ciento' : 'Baseline visible');
+    }
+  };
+
+  prev?.addEventListener('click', () => updateMoment(current - 1));
+  next?.addEventListener('click', () => updateMoment(current + 1));
+  positionButtons.forEach((button) => button.addEventListener('click', () => updateMoment(button.dataset.go)));
+  document.querySelectorAll('.lens-row').forEach((row, index) => row.addEventListener('click', () => setLens(index)));
+  document.querySelectorAll('.pipeline-node').forEach((node, index) => node.addEventListener('click', () => setPipeline(index)));
+
+  fullscreen?.addEventListener('click', async () => {
     try {
-      if (!document.fullscreenElement) await document.documentElement.requestFullscreen(); else await document.exitFullscreen();
-    } catch { fullscreen.setAttribute('aria-label', 'Pantalla completa no disponible en este navegador'); }
+      if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
+      else await document.exitFullscreen();
+    } catch {
+      fullscreen.setAttribute('aria-label', 'Pantalla completa no disponible en este navegador');
+      announce('Pantalla completa no disponible en este navegador');
+    }
   });
   document.addEventListener('fullscreenchange', () => {
     const active = Boolean(document.fullscreenElement);
-    fullscreen.querySelector('span').textContent = active ? 'salir' : 'pantalla completa';
-    fullscreen.setAttribute('aria-label', active ? 'Salir de pantalla completa' : 'Entrar en pantalla completa');
+    if (fullscreenLabel) fullscreenLabel.textContent = active ? 'salir' : 'pantalla completa';
+    fullscreen?.setAttribute('aria-label', active ? 'Salir de pantalla completa' : 'Entrar en pantalla completa');
   });
+
   document.addEventListener('keydown', (event) => {
+    const target = event.target;
+    const isControl = target.matches('button, a, input, textarea, select');
     if (event.key === 'ArrowRight' || event.key === 'PageDown') { event.preventDefault(); updateMoment(current + 1); return; }
     if (event.key === 'ArrowLeft' || event.key === 'PageUp') { event.preventDefault(); updateMoment(current - 1); return; }
     if (event.key === 'Home') { event.preventDefault(); updateMoment(1); return; }
-    if (event.key === 'End') { event.preventDefault(); updateMoment(7); return; }
-    if (event.key.toLowerCase() === 'r') { event.preventDefault(); resetCurrent(); return; }
-    if (event.key === ' ' || event.key === 'Enter') {
-      if (event.target.matches('button, input, textarea, select')) return;
-      event.preventDefault(); advanceInner();
-    }
+    if (event.key === 'End') { event.preventDefault(); updateMoment(count); return; }
+    if (event.key.toLowerCase() === 'r' && !isControl) { event.preventDefault(); resetCurrent(); return; }
+    if ((event.key === ' ' || event.key === 'Enter') && !isControl) { event.preventDefault(); advanceInner(); }
   });
-  // Headings are not interactive, but focus them on navigation for a readable
-  // announcement in assistive technology without adding a focus trap.
-  moments.forEach(moment => moment.querySelector('h1, h2')?.setAttribute('tabindex', '-1'));
-  document.querySelectorAll('.demo-config, .baseline-strip, .rule-reveal, .holdout-strip').forEach(el => el.setAttribute('tabindex', '-1'));
-  document.querySelector('.demo-table')?.classList.add('is-interactive');
-  resetInner(2);
-  updateMoment(1, { focus: false });
+
+  window.addEventListener('hashchange', () => updateMoment(getMomentFromLocation(), { focus: true, writeHash: false }));
+  moments.forEach((moment) => moment.querySelector('h1, h2')?.setAttribute('tabindex', '-1'));
+  updateMoment(getMomentFromLocation(), { focus: false, writeHash: false });
 })();
